@@ -146,7 +146,7 @@ docker-build:
 .PHONY: docker-run  ## Run Docker container
 docker-run:
 	@echo "Running Docker container..."
-	docker run -d --name $(CONTAINER_NAME) $(IMAGE_NAME)
+	docker run -d -p 8000:8000 --name $(CONTAINER_NAME) $(IMAGE_NAME)
 
 .PHONY: docker-stop  ## Stop Docker container
 docker-stop:
