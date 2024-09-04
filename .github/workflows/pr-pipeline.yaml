@@ -30,24 +30,32 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     #needs: pre-commit-checks
-
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Check out the repository
         uses: actions/checkout@v2
 
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION }}
+
       - name: Log in to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        run: |
+          aws ecr get-login-password --region ${{ vars.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+
 
       - name: Build Docker image
         run: |
-          REGION=${{ vars.AWS_REGION }}
-          ECR_REPOSITORY=${{ secrets.ECR_REGISTRY }}
+          ECR_REPOSITORY=${{ secrets.ECR_REPOSITORY }}
           IMAGE_TAG=latest
           # Build the Docker image
           docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
           # Tag the image
-          ECR_URI=$(aws ecr describe-repositories --repository-names $ECR_REPOSITORY --region $REGION --query "repositories[0].repositoryUri" --output text)
+          ECR_URI=$(aws ecr describe-repositories --repository-names $ECR_REPOSITORY --region ${{ vars.AWS_REGION }} --query "repositories[0].repositoryUri" --output text)
           docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_URI:$IMAGE_TAG
 
       - name: Push Docker image to Amazon ECR
