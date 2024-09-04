@@ -46,3 +46,7 @@ jobs:
       - name: Log in to Amazon ECR
         run: |
           aws ecr get-login-password --region ${{ vars.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+      - name: Build Docker image
+        run: |
+          # Build the Docker image
+          docker build -t ${{ secrets.ECR_REPOSITORY }}:$IMAGE_TAG .
