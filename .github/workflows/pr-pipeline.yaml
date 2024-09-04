@@ -49,4 +49,4 @@ jobs:
       - name: Build Docker image
         run: |
           # Build the Docker image
-          docker build -t ${{ secrets.ECR_REPOSITORY }}
+          docker build -t ac-api
