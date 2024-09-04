@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - cicd
-
-
 jobs:
   test-aws-connectivity:
     runs-on: ubuntu-latest
@@ -22,7 +20,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v3
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Test AWS connectivity by listing S3 buckets
         run: |
