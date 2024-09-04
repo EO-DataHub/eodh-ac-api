@@ -41,6 +41,7 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           aws-region: ${{ vars.AWS_REGION }}
+          IMAGE_TAG: "latest"
 
       - name: Log in to Amazon ECR
         run: |
