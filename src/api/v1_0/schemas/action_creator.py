@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from datetime import datetime  # noqa: TCH003
 from enum import Enum
+from typing import Any
 
-from fastapi_hypermodel import FrozenDict, HALFor, HALHyperModel, HALLinks
-from geojson_pydantic import Polygon  # noqa: TCH002
-from pydantic import UUID4, BaseModel, Field
+from fastapi_hypermodel import FrozenDict, HALFor, HALLinks
+from pydantic import UUID4, BaseModel
 
 
 class ActionCreatorJobStatus(str, Enum):
@@ -17,19 +17,9 @@ class ActionCreatorJobStatus(str, Enum):
     cancelled = "cancelled"
 
 
-class ActionCreatorFunction(str, Enum):
-    evi = "EVI"
-    ndvi = "NDVI"
-    ndwi = "NDWI"
-    savi = "SAVI"
-
-
 class ActionCreatorSubmissionRequest(BaseModel):
-    collection: str
-    date_range_start: datetime
-    date_range_end: datetime
-    aoi: Polygon
-    function: ActionCreatorFunction = ActionCreatorFunction.ndvi
+    function_name: str
+    function_params: dict[str, Any]
 
 
 class ActionCreatorJob(BaseModel):
@@ -45,17 +35,4 @@ class ActionCreatorJob(BaseModel):
     links: HALLinks = FrozenDict({
         "self": HALFor("get_status", {"correlation_id": "<correlation_id>"}),
         "cancel": HALFor("cancel", {"correlation_id": "<correlation_id>"}),
-    })
-
-
-class CollectionFunctions(BaseModel):
-    collection: str
-    functions: list[ActionCreatorFunction] = Field(default_factory=list, alias="functions")
-
-
-class FunctionCollection(HALHyperModel):
-    functions: list[CollectionFunctions]
-
-    links: HALLinks = FrozenDict({
-        "self": HALFor("get_available_functions"),
     })
