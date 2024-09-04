@@ -41,7 +41,7 @@ jobs:
       - name: Build Docker image
         run: |
           REGION=${{ vars.AWS_REGION }}
-          ECR_REPOSITORY=${{ secret.ECR_REGISTRY }}
+          ECR_REPOSITORY=${{ secrets.ECR_REGISTRY }}
           IMAGE_TAG=latest
           # Build the Docker image
           docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
