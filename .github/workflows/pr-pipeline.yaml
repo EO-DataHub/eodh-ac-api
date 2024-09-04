@@ -48,7 +48,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          ECR_REPOSITORY=${{ secrets.ECR_REPOSITORY }}
+          ECR_REPOSITORY=${{ secrets.ECR_REGISTRY }}
           IMAGE_TAG=latest
           
           # Check if ECR_REPOSITORY is set
