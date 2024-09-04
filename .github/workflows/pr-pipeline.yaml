@@ -56,4 +56,4 @@ jobs:
           docker tag ${{ secrets.ECR_REPOSITORY }}$IMAGE_TAG $ECR_URI$IMAGE_TAG
       - name: Push Docker image to Amazon ECR
         run: |
-          docker push $ECR_URI$IMAGE_TAG
+          docker push $ECR_URI
