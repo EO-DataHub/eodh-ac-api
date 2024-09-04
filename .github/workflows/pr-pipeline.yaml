@@ -49,4 +49,4 @@ jobs:
       - name: Build Docker image
         run: |
           # Build the Docker image
-          docker build -t ac-api
+          docker build -t ac-api:latest
