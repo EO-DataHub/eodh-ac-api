@@ -46,10 +46,18 @@ jobs:
         run: |
           aws ecr get-login-password --region ${{ vars.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
       - name: Build Docker image
+        env:
+          ECR_REPOSITORY: ${{ secrets.ECR_REGISTRY }}
+          IMAGE_TAG: latest
         run: |
+          # Extract repository name from the full URI
+          REPO_NAME=$(echo "$ECR_REPOSITORY" | awk -F'/' '{print $2}')
+          
           # Build the Docker image
-          docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
-          docker tag $ECR_REPOSITORY:$IMAGE_TAG
+          docker build -t $REPO_NAME:$IMAGE_TAG .
+          
+          # Tag the Docker image for ECR
+          docker tag $REPO_NAME:$IMAGE_TAG $ECR_REPOSITORY:$IMAGE_TAG
 
       - name: Push Docker image to Amazon ECR
         run: |
