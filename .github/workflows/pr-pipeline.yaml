@@ -1,38 +1,29 @@
 name: PR
 
 on:
-  pull_request:
+  push:
     branches:
-      - cicd
-  workflow_dispatch:
+      - main
+
+
 jobs:
-  build-and-push:
+  test-aws-connectivity:
     runs-on: ubuntu-latest
+
     permissions:
       id-token: write
       contents: read
 
-    needs: pre-commit-checks
-
     steps:
-      - name: Check out the repository
-        uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Log in to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Build Docker image
+      - name: Test AWS connectivity by listing S3 buckets
         run: |
-          REGION=${{ vars.AWS_REGION }}
-          ECR_REPOSITORY=${{ secrets.ECR_REGISTRY }}
-          IMAGE_TAG=latest
-          # Build the Docker image
-          docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
-          # Tag the image
-          ECR_URI=$(aws ecr describe-repositories --repository-names $ECR_REPOSITORY --region $REGION --query "repositories[0].repositoryUri" --output text)
-          docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_URI:$IMAGE_TAG
-
-      - name: Push Docker image to Amazon ECR
-        run: |
-          docker push $ECR_URI:$IMAGE_TAG
+          aws s3 ls
