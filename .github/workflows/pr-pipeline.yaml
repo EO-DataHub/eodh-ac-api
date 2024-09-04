@@ -74,10 +74,8 @@ jobs:
           REGION=${{ vars.AWS_REGION }}
           ECR_REPOSITORY=${{ secret.ECR_REGISTRY }}
           IMAGE_TAG=latest
-          
           # Build the Docker image
           docker build -t $ECR_REPOSITORY:$IMAGE_TAG .
-          
           # Tag the image
           ECR_URI=$(aws ecr describe-repositories --repository-names $ECR_REPOSITORY --region $REGION --query "repositories[0].repositoryUri" --output text)
           docker tag $ECR_REPOSITORY:$IMAGE_TAG $ECR_URI:$IMAGE_TAG
