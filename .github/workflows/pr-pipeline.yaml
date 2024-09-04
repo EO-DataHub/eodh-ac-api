@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - cicd
+  workflow_dispatch:
 jobs:
   pre-commit-checks:
     runs-on: ubuntu-latest
