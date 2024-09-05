@@ -2,22 +2,17 @@ from __future__ import annotations
 
 from typing import Annotated, Any
 
+import aiohttp
 import jwt
 import jwt.exceptions
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import PyJWKClient  # type: ignore[attr-defined]
-from pydantic import BaseModel
 
-from src.core.settings import current_settings
+from src.api.v1_0.schemas.auth import IntrospectResponse, TokenResponse
+from src.core.settings import Settings, current_settings
 
-
-class User(BaseModel):
-    username: str
-    email: str | None = None
-    full_name: str | None = None
-    disabled: bool | None = None
-
+_HEADERS = {"Content-Type": "application/x-www-form-urlencoded"}
 
 auth_router_v1_0 = APIRouter(
     prefix="/auth",
@@ -25,9 +20,10 @@ auth_router_v1_0 = APIRouter(
 )
 
 jwt_bearer_scheme = HTTPBearer()
+TIMEOUT = 30
 
 
-async def valid_access_token(
+async def decode_token(
     credential: Annotated[HTTPAuthorizationCredentials, Depends(jwt_bearer_scheme)],
 ) -> dict[str, Any]:
     optional_custom_headers = {"User-agent": "custom-user-agent"}
@@ -50,25 +46,80 @@ async def valid_access_token(
         ) from ex
 
 
-async def get_current_user(token_data: Annotated[dict[str, Any], Depends(valid_access_token)]) -> User:
-    return User(
-        username=token_data["sub"],
-        email=token_data.get("email"),
-        full_name=token_data.get("name"),
-        disabled=token_data.get("disabled", False),
-    )
+async def validate_access_token(
+    credential: Annotated[HTTPAuthorizationCredentials, Depends(jwt_bearer_scheme)],
+) -> HTTPAuthorizationCredentials:
+    await decode_token(credential)
+    return credential
 
 
-async def get_current_active_user(
-    current_user: Annotated[User, Depends(get_current_user)],
-) -> User:
-    if current_user.disabled:
-        raise HTTPException(status_code=401, detail="Inactive user")
-    return current_user
+@auth_router_v1_0.post(
+    "/token",
+    response_model=TokenResponse,
+    responses={
+        status.HTTP_200_OK: {
+            "description": "Successful response",
+        },
+        status.HTTP_400_BAD_REQUEST: {
+            "description": "Bad request - Request was malformed",
+        },
+        status.HTTP_401_UNAUTHORIZED: {
+            "description": "Unauthorized - Invalid client or Invalid client credentials",
+        },
+    },
+)
+async def authenticate(
+    username: str,
+    password: str,
+    settings: Annotated[Settings, Depends(current_settings)],
+) -> TokenResponse:
+    async with aiohttp.ClientSession() as session, session.get(
+        url=settings.eodh_auth.token_url,
+        headers=_HEADERS,
+        data={
+            "client_id": settings.eodh_auth.client_id,
+            "client_secret": settings.eodh_auth.client_secret,
+            "username": username,
+            "password": password,
+            "grant_type": "password",
+            "scope": "offline_access",
+        },
+        timeout=TIMEOUT,
+    ) as response:
+        if response.status != status.HTTP_200_OK:
+            raise HTTPException(status_code=response.status, detail=await response.json())
+        return TokenResponse(**await response.json())
 
 
-@auth_router_v1_0.get("/users/me")
-async def get_my_info(
-    current_user: Annotated[User, Depends(get_current_user)],
-) -> User:
-    return current_user
+@auth_router_v1_0.post(
+    "/token/introspection",
+    response_model=IntrospectResponse,
+    responses={
+        status.HTTP_200_OK: {
+            "description": "Successful response",
+        },
+        status.HTTP_400_BAD_REQUEST: {
+            "description": "Bad request - Request was malformed",
+        },
+        status.HTTP_401_UNAUTHORIZED: {
+            "description": "Unauthorized - Invalid token",
+        },
+    },
+)
+async def token_introspection(
+    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
+    settings: Annotated[Settings, Depends(current_settings)],
+) -> IntrospectResponse:
+    async with aiohttp.ClientSession() as session, session.post(
+        settings.eodh_auth.introspect_url,
+        headers=_HEADERS,
+        data={
+            "client_id": settings.eodh_auth.client_id,
+            "client_secret": settings.eodh_auth.client_secret,
+            "token": credential.credentials,
+        },
+        timeout=TIMEOUT,
+    ) as response:
+        if response.status != status.HTTP_200_OK:
+            raise HTTPException(status_code=response.status, detail=await response.json())
+        return IntrospectResponse(**await response.json())

@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-import typing
 import uuid
 from datetime import datetime, timezone
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
+from fastapi.security import HTTPAuthorizationCredentials  # noqa: TCH002
 from fastapi_hypermodel import (
     HALResponse,
 )
@@ -23,9 +23,6 @@ from src.api.v1_0.schemas import (
 )
 from src.consts.action_creator import FUNCTIONS
 from src.services.action_creator_repo import ActionCreatorRepository
-
-if typing.TYPE_CHECKING:
-    from fastapi.security import HTTPAuthorizationCredentials
 
 action_creator_router_v1_0 = APIRouter(
     prefix="/action-creator",

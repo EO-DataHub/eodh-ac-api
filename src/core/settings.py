@@ -30,7 +30,7 @@ class OAuth2Settings(BaseModel):
 
     @property
     def introspect_url(self) -> str:
-        return self.oid_url + "/introspect"
+        return self.token_url + "/introspect"
 
     @property
     def certs_url(self) -> str:
