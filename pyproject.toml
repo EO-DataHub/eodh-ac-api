@@ -183,6 +183,7 @@ plugins = "numpy.typing.mypy_plugin"
 
 [[tool.mypy.overrides]]
 module = [
+    "aiohttp.*",
     "fastapi.*",
     "fastapi_hypermodel.*",
     "geojson_pydantic.*",
