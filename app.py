@@ -21,7 +21,7 @@ app = FastAPI(
 v1_0_app = FastAPI(
     title="EOPro Action Creator API", version="1.0.0", description="Mockup of an API for Action Creator."
 )
-HALHyperModel.init_app(app)
+HALHyperModel.init_app(v1_0_app)
 
 v1_0_app.include_router(action_creator_router_v1_0)
 v1_0_app.include_router(auth_router_v1_0)
