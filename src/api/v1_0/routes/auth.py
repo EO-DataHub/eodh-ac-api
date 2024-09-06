@@ -73,7 +73,7 @@ async def authenticate(
     password: str,
     settings: Annotated[Settings, Depends(current_settings)],
 ) -> TokenResponse:
-    async with aiohttp.ClientSession() as session, session.get(
+    async with aiohttp.ClientSession() as session, session.post(
         url=settings.eodh_auth.token_url,
         headers=_HEADERS,
         data={
