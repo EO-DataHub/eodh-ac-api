@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import Annotated
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.security import HTTPAuthorizationCredentials  # noqa: TCH002
 from fastapi_hypermodel import (
     HALResponse,
@@ -13,13 +13,13 @@ from geojson_pydantic import Polygon
 from pydantic import UUID4  # noqa: TCH002
 from starlette import status
 
-from src.api.v1_0.routes.auth import jwt_bearer_scheme  # noqa: TCH001
+from src.api.v1_0.routes.auth import validate_access_token  # noqa: TCH001
 from src.api.v1_0.schemas import (
     ActionCreatorFunctionSpec,
     ActionCreatorJob,
     ActionCreatorJobStatus,
     ActionCreatorSubmissionRequest,
-    FunctionCollection,
+    FunctionsResponse,
 )
 from src.consts.action_creator import FUNCTIONS
 from src.services.action_creator_repo import ActionCreatorRepository
@@ -36,20 +36,7 @@ def get_function_repo() -> ActionCreatorRepository:
 
 @action_creator_router_v1_0.get(
     "/functions",
-    response_model=FunctionCollection,
-    response_model_exclude_unset=True,
-    response_class=HALResponse,
-)
-async def get_available_functions(
-    repo: Annotated[ActionCreatorRepository, Depends(get_function_repo)],
-    credential: Annotated[HTTPAuthorizationCredentials, Depends(jwt_bearer_scheme)],  # noqa: ARG001
-) -> FunctionCollection:
-    return FunctionCollection(functions=[ActionCreatorFunctionSpec(**f) for f in repo.get_available_functions()])
-
-
-@action_creator_router_v1_0.get(
-    "/functions/{collection}",
-    response_model=FunctionCollection,
+    response_model=FunctionsResponse,
     response_model_exclude_unset=True,
     response_class=HALResponse,
     responses={
@@ -58,14 +45,18 @@ async def get_available_functions(
         }
     },
 )
-async def get_available_functions_for_collection(
-    collection: str,
+async def get_available_functions(
     repo: Annotated[ActionCreatorRepository, Depends(get_function_repo)],
-    credential: Annotated[HTTPAuthorizationCredentials, Depends(jwt_bearer_scheme)],  # noqa: ARG001
-) -> FunctionCollection:
-    return FunctionCollection(
-        functions=[ActionCreatorFunctionSpec(**f) for f in repo.get_available_functions_for_collection(collection)]
-    )
+    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
+    collection: Annotated[str | None, Query(max_length=64, description="STAC collection")] = None,
+) -> FunctionsResponse:
+    collection_supported_flag, results = repo.get_available_functions(collection)
+    if not collection_supported_flag:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Collection does not exist or is not supported by Action Creator",
+        )
+    return FunctionsResponse(functions=[ActionCreatorFunctionSpec(**f) for f in results])
 
 
 @action_creator_router_v1_0.post(
@@ -77,7 +68,7 @@ async def get_available_functions_for_collection(
 )
 async def submit_function(
     creation_spec: ActionCreatorSubmissionRequest,
-    credential: Annotated[HTTPAuthorizationCredentials, Depends(jwt_bearer_scheme)],  # noqa: ARG001
+    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
 ) -> ActionCreatorJob:
     return ActionCreatorJob(
         correlation_id=uuid.uuid4(),
@@ -95,7 +86,7 @@ async def submit_function(
     status_code=status.HTTP_202_ACCEPTED,
 )
 async def get_function_submissions(
-    credential: Annotated[HTTPAuthorizationCredentials, Depends(jwt_bearer_scheme)],  # noqa: ARG001
+    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
 ) -> list[ActionCreatorJob]:
     return [
         ActionCreatorJob(
@@ -134,7 +125,7 @@ async def get_function_submissions(
 )
 async def get_status(
     correlation_id: UUID4,
-    credential: Annotated[HTTPAuthorizationCredentials, Depends(jwt_bearer_scheme)],  # noqa: ARG001
+    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
 ) -> ActionCreatorJob:
     return ActionCreatorJob(
         correlation_id=correlation_id,
@@ -170,5 +161,5 @@ async def get_status(
 )
 async def cancel(
     correlation_id: UUID4,  # noqa: ARG001
-    credential: Annotated[HTTPAuthorizationCredentials, Depends(jwt_bearer_scheme)],  # noqa: ARG001
+    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
 ) -> None: ...

@@ -1,17 +1,9 @@
 from __future__ import annotations
 
-from enum import Enum
 from typing import Any
 
 from fastapi_hypermodel import FrozenDict, HALFor, HALHyperModel, HALLinks
 from pydantic import BaseModel
-
-
-class RasterCalculatorIndex(str, Enum):
-    evi = "EVI"
-    ndvi = "NDVI"
-    ndwi = "NDWI"
-    savi = "SAVI"
 
 
 class FuncParameterSpec(BaseModel):
@@ -24,11 +16,10 @@ class FuncParameterSpec(BaseModel):
 
 class ActionCreatorFunctionSpec(BaseModel):
     name: str
-    supported_collections: list[str]
     parameters: dict[str, FuncParameterSpec]
 
 
-class FunctionCollection(HALHyperModel):
+class FunctionsResponse(HALHyperModel):
     functions: list[ActionCreatorFunctionSpec]
 
     links: HALLinks = FrozenDict({
