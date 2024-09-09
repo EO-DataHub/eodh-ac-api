@@ -3,6 +3,11 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 
+class TokenRequest(BaseModel):
+    username: str
+    password: str
+
+
 class User(BaseModel):
     username: str
     email: str | None = None

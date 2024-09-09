@@ -21,17 +21,12 @@ from src.api.v1_0.schemas import (
     ActionCreatorSubmissionRequest,
     FunctionsResponse,
 )
-from src.consts.action_creator import FUNCTIONS
-from src.services.action_creator_repo import ActionCreatorRepository
+from src.services.action_creator_repo import ActionCreatorRepository, get_function_repo  # noqa: TCH001
 
 action_creator_router_v1_0 = APIRouter(
     prefix="/action-creator",
     tags=["Action Creator"],
 )
-
-
-def get_function_repo() -> ActionCreatorRepository:
-    return ActionCreatorRepository(FUNCTIONS)
 
 
 @action_creator_router_v1_0.get(

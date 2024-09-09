@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import PyJWKClient  # type: ignore[attr-defined]
 
-from src.api.v1_0.schemas.auth import IntrospectResponse, TokenResponse
+from src.api.v1_0.schemas.auth import IntrospectResponse, TokenRequest, TokenResponse
 from src.core.settings import Settings, current_settings
 
 _HEADERS = {"Content-Type": "application/x-www-form-urlencoded"}
@@ -69,8 +69,7 @@ async def validate_access_token(
     },
 )
 async def authenticate(
-    username: str,
-    password: str,
+    token_request: TokenRequest,
     settings: Annotated[Settings, Depends(current_settings)],
 ) -> TokenResponse:
     async with aiohttp.ClientSession() as session, session.post(
@@ -79,8 +78,8 @@ async def authenticate(
         data={
             "client_id": settings.eodh_auth.client_id,
             "client_secret": settings.eodh_auth.client_secret,
-            "username": username,
-            "password": password,
+            "username": token_request.username,
+            "password": token_request.password,
             "grant_type": "password",
             "scope": "offline_access",
         },
