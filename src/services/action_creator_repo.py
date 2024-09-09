@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 from typing import Any
 
+from src.consts.action_creator import FUNCTIONS
 from src.services.db import AbstractActionCreatorRepository
 
 
@@ -22,3 +23,7 @@ class ActionCreatorRepository(AbstractActionCreatorRepository):
                 for c in f["parameters"]["collection"]["options"]:
                     _funcs[c].append(f)
         return collection in _funcs, _funcs[collection]
+
+
+def get_function_repo() -> ActionCreatorRepository:
+    return ActionCreatorRepository(FUNCTIONS)
