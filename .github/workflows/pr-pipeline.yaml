@@ -27,3 +27,36 @@ jobs:
     - name: Run simplified pre-commit hooks
       run: |
         SKIP=pytest-check pre-commit run --all-files
+
+  tests:
+    defaults:
+      run:
+        # Ensure the environment is activated
+        # <https://github.com/mamba-org/provision-with-micromamba#important>
+        shell: bash -l {0}
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v2
+
+    - name: Install Micromamba
+      uses: mamba-org/setup-micromamba@v1
+      with:
+        environment-file: conda-lock-dev.yml
+        environment-name: conda-lock-dev
+
+    - name: Run unit tests
+      run: |
+        pytest --cov=src tests/
+      env:
+        API_KEY: ${{ secrets.API_KEY }}
+
+    - name: Upload test coverage results
+      uses: codecov/codecov-action@v2
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
