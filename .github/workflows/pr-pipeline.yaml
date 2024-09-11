@@ -31,7 +31,7 @@ jobs:
 
     - name: Install packages
       run: |
-        conda-lock install -f conda-lock-dev.yml
+        conda-lock install --mamba conda-lock-dev.yml
 
     - name: Install pre-commit
       run: |
