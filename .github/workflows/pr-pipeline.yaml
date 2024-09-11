@@ -5,6 +5,8 @@ on:
     branches:
       - main
 
+permissions: write-all
+
 jobs:
   pr-checks:
     defaults:
@@ -36,7 +38,7 @@ jobs:
 
     - name: Run unit tests
       run: |
-        pytest --cov=src tests/ --cov-report xml:coverage/coverage.xml
+        pytest -vv --cov=src tests/ --cov-report xml:coverage/coverage.xml
       env:
         EODH_AUTH__BASE_URL: ${{ secrets.EODH_AUTH__BASE_URL }}
         EODH_AUTH__REALM: ${{ secrets.EODH_AUTH__REALM }}
