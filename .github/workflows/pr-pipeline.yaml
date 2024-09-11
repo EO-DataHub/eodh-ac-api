@@ -27,7 +27,6 @@ jobs:
           python=3.11
           conda-lock
           mamba
-        generate-run-shell: false
 
     - name: Install packages
       run: |
