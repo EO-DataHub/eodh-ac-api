@@ -22,7 +22,7 @@ jobs:
     - name: Install Micromamba
       uses: mamba-org/setup-micromamba@v1
       with:
-        environment-name: ci-env
+        environment-name: base-env
         create-args: >-
           python=3.11
           conda-lock
@@ -31,11 +31,11 @@ jobs:
 
     - name: Install packages
       run: |
-        conda-lock install --mamba conda-lock-dev.yml
+        conda-lock install --mamba -n ci-env conda-lock-dev.yml
 
     - name: Install pre-commit
       run: |
-        pre-commit install
+        conda activate ci-env; pre-commit install
 
     - name: Run simplified pre-commit hooks
       run: |
