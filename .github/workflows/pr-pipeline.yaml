@@ -34,7 +34,7 @@ jobs:
 
     - name: Install pre-commit
       run: |
-        mamba activate ci-env; pre-commit install
+        pre-commit install
 
     - name: Run simplified pre-commit hooks
       run: |
