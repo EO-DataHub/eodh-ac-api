@@ -39,7 +39,7 @@ jobs:
 
     steps:
     - name: Check out the repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Install Micromamba
       uses: mamba-org/setup-micromamba@v1
