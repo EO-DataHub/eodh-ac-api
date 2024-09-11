@@ -38,6 +38,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+
     - name: Check out the repository
       uses: actions/checkout@v4
 
@@ -46,6 +48,7 @@ jobs:
       with:
         environment-file: conda-lock-dev.yml
         environment-name: conda-lock-dev
+        generate-run-shell: false
 
     - name: Run unit tests
       run: |
