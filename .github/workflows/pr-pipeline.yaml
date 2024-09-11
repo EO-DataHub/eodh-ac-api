@@ -30,7 +30,7 @@ jobs:
 
     - name: Install packages
       run: |
-        conda-lock install --mamba -n ci-env conda-lock-dev.yml
+        conda-lock install --mamba -n base-env conda-lock-dev.yml
 
     - name: Install pre-commit
       run: |
