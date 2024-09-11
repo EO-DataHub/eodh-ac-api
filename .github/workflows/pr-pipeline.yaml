@@ -49,14 +49,20 @@ jobs:
 
     - name: Run unit tests
       run: |
-        pytest --cov=src tests/
+        pytest --cov=src tests/ --cov-report xml:coverage/coverage.xml
       env:
-        API_KEY: ${{ secrets.API_KEY }}
+        EODH_AUTH__BASE_URL: ${{ secrets.EODH_AUTH__BASE_URL }}
+        EODH_AUTH__REALM: ${{ secrets.EODH_AUTH__REALM }}
+        EODH_AUTH__USERNAME: ${{ secrets.EODH_AUTH__USERNAME }}
+        EODH_AUTH__PASSWORD: ${{ secrets.EODH_AUTH__PASSWORD }}
+        EODH_AUTH__CLIENT_ID: ${{ secrets.EODH_AUTH__CLIENT_ID }}
+        EODH_AUTH__CLIENT_SECRET: ${{ secrets.EODH_AUTH__CLIENT_SECRET }}
 
-    - name: Upload test coverage results
-      uses: codecov/codecov-action@v2
+    - name: Get code coverage
+      uses: orgoro/coverage@v3.2
       with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        files: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella
+          coverageFile: coverage/coverage.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          thresholdAll: 0.7
+          thresholdNew: 0.7
+          thresholdModified: 0.0
