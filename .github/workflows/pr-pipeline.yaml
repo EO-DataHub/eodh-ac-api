@@ -22,7 +22,7 @@ jobs:
     - name: Install Micromamba
       uses: mamba-org/setup-micromamba@v1
       with:
-        environment-file: conda-lock-tmp.yml
+        environment-file: envs/conda-lock-tmp.yml
         environment-name: ci-env
 
     - name: Install pre-commit
