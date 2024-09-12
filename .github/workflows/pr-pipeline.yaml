@@ -58,6 +58,6 @@ jobs:
       - name: Push Docker image to Amazon ECR
         run: |
           for TAG in "${TAGS[@]}"; do
-            docker tag ${{ secrets.ECR_REPOSITORY }}:latest $ECR_URI:$TAG
+            docker tag ${{ secrets.ECR_REPOSITORY }} $ECR_URI:$TAG
             docker push $ECR_URI:$TAG
           done
