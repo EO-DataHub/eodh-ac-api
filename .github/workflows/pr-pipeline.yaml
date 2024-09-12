@@ -53,7 +53,9 @@ jobs:
           docker build -t ${{ secrets.ECR_REPOSITORY }}$IMAGE_TAG .
           # Tag the image
           ECR_URI=$(aws ecr describe-repositories --repository-names ${{ secrets.ECR_REPOSITORY }} --region ${{ vars.AWS_REGION }} --query "repositories[0].repositoryUri" --output text)
-          docker tag ${{ secrets.ECR_REPOSITORY }}$IMAGE_TAG $ECR_URI$IMAGE_TAG
       - name: Push Docker image to Amazon ECR
         run: |
-          docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}$IMAGE_TAG
+          for TAG in "${TAGS[@]}"; do
+            docker tag ${{ secrets.ECR_REPOSITORY }}$IMAGE_TAG $ECR_URI:$TAG
+            docker push $ECR_URI:$TAG
+          done
