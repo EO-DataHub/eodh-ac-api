@@ -42,7 +42,6 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           aws-region: ${{ vars.AWS_REGION }}
-          IMAGE_TAG: "latest"
 
       - name: Log in to Amazon ECR
         run: |
@@ -50,12 +49,13 @@ jobs:
       - name: Build Docker image
         run: |
           # Build the Docker image
-          docker build -t ${{ secrets.ECR_REPOSITORY }}$IMAGE_TAG .
+          TAGS=("latest" "dev")
+          docker build -t ${{ secrets.ECR_REPOSITORY }}${TAGS[0]} .
           # Tag the image
           ECR_URI=$(aws ecr describe-repositories --repository-names ${{ secrets.ECR_REPOSITORY }} --region ${{ vars.AWS_REGION }} --query "repositories[0].repositoryUri" --output text)
       - name: Push Docker image to Amazon ECR
         run: |
           for TAG in "${TAGS[@]}"; do
-            docker tag ${{ secrets.ECR_REPOSITORY }}$IMAGE_TAG $ECR_URI:$TAG
+            docker tag ${{ secrets.ECR_REPOSITORY }}:${TAGS[0]} $ECR_URI:$TAG
             docker push $ECR_URI:$TAG
           done
