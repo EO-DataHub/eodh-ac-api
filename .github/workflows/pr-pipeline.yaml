@@ -81,5 +81,5 @@ jobs:
           ECR_URI=$(aws ecr describe-repositories --repository-names ${{ secrets.ECR_REPOSITORY }} --region ${{ vars.AWS_REGION }} --query "repositories[0].repositoryUri" --output text)
       - name: Push Docker image to Amazon ECR
         run: |
-          for TAG in ${TAGS[@]}; do docker tag $IMAGE_ID ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}$TAG; done
-          for TAG in ${TAGS[@]}; do docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}$TAG; done
+          for TAG in ${TAGS[@]}; do docker tag $IMAGE_ID ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:$TAG; done
+          for TAG in ${TAGS[@]}; do docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:$TAG; done
