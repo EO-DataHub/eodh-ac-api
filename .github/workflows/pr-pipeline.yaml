@@ -76,7 +76,7 @@ jobs:
       - name: Set up image tags
         run: |
           # Define the tags as a list
-          TAGS=("latest" "dev" ${BUILD_ID})
+          TAGS=("latest" "dev" ${GITHUB_SHA})
           echo "TAGS=${TAGS[@]}" >> $GITHUB_ENV
       - name: Build Docker image
         run: |
