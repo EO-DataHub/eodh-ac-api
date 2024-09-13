@@ -41,7 +41,6 @@ class Settings(BaseSettings):
     """Represents Application Settings with nested configuration sections."""
 
     environment: str = "local"
-    api_key: str
     eodh_auth: OAuth2Settings
 
     model_config = SettingsConfigDict(
