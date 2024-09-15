@@ -93,6 +93,7 @@ jobs:
           done
   release-qa:
     runs-on: ubuntu-latest
+    environment: qa
     needs: build-and-push
     permissions:
        id-token: write
