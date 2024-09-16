@@ -114,29 +114,29 @@ jobs:
       - name: Update ECS service
         run: |
           aws --region ${{ vars.AWS_REGION }} ecs update-service --cluster ${{ vars.TAGS }} --service ${{ secrets.ECR_REPOSITORY }} --force-new-deployment
-    release-staging:
-      runs-on: ubuntu-latest
-      environment: staging
-      needs: release-qa
-      permissions:
-        id-token: write
-        contents: read
-      steps:
-        - name: Check out the repository
-          uses: actions/checkout@v2
-        - name: Configure AWS credentials using OIDC
-          uses: aws-actions/configure-aws-credentials@v3
-          with:
-            role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-            aws-region: ${{ vars.AWS_REGION }}
-        - name: Log in to Amazon ECR
-          run: |
-            aws ecr get-login-password --region ${{ vars.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
-        - name: Tag and push Docker image to Amazon ECR
-          run: |
-            # Get the ECR URI
-            MANIFEST=$(aws ecr batch-get-image --repository-name ${{ secrets.ECR_REPOSITORY }} --region ${{ vars.AWS_REGION }} --image-ids imageTag=${GITHUB_SHA} --query 'images[].imageManifest' --output text)
-            aws ecr put-image --repository-name ${{ secrets.ECR_REPOSITORY }} --image-tag ${{ vars.TAGS }} --image-manifest "$MANIFEST" --region ${{ vars.AWS_REGION }}
-        - name: Update ECS service
-          run: |
-            aws --region ${{ vars.AWS_REGION }} ecs update-service --cluster ${{ vars.TAGS }} --service ${{ secrets.ECR_REPOSITORY }} --force-new-deployment
+  release-staging:
+     runs-on: ubuntu-latest
+     environment: staging
+     needs: release-qa
+     permissions:
+       id-token: write
+       contents: read
+     steps:
+       - name: Check out the repository
+         uses: actions/checkout@v2
+       - name: Configure AWS credentials using OIDC
+         uses: aws-actions/configure-aws-credentials@v3
+         with:
+           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+           aws-region: ${{ vars.AWS_REGION }}
+       - name: Log in to Amazon ECR
+         run: |
+          aws ecr get-login-password --region ${{ vars.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+       - name: Tag and push Docker image to Amazon ECR
+         run: |
+           # Get the ECR URI
+           MANIFEST=$(aws ecr batch-get-image --repository-name ${{ secrets.ECR_REPOSITORY }} --region ${{ vars.AWS_REGION }} --image-ids imageTag=${GITHUB_SHA} --query 'images[].imageManifest' --output text)
+           aws ecr put-image --repository-name ${{ secrets.ECR_REPOSITORY }} --image-tag ${{ vars.TAGS }} --image-manifest "$MANIFEST" --region ${{ vars.AWS_REGION }}
+       - name: Update ECS service
+         run: |
+           aws --region ${{ vars.AWS_REGION }} ecs update-service --cluster ${{ vars.TAGS }} --service ${{ secrets.ECR_REPOSITORY }} --force-new-deployment
