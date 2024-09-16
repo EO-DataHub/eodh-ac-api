@@ -86,7 +86,7 @@ jobs:
           # Get the ECR URI
           ECR_URI=$(aws ecr describe-repositories --repository-names ${{ secrets.ECR_REPOSITORY }} --region ${{ vars.AWS_REGION }} --query "repositories[0].repositoryUri" --output text)
           # Loop through the tags and push each one
-          for TAG in ${{ vars.TAGS[@] }} ${GITHUB_SHA}; do
+          for TAG in ${{ vars.TAGS }} ${GITHUB_SHA}; do
             docker tag ${{ secrets.ECR_REPOSITORY }}:latest $ECR_URI:$TAG
             docker push $ECR_URI:$TAG
           done
