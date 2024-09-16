@@ -116,9 +116,9 @@ jobs:
         run: |
           # Get the ECR URI
           MANIFEST=$(aws ecr batch-get-image --repository-name ${{ secrets.ECR_REPOSITORY }} --region ${{ vars.AWS_REGION }} --image-ids imageTag=${GITHUB_SHA} --query 'images[].imageManifest' --output text)
-          aws ecr put-image --repository-name ${{ secrets.ECR_REPOSITORY }} --image-tag ${{ vars.$TAGS }} --image-manifest "$MANIFEST" --region ${{ vars.AWS_REGION }}
+          aws ecr put-image --repository-name ${{ secrets.ECR_REPOSITORY }} --image-tag ${{ vars.TAGS }} --image-manifest "$MANIFEST" --region ${{ vars.AWS_REGION }}
       - name: Update ECS service
         run: |
           CLUSTER_NAME="${{ github.workflow }}-${{ github.ref_name }}"
           echo "CLUSTER_NAME=$CLUSTER_NAME" >> $GITHUB_ENV
-          aws --region ${{ vars.AWS_REGION }} ecs update-service --cluster ${{ vars.$TAGS }} --service ${{ secrets.ECR_REPOSITORY }} --force-new-deployment
+          aws --region ${{ vars.AWS_REGION }} ecs update-service --cluster ${{ vars.TAGS }} --service ${{ secrets.ECR_REPOSITORY }} --force-new-deployment
