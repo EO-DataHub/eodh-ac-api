@@ -54,7 +54,7 @@ jobs:
 
   build-and-push:
     runs-on: ubuntu-latest
-    environment: qa
+    environment: dev
     needs: pr-checks
     permissions:
       id-token: write
