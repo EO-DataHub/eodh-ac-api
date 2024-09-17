@@ -122,6 +122,17 @@ jobs:
           # Get the ECR URI
           MANIFEST=$(aws ecr batch-get-image --repository-name ${{ secrets.ECR_REPOSITORY }} --region ${{ vars.AWS_REGION }} --image-ids imageTag=${GITHUB_SHA} --query 'images[].imageManifest' --output text)
           aws ecr put-image --repository-name ${{ secrets.ECR_REPOSITORY }} --image-tag ${{ vars.TAGS }} --image-manifest "$MANIFEST" --region ${{ vars.AWS_REGION }}
+      - name: Create file with environment variables
+        run: |
+          echo "EODH_AUTH__BASE_URL=${{ secrets.EODH_AUTH__BASE_URL }}" > envs.env
+          echo "EODH_AUTH__CLIENT_ID=${{ secrets.EODH_AUTH__CLIENT_ID }}" >> envs.env
+          echo "EODH_AUTH__CLIENT_SECRET=${{ secrets.EODH_AUTH__CLIENT_SECRET }}" >> envs.env
+          echo "EODH_AUTH__PASSWORD=${{ secrets.EODH_AUTH__PASSWORD }}" >> envs.env
+          echo "EODH_AUTH__REALM=${{ secrets.EODH_AUTH__REALM }}" >> envs.env
+          echo "EODH_AUTH__USERNAME=${{ secrets.EODH_AUTH__USERNAME }}" >> envs.env
+      - name: Upload file as artifact
+        run: |
+          aws s3 cp envs.env s3://ukri-task-definition-variables/${{ vars.TAGS }}/
       - name: Update ECS service
         run: |
           aws --region ${{ vars.AWS_REGION }} ecs update-service --cluster ${{ vars.TAGS }} --service ${{ secrets.ECR_REPOSITORY }} --force-new-deployment
@@ -148,6 +159,17 @@ jobs:
            # Get the ECR URI
            MANIFEST=$(aws ecr batch-get-image --repository-name ${{ secrets.ECR_REPOSITORY }} --region ${{ vars.AWS_REGION }} --image-ids imageTag=${GITHUB_SHA} --query 'images[].imageManifest' --output text)
            aws ecr put-image --repository-name ${{ secrets.ECR_REPOSITORY }} --image-tag ${{ vars.TAGS }} --image-manifest "$MANIFEST" --region ${{ vars.AWS_REGION }}
+       - name: Create file with environment variables
+         run: |
+           echo "EODH_AUTH__BASE_URL=${{ secrets.EODH_AUTH__BASE_URL }}" > envs.env
+           echo "EODH_AUTH__CLIENT_ID=${{ secrets.EODH_AUTH__CLIENT_ID }}" >> envs.env
+           echo "EODH_AUTH__CLIENT_SECRET=${{ secrets.EODH_AUTH__CLIENT_SECRET }}" >> envs.env
+           echo "EODH_AUTH__PASSWORD=${{ secrets.EODH_AUTH__PASSWORD }}" >> envs.env
+           echo "EODH_AUTH__REALM=${{ secrets.EODH_AUTH__REALM }}" >> envs.env
+           echo "EODH_AUTH__USERNAME=${{ secrets.EODH_AUTH__USERNAME }}" >> envs.env
+       - name: Upload file as artifact
+         run: |
+           aws s3 cp envs.env s3://ukri-task-definition-variables/${{ vars.TAGS }}/
        - name: Update ECS service
          run: |
            aws --region ${{ vars.AWS_REGION }} ecs update-service --cluster ${{ vars.TAGS }} --service ${{ secrets.ECR_REPOSITORY }} --force-new-deployment
