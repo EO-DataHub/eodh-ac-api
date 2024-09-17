@@ -112,6 +112,8 @@ ignore = [
     "DJ", # see: https://pypi.org/project/flake8-django - not used
     "TD", # see: https://pypi.org/project/flake8-todos - too restrictive
     "FIX", # see: https://pypi.org/project/flake8-fixme - too restrictive
+    "PLR0913", # see: https://pypi.org/project/Pylint - Too many arguments in function definition
+    "PLR0917", # see: https://pypi.org/project/Pylint - Too many positional arguments
 ]
 
 [tool.ruff.format]
@@ -184,6 +186,7 @@ plugins = "numpy.typing.mypy_plugin"
 [[tool.mypy.overrides]]
 module = [
     "aiohttp.*",
+    "aiohttp_retry.*",
     "fastapi.*",
     "fastapi_hypermodel.*",
     "geojson_pydantic.*",
