@@ -85,6 +85,19 @@ jobs:
             docker tag ${{ secrets.ECR_REPOSITORY }}:latest $ECR_URI:$TAG
             docker push $ECR_URI:$TAG
           done
+      - name: Create file with environment variables
+        run: |
+          echo "EODH_AUTH__BASE_URL=${{ secrets.EODH_AUTH__BASE_URL }}" > envs.env
+          echo "EODH_AUTH__CLIENT_ID=${{ secrets.EODH_AUTH__CLIENT_ID }}" >> envs.env
+          echo "EODH_AUTH__CLIENT_SECRET=${{ secrets.EODH_AUTH__CLIENT_SECRET }}" >> envs.env
+          echo "EODH_AUTH__PASSWORD=${{ secrets.EODH_AUTH__PASSWORD }}" >> envs.env
+          echo "EODH_AUTH__REALM=${{ secrets.EODH_AUTH__REALM }}" >> envs.env
+          echo "EODH_AUTH__USERNAME=${{ secrets.EODH_AUTH__USERNAME }}" >> envs.env
+      - name: Upload file as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: envs.env
+          path: s3://ukri-task-definition-variables/dev/
       - name: Update ECS service
         run: |
           aws --region ${{ vars.AWS_REGION }} ecs update-service --cluster ${{ vars.TAGS }} --service ${{ secrets.ECR_REPOSITORY }} --force-new-deployment
