@@ -94,10 +94,8 @@ jobs:
           echo "EODH_AUTH__REALM=${{ secrets.EODH_AUTH__REALM }}" >> envs.env
           echo "EODH_AUTH__USERNAME=${{ secrets.EODH_AUTH__USERNAME }}" >> envs.env
       - name: Upload file as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: envs.env
-          path: s3://ukri-task-definition-variables/dev/
+        run: |
+          aws s3 cp envs.env s3://ukri-task-definition-variables/${{ vars.TAGS }}/
       - name: Update ECS service
         run: |
           aws --region ${{ vars.AWS_REGION }} ecs update-service --cluster ${{ vars.TAGS }} --service ${{ secrets.ECR_REPOSITORY }} --force-new-deployment
