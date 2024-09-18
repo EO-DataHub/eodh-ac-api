@@ -47,6 +47,9 @@ jobs:
         EODH_AUTH__PASSWORD: ${{ secrets.EODH_AUTH__PASSWORD }}
         EODH_AUTH__CLIENT_ID: ${{ secrets.EODH_AUTH__CLIENT_ID }}
         EODH_AUTH__CLIENT_SECRET: ${{ secrets.EODH_AUTH__CLIENT_SECRET }}
+        ADES__URL: ${{ secrets.ADES__URL }}
+        ADES__OGC_PROCESSES_API_PATH: ${{ secrets.ADES__OGC_PROCESSES_API_PATH }}
+        ADES__OGC_JOBS_API_PATH: ${{ secrets.ADES__OGC_JOBS_API_PATH }}
 
     - name: Get code coverage
       uses: orgoro/coverage@v3.2
