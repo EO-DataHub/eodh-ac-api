@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from pydantic import BaseModel, Field
 
 
@@ -59,7 +61,7 @@ class AdesProcessesResponse(BaseModel):
     number_total: int = Field(..., alias="numberTotal")
 
 
-class Job(BaseModel):
+class AdesJobResponse(BaseModel):
     job_id: str = Field(..., alias="jobID")
     type: str
     process_id: str = Field(..., alias="processID")
@@ -73,7 +75,7 @@ class Job(BaseModel):
 
 
 class AdesJobSubmissionsResponse(BaseModel):
-    jobs: list[Job]
+    jobs: list[AdesJobResponse]
     links: list[Link]
     number_total: int = Field(..., alias="numberTotal")
 
@@ -112,3 +114,13 @@ class AdesProcessDetailsResponse(BaseModel):
     links: list[Link]
     inputs: dict[str, Input]
     outputs: Outputs
+
+
+class AdesJobExecutionErrorResponse(BaseModel):
+    title: str
+    type: str
+    detail: str
+
+
+class AdesJobExecutionResultsResponse(BaseModel):
+    results: dict[str, Any]
