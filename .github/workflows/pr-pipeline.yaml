@@ -4,52 +4,48 @@ on:
   pull_request:
     branches:
       - main
-
 permissions: write-all
 
 jobs:
   pr-checks:
     defaults:
       run:
-        # Ensure the environment is activated
-        # <https://github.com/mamba-org/provision-with-micromamba#important>
         shell: bash -l {0}
-
     runs-on: ubuntu-latest
 
     steps:
-    - name: Check out the repository
-      uses: actions/checkout@v4
+      - name: Check out the repository
+        uses: actions/checkout@v2
 
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.11'
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install -r requirements.txt
-        pip install pre-commit pytest pytest-asyncio pytest-cov pytest-mock pytest-pretty
-        pre-commit install
+      - name: Install dependencies
+        run: |
+          python -m pip install -r requirements.txt
+          pip install pre-commit pytest pytest-asyncio pytest-cov pytest-mock pytest-pretty
+          pre-commit install
 
-    - name: Run simplified pre-commit hooks
-      run: |
-        SKIP=pytest-check pre-commit run --all-files
+      - name: Run simplified pre-commit hooks
+        run: |
+          SKIP=pytest-check pre-commit run --all-files
 
-    - name: Run unit tests
-      run: |
-        pytest -vv --cov=src tests/ --cov-report xml:coverage/coverage.xml
-      env:
-        EODH_AUTH__BASE_URL: ${{ secrets.EODH_AUTH__BASE_URL }}
-        EODH_AUTH__REALM: ${{ secrets.EODH_AUTH__REALM }}
-        EODH_AUTH__USERNAME: ${{ secrets.EODH_AUTH__USERNAME }}
-        EODH_AUTH__PASSWORD: ${{ secrets.EODH_AUTH__PASSWORD }}
-        EODH_AUTH__CLIENT_ID: ${{ secrets.EODH_AUTH__CLIENT_ID }}
-        EODH_AUTH__CLIENT_SECRET: ${{ secrets.EODH_AUTH__CLIENT_SECRET }}
+      - name: Run unit tests
+        run: |
+          pytest -vv --cov=src tests/ --cov-report xml:coverage/coverage.xml
+        env:
+          EODH_AUTH__BASE_URL: ${{ secrets.EODH_AUTH__BASE_URL }}
+          EODH_AUTH__REALM: ${{ secrets.EODH_AUTH__REALM }}
+          EODH_AUTH__USERNAME: ${{ secrets.EODH_AUTH__USERNAME }}
+          EODH_AUTH__PASSWORD: ${{ secrets.EODH_AUTH__PASSWORD }}
+          EODH_AUTH__CLIENT_ID: ${{ secrets.EODH_AUTH__CLIENT_ID }}
+          EODH_AUTH__CLIENT_SECRET: ${{ secrets.EODH_AUTH__CLIENT_SECRET }}
 
-    - name: Get code coverage
-      uses: orgoro/coverage@v3.2
-      with:
+      - name: Get code coverage
+        uses: orgoro/coverage@v3.2
+        with:
           coverageFile: coverage/coverage.xml
           token: ${{ secrets.GITHUB_TOKEN }}
           thresholdAll: 0.7
