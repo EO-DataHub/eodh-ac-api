@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-permissions: write-all
-
 jobs:
   build-push-release-dev:
     runs-on: ubuntu-latest
@@ -15,7 +13,7 @@ jobs:
       contents: read
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Configure AWS credentials using OIDC
         uses: aws-actions/configure-aws-credentials@v3
@@ -62,7 +60,7 @@ jobs:
        contents: read
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Configure AWS credentials using OIDC
         uses: aws-actions/configure-aws-credentials@v3
         with:
@@ -99,7 +97,7 @@ jobs:
        contents: read
      steps:
        - name: Check out the repository
-         uses: actions/checkout@v2
+         uses: actions/checkout@v4
        - name: Configure AWS credentials using OIDC
          uses: aws-actions/configure-aws-credentials@v3
          with:
