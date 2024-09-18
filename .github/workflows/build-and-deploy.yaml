@@ -1,9 +1,9 @@
-name: PR
+name: build-and-deploy
 
 on:
   push:
     branches:
-      - cicd
+      - main
 permissions: write-all
 
 jobs:
