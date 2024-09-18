@@ -116,10 +116,10 @@ class ADESService:
             await client_session.close()
 
     async def unregister_process(self, process_id: UUID) -> None:
-        pass
+        raise NotImplementedError
 
     async def reregister_process(self, process_spec: dict[str, Any]) -> None:
-        pass
+        raise NotImplementedError
 
     async def get_process_details(self, name: str) -> dict[str, Any]:
         client_session, retry_client = self._get_retry_client()
