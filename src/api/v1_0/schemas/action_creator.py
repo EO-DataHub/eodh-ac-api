@@ -13,7 +13,7 @@ class ActionCreatorJobStatus(str, Enum):
     submitted = "submitted"
     running = "running"
     cancel_request = "cancel-request"
-    completed = "completed"
+    successful = "successful"
     failed = "failed"
     cancelled = "cancelled"
 
