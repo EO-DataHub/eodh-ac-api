@@ -1,6 +1,7 @@
 aiodns==3.2.0
+aiohttp-retry==2.8.3
 aiohttp[speedups]==3.10.5
-cryptography==43.0.0
+cryptography==43.0.1
 fastapi-hypermodel==2.1.0
 fastapi[standard]==0.112.0
 geojson-pydantic==1.1.0

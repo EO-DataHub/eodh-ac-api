@@ -6,7 +6,9 @@ from fastapi_hypermodel import (
 )
 
 from src.api.v1_0.routes.action_creator import action_creator_router_v1_0
+from src.api.v1_0.routes.ades import ades_router_v1_0
 from src.api.v1_0.routes.auth import auth_router_v1_0
+from src.api.v1_0.routes.health import health_router_v1_0
 from src.utils.logging import get_logger
 
 _logger = get_logger(__name__)
@@ -23,8 +25,10 @@ v1_0_app = FastAPI(
 )
 HALHyperModel.init_app(v1_0_app)
 
-v1_0_app.include_router(action_creator_router_v1_0)
+v1_0_app.include_router(health_router_v1_0)
 v1_0_app.include_router(auth_router_v1_0)
+v1_0_app.include_router(action_creator_router_v1_0)
+v1_0_app.include_router(ades_router_v1_0)
 
 app.mount("/api/v1.0", v1_0_app)
 app.mount("/latest", v1_0_app)

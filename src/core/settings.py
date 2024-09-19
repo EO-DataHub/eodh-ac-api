@@ -37,11 +37,18 @@ class OAuth2Settings(BaseModel):
         return self.oid_url + "/certs"
 
 
+class ADESSettings(BaseModel):
+    url: str
+    ogc_processes_api_path: str = "ogc-api/processes"
+    ogc_jobs_api_path: str = "ogc-api/jobs"
+
+
 class Settings(BaseSettings):
     """Represents Application Settings with nested configuration sections."""
 
     environment: str = "local"
     eodh_auth: OAuth2Settings
+    ades: ADESSettings
 
     model_config = SettingsConfigDict(
         env_file=consts.directories.ROOT_DIR / ".env",

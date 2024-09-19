@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime, timezone
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.security import HTTPAuthorizationCredentials  # noqa: TCH002
@@ -13,15 +13,18 @@ from geojson_pydantic import Polygon
 from pydantic import UUID4  # noqa: TCH002
 from starlette import status
 
-from src.api.v1_0.routes.auth import validate_access_token  # noqa: TCH001
+from src.api.v1_0.routes.auth import decode_token, validate_access_token
 from src.api.v1_0.schemas import (
     ActionCreatorFunctionSpec,
     ActionCreatorJob,
+    ActionCreatorJobsResponse,
     ActionCreatorJobStatus,
     ActionCreatorSubmissionRequest,
     FunctionsResponse,
 )
+from src.api.v1_0.schemas.action_creator import ActionCreatorJobSummary
 from src.services.action_creator_repo import ActionCreatorRepository, get_function_repo  # noqa: TCH001
+from src.services.ades import ades_service
 
 action_creator_router_v1_0 = APIRouter(
     prefix="/action-creator",
@@ -32,7 +35,7 @@ action_creator_router_v1_0 = APIRouter(
 @action_creator_router_v1_0.get(
     "/functions",
     response_model=FunctionsResponse,
-    response_model_exclude_unset=True,
+    response_model_exclude_unset=False,
     response_class=HALResponse,
     responses={
         status.HTTP_404_NOT_FOUND: {
@@ -57,7 +60,7 @@ async def get_available_functions(
 @action_creator_router_v1_0.post(
     "/submissions",
     response_model=ActionCreatorJob,
-    response_model_exclude_unset=True,
+    response_model_exclude_unset=False,
     response_class=HALResponse,
     status_code=status.HTTP_202_ACCEPTED,
 )
@@ -75,41 +78,30 @@ async def submit_function(
 
 @action_creator_router_v1_0.get(
     "/submissions",
-    response_model=list[ActionCreatorJob],
-    response_model_exclude_unset=True,
+    response_model=ActionCreatorJobsResponse,
+    response_model_exclude_unset=False,
     response_class=HALResponse,
-    status_code=status.HTTP_202_ACCEPTED,
+    status_code=status.HTTP_200_OK,
 )
 async def get_function_submissions(
-    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
-) -> list[ActionCreatorJob]:
-    return [
-        ActionCreatorJob(
-            correlation_id=uuid.uuid4(),
-            spec=ActionCreatorSubmissionRequest(
-                function_name="raster_calculator",
-                function_params={
-                    "collection": "sentinel-2-l2a",
-                    "date_range_start": datetime.now(tz=timezone.utc),
-                    "date_range_end": datetime.now(tz=timezone.utc),
-                    "aoi": Polygon(
-                        type="Polygon",
-                        coordinates=[
-                            [
-                                [0, 0],
-                                [0, 0],
-                                [0, 0],
-                                [0, 0],
-                            ]
-                        ],
-                    ),
-                },
-            ),
-            status=ActionCreatorJobStatus.submitted,
-            submitted_at=datetime.now(tz=timezone.utc),
-        )
-        for _ in range(3)
-    ]
+    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
+) -> Any:
+    introspected_token = await decode_token(credential)
+    username = introspected_token["preferred_username"]
+    ades = ades_service(workspace=username, token=credential.credentials)
+    ades_jobs = await ades.list_job_submissions()
+    return ActionCreatorJobsResponse(
+        submitted_jobs=[
+            ActionCreatorJobSummary(
+                correlation_id=uuid.UUID(job["jobID"], version=4),
+                function_name=job["processID"],
+                status=job["status"],
+                submitted_at=job["created"],
+                finished_at=job["finished"],
+            )
+            for job in ades_jobs["jobs"]
+        ]
+    )
 
 
 @action_creator_router_v1_0.get(
@@ -118,7 +110,7 @@ async def get_function_submissions(
     status_code=status.HTTP_200_OK,
     responses={status.HTTP_404_NOT_FOUND: {}},
 )
-async def get_status(
+async def get_function_submission_status(
     correlation_id: UUID4,
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
 ) -> ActionCreatorJob:
@@ -154,7 +146,7 @@ async def get_status(
     response_model=None,
     responses={status.HTTP_404_NOT_FOUND: {}},
 )
-async def cancel(
+async def cancel_function_execution(
     correlation_id: UUID4,  # noqa: ARG001
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
 ) -> None: ...
