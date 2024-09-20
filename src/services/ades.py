@@ -115,6 +115,17 @@ class ADESService:
         finally:
             await client_session.close()
 
+    async def get_process_executions(self, name: str) -> dict[str, Any]:
+        client_session, retry_client = self._get_retry_client()
+        try:
+            async with retry_client.get(
+                url=f"{self.processes_endpoint_url}/{name}/jobs",
+                headers=self.headers,
+            ) as response:
+                return await response.json()  # type: ignore[no-any-return]
+        finally:
+            await client_session.close()
+
     async def unregister_process(self, process_id: UUID) -> None:
         raise NotImplementedError
 

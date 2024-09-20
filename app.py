@@ -28,7 +28,12 @@ HALHyperModel.init_app(v1_0_app)
 v1_0_app.include_router(health_router_v1_0)
 v1_0_app.include_router(auth_router_v1_0)
 v1_0_app.include_router(action_creator_router_v1_0)
-v1_0_app.include_router(ades_router_v1_0)
 
 app.mount("/api/v1.0", v1_0_app)
 app.mount("/latest", v1_0_app)
+
+ades_app = FastAPI(
+    title="EOPro ADES Wrapper API",
+)
+ades_app.include_router(ades_router_v1_0)
+app.mount("/api/hidden", ades_app)
