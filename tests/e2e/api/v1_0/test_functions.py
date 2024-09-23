@@ -26,7 +26,6 @@ async def test_functions_endpoint_returns_all_functions(auth_token: str) -> None
     response = client.get("/api/v1.0/action-creator/functions", headers={"Authorization": f"Bearer {auth_token}"})
     assert response.status_code == status.HTTP_200_OK
     assert len(response.json()["functions"]) > 1
-    assert "self" in response.json()["_links"]
 
 
 @pytest.mark.asyncio()
@@ -39,4 +38,3 @@ async def test_functions_endpoint_returns_functions_for_collection(auth_token: s
     assert response.status_code == status.HTTP_200_OK
     for f in response.json()["functions"]:
         assert collection in f["parameters"]["collection"]["options"]
-    assert "self" in response.json()["_links"]

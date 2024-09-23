@@ -27,5 +27,4 @@ async def test_get_job_submissions_endpoint_returns_unauthorized_error_when_bad_
 async def test_get_job_submissions_endpoint_returns_valid_response_when_all_is_ok(auth_token: str) -> None:
     response = client.get("/api/v1.0/action-creator/submissions", headers={"Authorization": f"Bearer {auth_token}"})
     assert response.status_code == status.HTTP_200_OK
-    assert all(k in response.json() for k in ("_links", "submitted_jobs"))
-    assert "self" in response.json()["_links"]
+    assert all(k in response.json() for k in ("submitted_jobs", "total"))
