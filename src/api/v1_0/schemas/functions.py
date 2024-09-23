@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Any
 
-from fastapi_hypermodel import FrozenDict, HALFor, HALHyperModel, HALLinks
 from pydantic import BaseModel
 
 
@@ -19,9 +18,6 @@ class ActionCreatorFunctionSpec(BaseModel):
     parameters: dict[str, FuncParameterSpec]
 
 
-class FunctionsResponse(HALHyperModel):
+class FunctionsResponse(BaseModel):
     functions: list[ActionCreatorFunctionSpec]
-
-    links: HALLinks = FrozenDict({
-        "self": HALFor("get_available_functions"),
-    })
+    total: int

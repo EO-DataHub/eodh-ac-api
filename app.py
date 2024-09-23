@@ -1,9 +1,6 @@
 from __future__ import annotations
 
 from fastapi import FastAPI
-from fastapi_hypermodel import (
-    HALHyperModel,
-)
 
 from src.api.v1_0.routes.action_creator import action_creator_router_v1_0
 from src.api.v1_0.routes.ades import ades_router_v1_0
@@ -23,7 +20,6 @@ app = FastAPI(
 v1_0_app = FastAPI(
     title="EOPro Action Creator API", version="1.0.0", description="Mockup of an API for Action Creator."
 )
-HALHyperModel.init_app(v1_0_app)
 
 v1_0_app.include_router(health_router_v1_0)
 v1_0_app.include_router(auth_router_v1_0)
@@ -36,4 +32,4 @@ ades_app = FastAPI(
     title="EOPro ADES Wrapper API",
 )
 ades_app.include_router(ades_router_v1_0)
-app.mount("/api/hidden", ades_app)
+app.mount("/api/ades", ades_app)
