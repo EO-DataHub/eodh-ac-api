@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-import uuid  # noqa: TCH003
 from datetime import datetime  # noqa: TCH003
 from enum import Enum
-from typing import Annotated, Any, Sequence
+from typing import Any, Sequence
 
-from pydantic import UUID4, AfterValidator, BaseModel, model_validator
+from pydantic import BaseModel, model_validator
 
 
 class ActionCreatorJobStatus(str, Enum):
@@ -23,7 +22,7 @@ class ActionCreatorSubmissionRequest(BaseModel):
 
 
 class ActionCreatorJob(BaseModel):
-    correlation_id: UUID4 | Annotated[str, AfterValidator(lambda x: uuid.UUID(x, version=4))]
+    correlation_id: str
     spec: ActionCreatorSubmissionRequest
     status: ActionCreatorJobStatus = ActionCreatorJobStatus.submitted
     submitted_at: datetime
@@ -33,7 +32,7 @@ class ActionCreatorJob(BaseModel):
 
 
 class ActionCreatorJobSummary(BaseModel):
-    correlation_id: UUID4 | Annotated[str, AfterValidator(lambda x: uuid.UUID(x, version=4))]
+    correlation_id: str
     status: ActionCreatorJobStatus
     function_name: str
     submitted_at: datetime

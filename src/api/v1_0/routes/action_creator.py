@@ -6,9 +6,6 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.security import HTTPAuthorizationCredentials  # noqa: TCH002
-from fastapi_hypermodel import (
-    HALResponse,
-)
 from starlette import status
 
 from src.api.v1_0.routes.auth import decode_token, validate_access_token
@@ -64,7 +61,7 @@ async def submit_function(
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
 ) -> ActionCreatorJob:
     return ActionCreatorJob(
-        correlation_id=uuid.uuid4(),
+        correlation_id=str(uuid.uuid4()),
         spec=creation_spec,
         status=ActionCreatorJobStatus.submitted,
         submitted_at=datetime.now(tz=timezone.utc),
@@ -88,7 +85,7 @@ async def get_function_submissions(
     return ActionCreatorJobsResponse(
         submitted_jobs=[
             ActionCreatorJobSummary(
-                correlation_id=uuid.UUID(job["jobID"], version=4),
+                correlation_id=job["jobID"],
                 function_name=job["processID"],
                 status=job["status"],
                 submitted_at=job["created"],
@@ -104,7 +101,6 @@ async def get_function_submissions(
     "/submissions/{correlation_id}",
     response_model=ActionCreatorJobSummary,
     response_model_exclude_unset=False,
-    response_class=HALResponse,
     status_code=status.HTTP_200_OK,
     responses={status.HTTP_404_NOT_FOUND: {}},
 )
@@ -117,7 +113,7 @@ async def get_function_submission_status(
     ades = ades_service(workspace=username, token=credential.credentials)
     job = await ades.get_job_details(job_id=correlation_id)
     return ActionCreatorJobSummary(
-        correlation_id=uuid.UUID(job["jobID"], version=4),
+        correlation_id=job["jobID"],
         function_name=job["processID"],
         status=job["status"],
         submitted_at=job["created"],

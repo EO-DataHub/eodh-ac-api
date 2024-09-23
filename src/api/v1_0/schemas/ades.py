@@ -147,7 +147,7 @@ class StatusInfo(BaseModel):
     started: AwareDatetime | None = None
     finished: AwareDatetime | None = None
     updated: AwareDatetime | None = None
-    progress: Annotated[int | None, Field(strict=True, ge=0, le=100)]
+    progress: Annotated[int | None, Field(None, strict=True, ge=0, le=100)]
     links: list[Link] | None = None
 
 
