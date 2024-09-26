@@ -1,0 +1,99 @@
+### GetRasterCalculatorFile
+GET {{raster_calculator_cwl_href}}
+
+>> raster-calculate-app.cwl
+
+### ListProcesses
+GET {{ades_url}}/{{username}}/ogc-api/processes
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### RegiserProcessFromURL
+POST {{ades_url}}/{{username}}/ogc-api/processes
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+Content-Type: application/json
+
+{ "executionUnit": {"href": "{{raster_calculator_cwl_href}}", "type": "application/cwl" }}
+
+> {%
+    client.global.set("register_process_response", response.body);
+%}
+
+### RegiserProcessFromLocalFile
+POST {{ades_url}}/{{username}}/ogc-api/processes
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+Content-Type: application/cwl+yaml
+
+< raster-calculate-app.cwl
+
+> {%
+    client.global.set("register_process_response", response.body);
+%}
+
+### UnregisterProcess
+DELETE {{ades_url}}/{{username}}/ogc-api/processes/{{register_process_response.id}}
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### GetProcessDetails
+GET {{ades_url}}/{{username}}/ogc-api/processes/{{register_process_response.id}}
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### ExecuteProcess
+POST {{ades_url}}/{{username}}/ogc-api/processes/{{register_process_response.id}}/execution
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+Content-Type: application/json
+Prefer: respond-async
+
+{
+    "inputs": {
+        "workspace": "{{username}}",
+        "stac_collection": "sentinel-2-l2a",
+        "aoi": "{\"type\": \"Polygon\",\"coordinates\": [[[14.763294437090849, 50.833598186651244],[15.052268923898112, 50.833598186651244],[15.052268923898112, 50.989077215056824],[14.763294437090849, 50.989077215056824],[14.763294437090849, 50.833598186651244]]]}",
+        "date_start": "2024-04-03",
+        "date_end": "2024-08-01",
+        "index": "ndvi"
+    }
+}
+
+> {%
+    client.global.set("execute_process_response", response.body);
+%}
+
+### ListJobs
+GET {{ades_url}}/{{username}}/ogc-api/jobs
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### GetJobStatus
+GET {{ades_url}}/{{username}}/ogc-api/jobs/{{execute_process_response.jobID}}
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+> {%
+    client.global.set("job_status", response.body);
+%}
+
+### GetJobResults
+GET {{ades_url}}/{{username}}/ogc-api/jobs/{{execute_process_response.jobID}}/results
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### GetJobLogs
+GET {{job_status.links[2].href}}
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### GetJobStageOutLogs
+GET {{job_status.links[3].href}}
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### CancelJob
+DELETE {{ades_url}}/{{username}}/ogc-api/jobs/{{execute_process_response.jobID}}
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
