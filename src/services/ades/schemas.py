@@ -198,6 +198,15 @@ class ProcessList(BaseModel):
     links: list[Link]
 
 
+class ExecutionUnit(BaseModel):
+    href: str
+    type: str = "application/cwl"
+
+
+class RegisterProcessRequest(BaseModel):
+    execution_unit: ExecutionUnit = Field(..., alias="executionUnit")
+
+
 class InlineOrRefData(RootModel[Union[InputValueNoObject, QualifiedInputValue, Link]]):
     root: InputValueNoObject | QualifiedInputValue | Link
 

@@ -19,8 +19,8 @@ class ActionCreatorRepository(AbstractActionCreatorRepository):
             return True, self._functions
         _funcs = defaultdict(list)
         for f in self._functions:
-            if "collection" in f["parameters"]:
-                for c in f["parameters"]["collection"]["options"]:
+            if "collection" in f["inputs"]:
+                for c in f["inputs"]["collection"]["options"]:
                     _funcs[c].append(f)
         return collection in _funcs, _funcs[collection]
 

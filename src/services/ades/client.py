@@ -11,10 +11,11 @@ from src.utils.logging import get_logger
 
 if TYPE_CHECKING:
     from logging import Logger
+    from pathlib import Path
     from uuid import UUID
 
 
-class ADESService:
+class ADESClient:
     def __init__(
         self,
         url: str,
@@ -68,6 +69,7 @@ class ADESService:
             async with retry_client.get(
                 url=f"{self.jobs_endpoint_url}/{job_id}",
                 headers=self.headers,
+                raise_for_status=True,
             ) as response:
                 return await response.json()  # type: ignore[no-any-return]
         finally:
@@ -79,6 +81,7 @@ class ADESService:
             async with retry_client.get(
                 url=f"{self.jobs_endpoint_url}/{job_id}/results",
                 headers=self.headers,
+                raise_for_status=True,
             ) as response:
                 return await response.json()  # type: ignore[no-any-return]
         finally:
@@ -90,19 +93,59 @@ class ADESService:
             async with retry_client.get(
                 url=self.jobs_endpoint_url,
                 headers=self.headers,
+                raise_for_status=True,
             ) as response:
                 return await response.json()  # type: ignore[no-any-return]
         finally:
             await client_session.close()
 
-    async def submit_job(self, job: dict[str, Any]) -> dict[str, Any]:
-        raise NotImplementedError
-
     async def cancel_job(self, job_id: UUID) -> None:
-        raise NotImplementedError
+        client_session, retry_client = self._get_retry_client()
+        try:
+            async with retry_client.delete(
+                url=f"{self.jobs_endpoint_url}/{job_id}",
+                headers=self.headers,
+            ) as response:
+                response.raise_for_status()
+        finally:
+            await client_session.close()
 
-    async def register_process(self, process_spec: dict[str, Any]) -> None:
-        raise NotImplementedError
+    async def register_and_execute_process(self, spec: dict[str, Any]) -> dict[str, Any]:
+        process_registration_result = (
+            await self.register_process_from_cwl_href(spec["cwl_location"])
+            if spec["cwl_location"].startswith("https://")
+            else await self.register_process_from_local_cwl_file(spec["cwl_location"])
+        )
+        return await self.execute_process(
+            process_identifier=process_registration_result["id"],
+            process_inputs=spec["inputs"],
+        )
+
+    async def register_process_from_cwl_href(self, cwl_href: str) -> dict[str, Any]:
+        client_session, retry_client = self._get_retry_client()
+        try:
+            async with retry_client.post(
+                url=self.processes_endpoint_url,
+                headers=self.headers,
+                raise_for_status=True,
+                json={"executionUnit": {"href": cwl_href, "type": "application/cwl"}},
+            ) as response:
+                return await response.json()  # type: ignore[no-any-return]
+        finally:
+            await client_session.close()
+
+    async def register_process_from_local_cwl_file(self, cwl_location: Path) -> dict[str, Any]:
+        client_session, retry_client = self._get_retry_client()
+        try:
+            async with retry_client.post(
+                url=self.processes_endpoint_url,
+                headers=self.headers | {"Content-Type": "application/cwl+yaml"},
+                raise_for_status=True,
+                data=cwl_location.read_bytes(),
+            ) as response:
+                return await response.json()  # type: ignore[no-any-return]
+        finally:
+            await client_session.close()
 
     async def list_processes(self) -> dict[str, Any]:
         client_session, retry_client = self._get_retry_client()
@@ -110,6 +153,25 @@ class ADESService:
             async with retry_client.get(
                 url=self.processes_endpoint_url,
                 headers=self.headers,
+                raise_for_status=True,
+            ) as response:
+                return await response.json()  # type: ignore[no-any-return]
+        finally:
+            await client_session.close()
+
+    async def execute_process(self, process_identifier: str, process_inputs: dict[str, Any]) -> dict[str, Any]:
+        client_session, retry_client = self._get_retry_client()
+        try:
+            if "inputs" not in process_inputs:
+                process_inputs = {"inputs": process_inputs}
+
+            if "workspace" not in process_inputs["inputs"]:
+                process_inputs["inputs"]["workspace"] = self.workspace
+
+            async with retry_client.post(
+                url=f"{self.processes_endpoint_url}/{process_identifier}/execution",
+                headers=self.headers | {"Content-Type": "application/json", "Prefer": "respond-async"},
+                json=process_inputs,
             ) as response:
                 return await response.json()  # type: ignore[no-any-return]
         finally:
@@ -121,22 +183,32 @@ class ADESService:
             async with retry_client.get(
                 url=f"{self.processes_endpoint_url}/{name}/jobs",
                 headers=self.headers,
+                raise_for_status=True,
             ) as response:
                 return await response.json()  # type: ignore[no-any-return]
         finally:
             await client_session.close()
 
-    async def unregister_process(self, process_id: UUID) -> None:
-        raise NotImplementedError
+    async def unregister_process(self, process_identifier: str) -> None:
+        client_session, retry_client = self._get_retry_client()
+        try:
+            async with retry_client.delete(
+                url=f"{self.processes_endpoint_url}/{process_identifier}",
+                headers=self.headers,
+                raise_for_status=True,
+            ):
+                return
+        finally:
+            await client_session.close()
 
     async def reregister_process(self, process_spec: dict[str, Any]) -> None:
         raise NotImplementedError
 
-    async def get_process_details(self, name: str) -> dict[str, Any]:
+    async def get_process_details(self, process_identifier: str) -> dict[str, Any]:
         client_session, retry_client = self._get_retry_client()
         try:
             async with retry_client.get(
-                url=f"{self.processes_endpoint_url}/{name}",
+                url=f"{self.processes_endpoint_url}/{process_identifier}",
                 headers=self.headers,
             ) as response:
                 return await response.json()  # type: ignore[no-any-return]
@@ -144,9 +216,9 @@ class ADESService:
             await client_session.close()
 
 
-def ades_service(workspace: str, token: str) -> ADESService:
+def ades_client(workspace: str, token: str) -> ADESClient:
     settings = current_settings()
-    return ADESService(
+    return ADESClient(
         url=settings.ades.url,
         ogc_processes_api_path=settings.ades.ogc_processes_api_path,
         ogc_jobs_api_path=settings.ades.ogc_jobs_api_path,

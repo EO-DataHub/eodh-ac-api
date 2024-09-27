@@ -4,7 +4,7 @@ from datetime import datetime  # noqa: TCH003
 from enum import Enum
 from typing import Any, Sequence
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, Field, model_validator
 
 
 class ActionCreatorJobStatus(str, Enum):
@@ -16,9 +16,26 @@ class ActionCreatorJobStatus(str, Enum):
     cancelled = "cancelled"
 
 
+class PresetFunctionExecutionRequest(BaseModel):
+    function_name: str = Field(..., examples=["raster-calculate", "lulc-change"])
+    inputs: dict[str, Any] = Field(
+        ...,
+        examples=[
+            {
+                "collection": "sentinel-2-l2a",
+                "aoi": '{"type": "Polygon","coordinates": [[[14.763294437090849, 50.833598186651244],'
+                "[15.052268923898112, 50.833598186651244],[15.052268923898112, 50.989077215056824],"
+                "[14.763294437090849, 50.989077215056824],[14.763294437090849, 50.833598186651244]]]}",
+                "date_start": "2024-04-03T00:00:00",
+                "date_end": "2024-08-01T00:00:00",
+                "index": "NDVI",
+            }
+        ],
+    )
+
+
 class ActionCreatorSubmissionRequest(BaseModel):
-    function_name: str
-    function_params: dict[str, Any]
+    preset_function: PresetFunctionExecutionRequest
 
 
 class ActionCreatorJob(BaseModel):

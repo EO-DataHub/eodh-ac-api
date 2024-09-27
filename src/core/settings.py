@@ -11,8 +11,8 @@ from src import consts
 class OAuth2Settings(BaseModel):
     base_url: str
     realm: str
-    username: str | None = None
-    password: str | None = None
+    username: str
+    password: str
     client_id: str
     client_secret: str
 
