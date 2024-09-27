@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-import uuid
-from datetime import datetime, timezone
+import uuid  # noqa: TCH003
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -13,13 +12,13 @@ from src.api.v1_0.schemas import (
     ActionCreatorFunctionSpec,
     ActionCreatorJob,
     ActionCreatorJobsResponse,
-    ActionCreatorJobStatus,
     ActionCreatorSubmissionRequest,
     FunctionsResponse,
 )
 from src.api.v1_0.schemas.action_creator import ActionCreatorJobSummary
+from src.api.v1_0.schemas.functions import FUNCTION_TO_INPUTS_LOOKUP
 from src.services.action_creator_repo import ActionCreatorRepository, get_function_repo  # noqa: TCH001
-from src.services.ades import ades_service
+from src.services.ades.client import ades_client
 
 action_creator_router_v1_0 = APIRouter(
     prefix="/action-creator",
@@ -58,13 +57,22 @@ async def get_available_functions(
 )
 async def submit_function(
     creation_spec: ActionCreatorSubmissionRequest,
-    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
+    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
 ) -> ActionCreatorJob:
+    introspected_token = await decode_token(credential)
+    username = introspected_token["preferred_username"]
+    ades = ades_client(workspace=username, token=credential.credentials)
+    inputs_cls = FUNCTION_TO_INPUTS_LOOKUP[creation_spec.preset_function.function_name]
+    validated_func_inputs = inputs_cls(**creation_spec.preset_function.inputs)
+    response = await ades.execute_process(
+        process_identifier=creation_spec.preset_function.function_name,
+        process_inputs=validated_func_inputs.as_inputs(),
+    )
     return ActionCreatorJob(
-        correlation_id=str(uuid.uuid4()),
+        correlation_id=response["jobID"],
         spec=creation_spec,
-        status=ActionCreatorJobStatus.submitted,
-        submitted_at=datetime.now(tz=timezone.utc),
+        status=response["status"],
+        submitted_at=response["created"],
     )
 
 
@@ -80,7 +88,7 @@ async def get_function_submissions(
 ) -> ActionCreatorJobsResponse:
     introspected_token = await decode_token(credential)
     username = introspected_token["preferred_username"]
-    ades = ades_service(workspace=username, token=credential.credentials)
+    ades = ades_client(workspace=username, token=credential.credentials)
     ades_jobs = await ades.list_job_submissions()
     return ActionCreatorJobsResponse(
         submitted_jobs=[
@@ -110,7 +118,7 @@ async def get_function_submission_status(
 ) -> ActionCreatorJobSummary:
     introspected_token = await decode_token(credential)
     username = introspected_token["preferred_username"]
-    ades = ades_service(workspace=username, token=credential.credentials)
+    ades = ades_client(workspace=username, token=credential.credentials)
     job = await ades.get_job_details(job_id=correlation_id)
     return ActionCreatorJobSummary(
         correlation_id=job["jobID"],

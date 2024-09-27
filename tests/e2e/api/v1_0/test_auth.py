@@ -10,7 +10,7 @@ from src.core.settings import current_settings
 client = TestClient(app)
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio(scope="function")
 async def test_authenticate_success() -> None:
     settings = current_settings()
 
@@ -24,7 +24,7 @@ async def test_authenticate_success() -> None:
     assert response.json()["refresh_token"] is not None
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio(scope="function")
 async def test_authenticate_failure() -> None:
     response = client.post(
         "/api/v1.0/auth/token",
@@ -35,7 +35,7 @@ async def test_authenticate_failure() -> None:
     assert response.json()["detail"]["error_description"] == "Invalid user credentials"
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio(scope="function")
 async def test_introspect_success() -> None:
     settings = current_settings()
 

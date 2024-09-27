@@ -6,7 +6,7 @@ from src.api.v1_0.schemas.action_creator import (
     ActionCreatorJobStatus,
     ActionCreatorSubmissionRequest,
 )
-from src.api.v1_0.schemas.functions import ActionCreatorFunctionSpec, FuncParameterSpec, FunctionsResponse
+from src.api.v1_0.schemas.functions import ActionCreatorFunctionSpec, FuncInputSpec, FunctionsResponse
 
 __all__ = [
     "ActionCreatorFunctionSpec",
@@ -14,6 +14,6 @@ __all__ = [
     "ActionCreatorJobStatus",
     "ActionCreatorJobsResponse",
     "ActionCreatorSubmissionRequest",
-    "FuncParameterSpec",
+    "FuncInputSpec",
     "FunctionsResponse",
 ]

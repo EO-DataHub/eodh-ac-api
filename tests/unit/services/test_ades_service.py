@@ -2,18 +2,18 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-from src.services.ades import ades_service
+from src.services.ades.client import ades_client
 
 
-@patch("src.services.ades.current_settings")
-def test_ades_service_factory_function_should_create_ades_service_instance(mocked_current_settings: MagicMock) -> None:
+@patch("src.services.ades.client.current_settings")
+def test_ades_client_factory_function_should_create_ades_service_instance(mocked_current_settings: MagicMock) -> None:
     settings = MagicMock()
     mocked_current_settings.return_value = settings
     settings.ades.url = "https://test.ades.com"
     settings.ades.ogc_processes_api_path = "ogc/processes"
     settings.ades.ogc_jobs_api_path = "ogc/jobs"
 
-    result = ades_service(workspace="test", token="test_token")  # noqa: S106
+    result = ades_client(workspace="test", token="test_token")  # noqa: S106
 
     assert result is not None
     assert result.url == settings.ades.url
