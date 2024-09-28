@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import abc
 from datetime import datetime  # noqa: TCH003
 from enum import Enum
 from typing import Any
@@ -59,12 +60,17 @@ class RasterCalculatorIndex(str, Enum):
     SAVI = "SAVI"
 
 
-class RasterCalculatorFunctionInputs(BaseModel):
+class OGCProcessInputs(BaseModel, abc.ABC):
+    @abc.abstractmethod
+    def as_ogc_process_inputs(self) -> dict[str, Any]: ...
+
+
+class RasterCalculatorFunctionInputs(OGCProcessInputs):
     aoi: Geometry
     bbox: tuple[float, float, float, float] | None = None
-    date_from: datetime | None = None
-    date_to: datetime | None = None
-    collection: str
+    date_start: datetime | None = None
+    date_end: datetime | None = None
+    stac_collection: str
     index: RasterCalculatorIndex = RasterCalculatorIndex.NDVI
 
     @model_validator(mode="before")
@@ -88,20 +94,24 @@ class RasterCalculatorFunctionInputs(BaseModel):
 
         # Validate STAC collection
         validate_stac_collection(
-            specified_collection=v["collection"],
-            function_name="raster-calculate",
+            specified_collection=v["stac_collection"],
+            function_identifier="raster-calculate",
         )
 
         return v
 
-    def as_inputs(self) -> dict[str, Any]:
-        return {
+    def as_ogc_process_inputs(self) -> dict[str, Any]:
+        vals = {
             "aoi": self.aoi.model_dump_json(),
-            "stac_collection": self.collection,
-            "date_start": self.date_from,
-            "date_end": self.date_to,
-            "index": self.index,
+            "stac_collection": self.stac_collection,
+            "date_start": self.date_start,
+            "date_end": self.date_end,
+            "index": self.index.value,
         }
+        keys_to_pop = [k for k in vals if vals[k] is None]
+        for k in keys_to_pop:
+            vals.pop(k, None)
+        return vals
 
 
 FUNCTION_TO_INPUTS_LOOKUP = {

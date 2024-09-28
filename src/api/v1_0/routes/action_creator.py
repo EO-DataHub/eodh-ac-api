@@ -62,14 +62,14 @@ async def submit_function(
     introspected_token = await decode_token(credential)
     username = introspected_token["preferred_username"]
     ades = ades_client(workspace=username, token=credential.credentials)
-    inputs_cls = FUNCTION_TO_INPUTS_LOOKUP[creation_spec.preset_function.function_name]
-    validated_func_inputs = inputs_cls(**creation_spec.preset_function.inputs)
+    inputs_cls = FUNCTION_TO_INPUTS_LOOKUP[creation_spec.preset_function.function_identifier]
+    validated_func_inputs = inputs_cls(**creation_spec.preset_function.inputs).as_ogc_process_inputs()
     response = await ades.execute_process(
-        process_identifier=creation_spec.preset_function.function_name,
-        process_inputs=validated_func_inputs.as_inputs(),
+        process_identifier=creation_spec.preset_function.function_identifier,
+        process_inputs=validated_func_inputs,
     )
     return ActionCreatorJob(
-        correlation_id=response["jobID"],
+        submission_id=response["jobID"],
         spec=creation_spec,
         status=response["status"],
         submitted_at=response["created"],
@@ -93,11 +93,11 @@ async def get_function_submissions(
     return ActionCreatorJobsResponse(
         submitted_jobs=[
             ActionCreatorJobSummary(
-                correlation_id=job["jobID"],
-                function_name=job["processID"],
+                submission_id=job["jobID"],
+                function_identifier=job["processID"],
                 status=job["status"],
                 submitted_at=job["created"],
-                finished_at=job["finished"],
+                finished_at=job.get("finished"),
             )
             for job in ades_jobs["jobs"]
         ],
@@ -106,23 +106,23 @@ async def get_function_submissions(
 
 
 @action_creator_router_v1_0.get(
-    "/submissions/{correlation_id}",
+    "/submissions/{submission_id}",
     response_model=ActionCreatorJobSummary,
     response_model_exclude_unset=False,
     status_code=status.HTTP_200_OK,
     responses={status.HTTP_404_NOT_FOUND: {}},
 )
 async def get_function_submission_status(
-    correlation_id: uuid.UUID,
+    submission_id: uuid.UUID,
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
 ) -> ActionCreatorJobSummary:
     introspected_token = await decode_token(credential)
     username = introspected_token["preferred_username"]
     ades = ades_client(workspace=username, token=credential.credentials)
-    job = await ades.get_job_details(job_id=correlation_id)
+    job = await ades.get_job_details(job_id=submission_id)
     return ActionCreatorJobSummary(
-        correlation_id=job["jobID"],
-        function_name=job["processID"],
+        submission_id=job["jobID"],
+        function_identifier=job["processID"],
         status=job["status"],
         submitted_at=job["created"],
         finished_at=job["finished"],

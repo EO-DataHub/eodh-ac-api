@@ -17,7 +17,7 @@ class ActionCreatorJobStatus(str, Enum):
 
 
 class PresetFunctionExecutionRequest(BaseModel):
-    function_name: str = Field(..., examples=["raster-calculate", "lulc-change"])
+    function_identifier: str = Field(..., examples=["raster-calculate", "lulc-change"])
     inputs: dict[str, Any] = Field(
         ...,
         examples=[
@@ -39,7 +39,7 @@ class ActionCreatorSubmissionRequest(BaseModel):
 
 
 class ActionCreatorJob(BaseModel):
-    correlation_id: str
+    submission_id: str
     spec: ActionCreatorSubmissionRequest
     status: ActionCreatorJobStatus = ActionCreatorJobStatus.submitted
     submitted_at: datetime
@@ -49,9 +49,9 @@ class ActionCreatorJob(BaseModel):
 
 
 class ActionCreatorJobSummary(BaseModel):
-    correlation_id: str
+    submission_id: str
     status: ActionCreatorJobStatus
-    function_name: str
+    function_identifier: str
     submitted_at: datetime
     finished_at: datetime | None = None
     successful: bool | None = None
