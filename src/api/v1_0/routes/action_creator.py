@@ -118,7 +118,7 @@ async def get_function_submissions(
             )
             for job in ades_jobs.jobs
         ],
-        total=len(ades_jobs["jobs"]),
+        total=len(ades_jobs.jobs),  # Use len() as ADES returns count for the unregistered processes too
     )
 
 
