@@ -9,14 +9,15 @@ from starlette import status
 
 from src.api.v1_0.routes.auth import decode_token, validate_access_token
 from src.api.v1_0.schemas import (
+    FUNCTION_TO_INPUTS_LOOKUP,
     ActionCreatorFunctionSpec,
     ActionCreatorJob,
     ActionCreatorJobsResponse,
+    ActionCreatorJobSummary,
     ActionCreatorSubmissionRequest,
+    ErrorResponse,
     FunctionsResponse,
 )
-from src.api.v1_0.schemas.action_creator import ActionCreatorJobSummary
-from src.api.v1_0.schemas.functions import FUNCTION_TO_INPUTS_LOOKUP
 from src.services.action_creator_repo import ActionCreatorRepository, get_function_repo  # noqa: TCH001
 from src.services.ades.client import ades_client
 
@@ -32,7 +33,8 @@ action_creator_router_v1_0 = APIRouter(
     response_model_exclude_unset=False,
     responses={
         status.HTTP_404_NOT_FOUND: {
-            "description": "Collection Not found",
+            "description": "Not found",
+            "model": ErrorResponse,
         }
     },
 )
@@ -54,12 +56,26 @@ async def get_available_functions(
     "/submissions",
     response_model=ActionCreatorJob,
     status_code=status.HTTP_202_ACCEPTED,
+    responses={
+        status.HTTP_404_NOT_FOUND: {
+            "description": "Not found",
+            "model": ErrorResponse,
+        }
+    },
 )
 async def submit_function(
     creation_spec: ActionCreatorSubmissionRequest,
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
 ) -> ActionCreatorJob:
     introspected_token = await decode_token(credential)
+
+    if creation_spec.preset_function.function_identifier not in FUNCTION_TO_INPUTS_LOOKUP:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Function '{creation_spec.preset_function.function_identifier}' not found. "
+            "Please use `/functions` endpoint to get list of supported functions.",
+        )
+
     username = introspected_token["preferred_username"]
     ades = ades_client(workspace=username, token=credential.credentials)
     inputs_cls = FUNCTION_TO_INPUTS_LOOKUP[creation_spec.preset_function.function_identifier]
@@ -68,11 +84,12 @@ async def submit_function(
         process_identifier=creation_spec.preset_function.function_identifier,
         process_inputs=validated_func_inputs,
     )
+
     return ActionCreatorJob(
-        submission_id=response["jobID"],
+        submission_id=response.job_id,
         spec=creation_spec,
-        status=response["status"],
-        submitted_at=response["created"],
+        status=response.status.value,
+        submitted_at=response.created,
     )
 
 
@@ -93,13 +110,13 @@ async def get_function_submissions(
     return ActionCreatorJobsResponse(
         submitted_jobs=[
             ActionCreatorJobSummary(
-                submission_id=job["jobID"],
-                function_identifier=job["processID"],
-                status=job["status"],
-                submitted_at=job["created"],
-                finished_at=job.get("finished"),
+                submission_id=job.job_id,
+                function_identifier=job.process_id,
+                status=job.status.value,
+                submitted_at=job.created,
+                finished_at=job.finished,
             )
-            for job in ades_jobs["jobs"]
+            for job in ades_jobs.jobs
         ],
         total=len(ades_jobs["jobs"]),
     )
@@ -110,7 +127,7 @@ async def get_function_submissions(
     response_model=ActionCreatorJobSummary,
     response_model_exclude_unset=False,
     status_code=status.HTTP_200_OK,
-    responses={status.HTTP_404_NOT_FOUND: {}},
+    responses={status.HTTP_404_NOT_FOUND: {"description": "Not Found", "model": ErrorResponse}},
 )
 async def get_function_submission_status(
     submission_id: uuid.UUID,
@@ -119,24 +136,32 @@ async def get_function_submission_status(
     introspected_token = await decode_token(credential)
     username = introspected_token["preferred_username"]
     ades = ades_client(workspace=username, token=credential.credentials)
-    job = await ades.get_job_details(job_id=submission_id)
+    err, job = await ades.get_job_details(job_id=submission_id)
+
+    if err:
+        raise HTTPException(status_code=err.code, detail=err.detail)
+
+    if job is None:
+        # This should never happen if error was not generated
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
+
     return ActionCreatorJobSummary(
-        submission_id=job["jobID"],
-        function_identifier=job["processID"],
-        status=job["status"],
-        submitted_at=job["created"],
-        finished_at=job["finished"],
+        submission_id=job.job_id,
+        function_identifier=job.process_id,
+        status=job.status.value,
+        submitted_at=job.created,
+        finished_at=job.finished,
     )
 
 
 @action_creator_router_v1_0.delete(
-    "/submissions/{correlation_id}",
+    "/submissions/{submission_id}",
     status_code=204,
     response_model=None,
-    responses={status.HTTP_404_NOT_FOUND: {}},
+    responses={status.HTTP_404_NOT_FOUND: {"description": "Not Found", "model": ErrorResponse}},
 )
 async def cancel_function_execution(
-    correlation_id: uuid.UUID,  # noqa: ARG001
+    submission_id: uuid.UUID,  # noqa: ARG001
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
 ) -> None:
     raise HTTPException(

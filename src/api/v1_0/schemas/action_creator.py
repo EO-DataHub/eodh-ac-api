@@ -22,7 +22,7 @@ class PresetFunctionExecutionRequest(BaseModel):
         ...,
         examples=[
             {
-                "collection": "sentinel-2-l2a",
+                "stac_collection": "sentinel-2-l2a",
                 "aoi": '{"type": "Polygon","coordinates": [[[14.763294437090849, 50.833598186651244],'
                 "[15.052268923898112, 50.833598186651244],[15.052268923898112, 50.989077215056824],"
                 "[14.763294437090849, 50.989077215056824],[14.763294437090849, 50.833598186651244]]]}",

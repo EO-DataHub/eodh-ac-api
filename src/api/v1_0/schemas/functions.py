@@ -75,7 +75,7 @@ class RasterCalculatorFunctionInputs(OGCProcessInputs):
 
     @model_validator(mode="before")
     @classmethod
-    def validate_aoi(cls, v: dict[str, Any]) -> dict[str, Any]:
+    def validate_model(cls, v: dict[str, Any]) -> dict[str, Any]:
         # Neither AOI nor BBox provided
         validate_aoi_or_bbox_provided(v)
 

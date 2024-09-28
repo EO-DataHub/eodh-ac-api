@@ -36,7 +36,7 @@ class Response(Enum):
     document = "document"
 
 
-class Type(Enum):
+class JobType(Enum):
     process = "process"
 
 
@@ -139,7 +139,7 @@ class LandingPage(BaseModel):
 
 class StatusInfo(BaseModel):
     process_id: str | None = Field(None, alias="processID")
-    type: Type
+    type: JobType
     job_id: str = Field(..., alias="jobID")
     status: StatusCode
     message: str | None = None
@@ -179,6 +179,7 @@ class InputValue(RootModel[Union[InputValueNoObject, Dict[str, Any]]]):
 class JobList(BaseModel):
     jobs: list[StatusInfo]
     links: list[Link]
+    number_total: int = Field(..., alias="numberTotal")
 
 
 class ProcessSummary(DescriptionType):
