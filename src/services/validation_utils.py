@@ -65,7 +65,7 @@ def aoi_from_bbox_if_necessary(v: dict[str, Any]) -> dict[str, Any]:
 
 def validate_stac_collection(specified_collection: str, function_identifier: str) -> None:
     function_spec = FUNCTIONS_REGISTRY[function_identifier]
-    if specified_collection not in (valid_collections := function_spec["inputs"]["collection"]["options"]):
+    if specified_collection not in (valid_collections := function_spec["inputs"]["stac_collection"]["options"]):
         msg = (
             f"Collection '{specified_collection}' cannot be used with '{function_identifier}' function! "
             f"Valid options are: {valid_collections}"

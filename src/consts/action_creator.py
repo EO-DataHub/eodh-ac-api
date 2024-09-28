@@ -9,24 +9,24 @@ RASTER_CALCULATOR_FUNCTION_SPEC = {
     "preset": True,
     "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/raster-calculate-app.cwl",
     "inputs": {
-        "collection": {
+        "stac_collection": {
             "type": "string",
             "required": False,
             "default": "sentinel-2-l2a",
             "description": "The STAC collection to use.",
             "options": ["sentinel-2-l1c", "sentinel-2-l2a"],
         },
-        "start_datetime": {
+        "date_start": {
             "type": "datetime",
             "required": False,
             "description": "The start date and time to use for item filtering. Must be RFC3339 compliant.",
         },
-        "end_datetime": {
+        "date_end": {
             "type": "datetime",
             "required": False,
             "description": "The end date and time to use for item filtering. Must be RFC3339 compliant.",
         },
-        "geometry": {
+        "aoi": {
             "type": "string",
             "required": False,
             "description": "The Area of Interest as GeoJSON string. Must be provided if bbox is null.",
@@ -63,24 +63,24 @@ LAND_COVER_CHANGE_DETECTION_FUNCTION_SPEC = {
     "preset": True,
     "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/lulc-change-app.cwl",
     "inputs": {
-        "collection": {
+        "stac_collection": {
             "type": "string",
             "required": False,
             "default": "global-land-cover",
             "description": "The STAC collection to use.",
             "options": ["global-land-cover", "corine-land-cover"],
         },
-        "start_datetime": {
+        "date_start": {
             "type": "datetime",
             "required": False,
             "description": "The start date and time to use for item filtering. Must be RFC3339 compliant.",
         },
-        "end_datetime": {
+        "date_end": {
             "type": "datetime",
             "required": False,
             "description": "The end date and time to use for item filtering. Must be RFC3339 compliant.",
         },
-        "geometry": {
+        "aoi": {
             "type": "string",
             "required": False,
             "description": "The Area of Interest as GeoJSON string. Must be provided if bbox is null.",
@@ -105,24 +105,24 @@ WATER_QUALITY_FUNCTION_SPEC = {
     "preset": True,
     "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/water-quality-app.cwl",
     "inputs": {
-        "collection": {
+        "stac_collection": {
             "type": "string",
             "required": False,
             "default": "sentinel-2-l2a",
             "description": "The STAC collection to use.",
             "options": ["sentinel-2-l1c", "sentinel-2-l2a"],
         },
-        "start_datetime": {
+        "date_start": {
             "type": "datetime",
             "required": False,
             "description": "The start date and time to use for item filtering. Must be RFC3339 compliant.",
         },
-        "end_datetime": {
+        "date_end": {
             "type": "datetime",
             "required": False,
             "description": "The end date and time to use for item filtering. Must be RFC3339 compliant.",
         },
-        "geometry": {
+        "aoi": {
             "type": "string",
             "required": False,
             "description": "The Area of Interest as GeoJSON string. Must be provided if bbox is null.",

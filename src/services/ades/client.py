@@ -108,14 +108,23 @@ class ADESClient:
         finally:
             await client_session.close()
 
-    async def cancel_job(self, job_id: str | UUID) -> None:
+    async def cancel_job(self, job_id: str | UUID) -> ErrorResponse | None:
         client_session, retry_client = self._get_retry_client()
         try:
             async with retry_client.delete(
                 url=f"{self.jobs_endpoint_url}/{job_id}",
                 headers=self.headers,
             ) as response:
+                # ADES returns 403 when cancelling non-existent job
+                if response.status == status.HTTP_403_FORBIDDEN:
+                    return ErrorResponse(code=status.HTTP_404_NOT_FOUND, detail=f"Job '{job_id}' does not exist.")
+                if response.status == status.HTTP_501_NOT_IMPLEMENTED:
+                    return ErrorResponse(
+                        code=status.HTTP_501_NOT_IMPLEMENTED,
+                        detail="Job cancellation is not implemented.",
+                    )
                 response.raise_for_status()
+                return None
         finally:
             await client_session.close()
 

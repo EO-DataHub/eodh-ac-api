@@ -37,4 +37,4 @@ async def test_functions_endpoint_returns_functions_for_collection(auth_token: s
     )
     assert response.status_code == status.HTTP_200_OK
     for f in response.json()["functions"]:
-        assert collection in f["parameters"]["collection"]["options"]
+        assert collection in f["inputs"]["stac_collection"]["options"]
