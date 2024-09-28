@@ -82,9 +82,9 @@ def test_raster_calculate_preset_validation_neither_aoi_nor_bbox_provided() -> N
     data = {
         "aoi": None,
         "bbox": None,
-        "date_from": "2024-01-01T00:00:00Z",
-        "date_to": "2024-01-01T00:00:00Z",
-        "collection": "sentinel-2-l2a",
+        "date_start": "2024-01-01T00:00:00Z",
+        "date_end": "2024-01-01T00:00:00Z",
+        "stac_collection": "sentinel-2-l2a",
         "index": "EVI",
     }
 
@@ -98,9 +98,9 @@ def test_raster_calculate_preset_validation_aoi_too_big() -> None:
     data = {
         "aoi": json.dumps(TEST_UK_AOI),
         "bbox": None,
-        "date_from": "2024-01-01T00:00:00Z",
-        "date_to": "2024-01-01T00:00:00Z",
-        "collection": "sentinel-2-l2a",
+        "date_start": "2024-01-01T00:00:00Z",
+        "date_end": "2024-01-01T00:00:00Z",
+        "stac_collection": "sentinel-2-l2a",
         "index": "EVI",
     }
 
@@ -113,9 +113,9 @@ def test_raster_calculate_preset_validation_raises_if_both_aoi_and_bbox_provided
     data = {
         "aoi": TEST_AOI_JSON,
         "bbox": TEST_BBOX,
-        "date_from": "2024-01-01T00:00:00Z",
-        "date_to": "2024-01-01T00:00:00Z",
-        "collection": "sentinel-2-l2a",
+        "date_start": "2024-01-01T00:00:00Z",
+        "date_end": "2024-01-01T00:00:00Z",
+        "stac_collection": "sentinel-2-l2a",
         "index": "EVI",
     }
 
@@ -129,9 +129,9 @@ def test_raster_calculate_preset_validation_uses_bbox_if_no_aoi() -> None:
     data = {
         "aoi": None,
         "bbox": TEST_BBOX,
-        "date_from": "2024-01-01T00:00:00Z",
-        "date_to": "2024-01-01T00:00:00Z",
-        "collection": "sentinel-2-l2a",
+        "date_start": "2024-01-01T00:00:00Z",
+        "date_end": "2024-01-01T00:00:00Z",
+        "stac_collection": "sentinel-2-l2a",
         "index": "EVI",
     }
 
@@ -147,9 +147,9 @@ def test_raster_calculate_preset_validation_raises_for_unsupported_collection() 
     data = {
         "aoi": TEST_AOI_JSON,
         "bbox": None,
-        "date_from": "2024-01-01T00:00:00Z",
-        "date_to": "2024-01-01T00:00:00Z",
-        "collection": "test",
+        "date_start": "2024-01-01T00:00:00Z",
+        "date_end": "2024-01-01T00:00:00Z",
+        "stac_collection": "test",
         "index": "EVI",
     }
 
@@ -162,9 +162,9 @@ def test_raster_calculate_preset_validation_uses_ndvi_if_index_not_provided() ->
     data = {
         "aoi": TEST_AOI_JSON,
         "bbox": None,
-        "date_from": "2024-01-01T00:00:00Z",
-        "date_to": "2024-01-01T00:00:00Z",
-        "collection": "sentinel-2-l2a",
+        "date_start": "2024-01-01T00:00:00Z",
+        "date_end": "2024-01-01T00:00:00Z",
+        "stac_collection": "sentinel-2-l2a",
     }
 
     # Act
@@ -178,9 +178,9 @@ def test_raster_calculate_preset_validation_happy_path() -> None:
     data = {
         "aoi": TEST_AOI_JSON,
         "bbox": None,
-        "date_from": "2024-01-01T00:00:00Z",
-        "date_to": "2024-01-01T00:00:00Z",
-        "collection": "sentinel-2-l2a",
+        "date_start": "2024-01-01T00:00:00Z",
+        "date_end": "2024-01-01T00:00:00Z",
+        "stac_collection": "sentinel-2-l2a",
         "index": "EVI",
     }
 
@@ -190,9 +190,9 @@ def test_raster_calculate_preset_validation_happy_path() -> None:
     # Assert
     assert result.aoi == Polygon(**json.loads(TEST_AOI_JSON))
     assert result.bbox is None
-    assert result.date_from == datetime(2024, 1, 1, tzinfo=timezone.utc)
-    assert result.date_to == datetime(2024, 1, 1, tzinfo=timezone.utc)
-    assert result.collection == "sentinel-2-l2a"
+    assert result.date_start == datetime(2024, 1, 1, tzinfo=timezone.utc)
+    assert result.date_end == datetime(2024, 1, 1, tzinfo=timezone.utc)
+    assert result.stac_collection == "sentinel-2-l2a"
     assert result.index == "EVI"
 
 
@@ -200,14 +200,14 @@ def test_raster_calculation_inputs() -> None:
     data = {
         "aoi": TEST_AOI_JSON,
         "bbox": None,
-        "date_from": "2024-01-01T00:00:00Z",
-        "date_to": "2024-01-01T00:00:00Z",
-        "collection": "sentinel-2-l2a",
+        "date_start": "2024-01-01T00:00:00Z",
+        "date_end": "2024-01-01T00:00:00Z",
+        "stac_collection": "sentinel-2-l2a",
         "index": "EVI",
     }
 
     # Act
-    result = RasterCalculatorFunctionInputs(**data).as_inputs()
+    result = RasterCalculatorFunctionInputs(**data).as_ogc_process_inputs()
 
     # Assert
     assert result["aoi"] == TEST_AOI_JSON

@@ -110,17 +110,6 @@ class ADESClient:
         finally:
             await client_session.close()
 
-    async def register_and_execute_process(self, spec: dict[str, Any]) -> dict[str, Any]:
-        process_registration_result = (
-            await self.register_process_from_cwl_href(spec["cwl_location"])
-            if spec["cwl_location"].startswith("https://")
-            else await self.register_process_from_local_cwl_file(spec["cwl_location"])
-        )
-        return await self.execute_process(
-            process_identifier=process_registration_result["id"],
-            process_inputs=spec["inputs"],
-        )
-
     async def register_process_from_cwl_href(self, cwl_href: str) -> dict[str, Any]:
         client_session, retry_client = self._get_retry_client()
         try:
