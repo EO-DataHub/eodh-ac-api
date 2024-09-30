@@ -111,7 +111,7 @@ class AdditionalParameter(BaseModel):
 
 
 class Reference(BaseModel):
-    field_ref: str = Field(..., alias="$ref")
+    field_ref: str | None = Field(None, alias="$ref")
 
 
 class BinaryInputValue(RootModel[str]):
