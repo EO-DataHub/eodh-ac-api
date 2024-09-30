@@ -80,10 +80,22 @@ async def submit_function(
     ades = ades_client(workspace=username, token=credential.credentials)
     inputs_cls = FUNCTION_TO_INPUTS_LOOKUP[creation_spec.preset_function.function_identifier]
     validated_func_inputs = inputs_cls(**creation_spec.preset_function.inputs).as_ogc_process_inputs()
-    response = await ades.execute_process(
+    err, response = await ades.execute_process(
         process_identifier=creation_spec.preset_function.function_identifier,
         process_inputs=validated_func_inputs,
     )
+
+    if err is not None:  # Will happen if there are race conditions and the process was deleted or ADES is unresponsive
+        raise HTTPException(
+            status_code=err.code,
+            detail=err.detail,
+        )
+
+    if response is None:  # Impossible case
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An error occurred while executing preset function",
+        )
 
     return ActionCreatorJob(
         submission_id=response.job_id,
@@ -106,7 +118,17 @@ async def get_function_submissions(
     introspected_token = await decode_token(credential)
     username = introspected_token["preferred_username"]
     ades = ades_client(workspace=username, token=credential.credentials)
-    ades_jobs = await ades.list_job_submissions()
+    err, ades_jobs = await ades.list_job_submissions()
+
+    if err is not None:
+        raise HTTPException(status_code=err.code, detail=err.detail)
+
+    if ades_jobs is None:  # Impossible case
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An error occurred while executing preset function",
+        )
+
     return ActionCreatorJobsResponse(
         submitted_jobs=[
             ActionCreatorJobSummary(

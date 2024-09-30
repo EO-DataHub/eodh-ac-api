@@ -17,8 +17,20 @@ Content-Type: application/json
 { "executionUnit": {"href": "{{raster_calculator_cwl_href}}", "type": "application/cwl" }}
 
 > {%
+
+
     client.global.set("register_process_response", response.body);
+
+
 %}
+
+### RegiserProcessFromBadURL
+POST {{ades_url}}/{{username}}/ogc-api/processes
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+Content-Type: application/json
+
+{ "executionUnit": {"href": "https://some-site.com/non-existend/cwl/file/spec/path.cwl", "type": "application/cwl" }}
 
 ### RegiserProcessFromLocalFile
 POST {{ades_url}}/{{username}}/ogc-api/processes
@@ -29,7 +41,11 @@ Content-Type: application/cwl+yaml
 < raster-calculate-app.cwl
 
 > {%
+
+
     client.global.set("register_process_response", response.body);
+
+
 %}
 
 ### UnregisterProcess
@@ -37,8 +53,18 @@ DELETE {{ades_url}}/{{username}}/ogc-api/processes/{{register_process_response.i
 Accept: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 
+### UnregisterNonExistentProcess
+DELETE {{ades_url}}/{{username}}/ogc-api/processes/i-dont-exist
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
 ### GetProcessDetails
 GET {{ades_url}}/{{username}}/ogc-api/processes/{{register_process_response.id}}
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### GetNonExistentProcessDetails
+GET {{ades_url}}/{{username}}/ogc-api/processes/i-dont-exist
 Accept: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 
@@ -61,8 +87,30 @@ Prefer: respond-async
 }
 
 > {%
+
+
     client.global.set("execute_process_response", response.body);
+
+
 %}
+
+### ExecuteNonExistentProcess
+POST {{ades_url}}/{{username}}/ogc-api/processes/i-dont-exist/execution
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+Content-Type: application/json
+Prefer: respond-async
+
+{
+    "inputs": {
+        "workspace": "{{username}}",
+        "stac_collection": "sentinel-2-l2a",
+        "aoi": "{\"type\":\"Polygon\",\"coordinates\":[[[14.763294437090849,50.833598186651244],[15.052268923898112,50.833598186651244],[15.052268923898112,50.989077215056824],[14.763294437090849,50.989077215056824],[14.763294437090849,50.833598186651244]]]}",
+        "date_start": "2024-04-03",
+        "date_end": "2024-08-01",
+        "index": "ndvi"
+    }
+}
 
 ### ListJobs
 GET {{ades_url}}/{{username}}/ogc-api/jobs
@@ -75,11 +123,35 @@ Accept: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 
 > {%
+
+
     client.global.set("job_status", response.body);
+
+
 %}
+
+### GetNonExistentJobStatus
+GET {{ades_url}}/{{username}}/ogc-api/jobs/non-existent-job-id
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### GetNonExistentJobStatus
+GET {{ades_url}}/{{username}}/ogc-api/jobs/8539da22-7f2e-11ef-92a3-921292eb1c22
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### GetNonExistentJobStatus
+GET {{ades_url}}/{{username}}/ogc-api/jobs/cadbba82-7f1f-11ef-a100-921292eb1c22/results
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
 
 ### GetJobResults
 GET {{ades_url}}/{{username}}/ogc-api/jobs/{{execute_process_response.jobID}}/results
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### GetNonExistentJobResults
+GET {{ades_url}}/{{username}}/ogc-api/jobs/non-existent-job-id/results
 Accept: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 
@@ -95,5 +167,10 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 
 ### CancelJob
 DELETE {{ades_url}}/{{username}}/ogc-api/jobs/{{execute_process_response.jobID}}
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### CancelNonExistentJob
+DELETE {{ades_url}}/{{username}}/ogc-api/jobs/non-existent-job-id
 Accept: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
