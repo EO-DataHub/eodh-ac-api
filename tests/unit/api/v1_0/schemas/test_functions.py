@@ -212,7 +212,7 @@ def test_raster_calculation_inputs() -> None:
     # Assert
     assert result["aoi"] == TEST_AOI_JSON
     assert "bbox" not in result
-    assert result["date_start"] == datetime(2024, 1, 1, tzinfo=timezone.utc)
-    assert result["date_end"] == datetime(2024, 1, 1, tzinfo=timezone.utc)
+    assert result["date_start"] == "2024-01-01T00:00:00+00:00"
+    assert result["date_end"] == "2024-01-01T00:00:00+00:00"
     assert result["stac_collection"] == "sentinel-2-l2a"
     assert result["index"] == "EVI"
