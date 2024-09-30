@@ -104,8 +104,8 @@ class RasterCalculatorFunctionInputs(OGCProcessInputs):
         vals = {
             "aoi": self.aoi.model_dump_json(),
             "stac_collection": self.stac_collection,
-            "date_start": self.date_start,
-            "date_end": self.date_end,
+            "date_start": self.date_start.isoformat() if self.date_start else None,
+            "date_end": self.date_end.isoformat() if self.date_end else None,
             "index": self.index.value,
         }
         keys_to_pop = [k for k in vals if vals[k] is None]
