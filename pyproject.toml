@@ -136,6 +136,9 @@ combine-as-imports = true
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
+[tool.ruff.lint.flake8-pytest-style]
+fixture-parentheses = false
+
 [tool.pytest.ini_options]
 addopts = "--ignore data --ignore notebooks --ignore build_tools --ignore examples --ignore docs"
 asyncio_mode = "auto"

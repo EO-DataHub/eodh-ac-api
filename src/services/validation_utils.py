@@ -33,7 +33,7 @@ class InvalidBoundingBoxError:
     def make(cls, bbox: tuple[float, ...]) -> PydanticCustomError:
         return PydanticCustomError(
             "invalid_bounding_box_error",
-            "BBOX object must be an array of 4 values: [xmin, ymin, xmax, ymax]",
+            "BBOX object must be an array of 4 values: [xmin, ymin, xmax, ymax].",
             {"bbox": bbox},
         )
 
@@ -43,7 +43,7 @@ class CollectionNotSupportedError:
     def make(cls, collection: str, valid_collections: list[str], function_identifier: str) -> PydanticCustomError:
         return PydanticCustomError(
             "collection_not_supported_error",
-            "Collection '{stac_collection}' cannot be used with '{function_identifier}' function! Valid options are: {valid_options}",  # noqa: E501
+            "Collection '{stac_collection}' cannot be used with '{function_identifier}' function! Valid options are: {valid_options}.",  # noqa: E501
             {
                 "stac_collection": collection,
                 "function_identifier": function_identifier,

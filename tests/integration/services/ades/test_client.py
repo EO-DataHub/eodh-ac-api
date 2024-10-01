@@ -29,7 +29,7 @@ TEST_PROCESS_INPUTS = {
 NON_EXISTENT_PROCESS_ID = NON_EXISTENT_JOB_ID = "i-dont-exist"
 
 
-@pytest.fixture()
+@pytest.fixture
 def ades(auth_token: str) -> ADESClient:
     settings = current_settings()
     return ades_client(
@@ -74,6 +74,10 @@ async def test_ades_ensure_process_exists(ades: ADESClient) -> None:
     # Assert
     assert err is None
     assert await ades.process_exists(RASTER_CALCULATOR_PROCESS_IDENTIFIER)
+    err, processes = await ades.list_processes()
+    assert err is None
+    assert processes is not None
+    assert any(p for p in processes.processes if p.id == RASTER_CALCULATOR_PROCESS_IDENTIFIER)
 
 
 @pytest.mark.asyncio(scope="function")

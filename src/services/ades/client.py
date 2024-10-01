@@ -216,10 +216,16 @@ class ADESClient:
                 detail=f"Process '{process_identifier}' does not exist in Action Creator Function Registry. "
                 f"Have you made a typo?",
             )
-        if await self.process_exists(process_identifier):
+
+        err, exists = await self.process_exists(process_identifier)
+        if err:
+            return err
+        if exists:
             return None
+
         cwl_href = FUNCTIONS_REGISTRY[process_identifier]["cwl_href"]
         err, _ = await self.register_process_from_cwl_href(cwl_href=cwl_href)
+
         return err
 
     async def list_processes(self) -> tuple[ErrorResponse | None, ProcessList | None]:
