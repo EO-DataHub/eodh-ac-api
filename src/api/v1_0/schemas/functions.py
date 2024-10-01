@@ -44,6 +44,7 @@ class ActionCreatorFunctionSpec(BaseModel):
     identifier: str
     preset: bool = False
     description: str | None = None
+    thumbnail_b64: str | None = None
     inputs: dict[str, FuncInputSpec]
     outputs: dict[str, FuncOutputSpec]
 
