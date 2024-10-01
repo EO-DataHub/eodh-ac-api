@@ -6,16 +6,8 @@ from datetime import datetime, timezone
 import pytest
 from geojson_pydantic import Polygon
 
-from src.api.v1_0.schemas.functions import RasterCalculatorFunctionInputs, RasterCalculatorIndex
+from src.api.v1_0.action_creator.schemas import RasterCalculatorFunctionInputs, RasterCalculatorIndex
 
-TEST_AOI_JSON = (
-    '{"type":"Polygon","coordinates":'
-    "[[[14.763294437090849,50.833598186651244],"
-    "[15.052268923898112,50.833598186651244],"
-    "[15.052268923898112,50.989077215056824],"
-    "[14.763294437090849,50.989077215056824],"
-    "[14.763294437090849,50.833598186651244]]]}"
-)
 TEST_BBOX = [
     14.763294437090849,  # xmin,
     50.833598186651244,  # ymin,
@@ -96,7 +88,7 @@ def test_raster_calculate_preset_validation_neither_aoi_nor_bbox_provided() -> N
 def test_raster_calculate_preset_validation_aoi_too_big() -> None:
     # Arrange
     data = {
-        "aoi": json.dumps(TEST_UK_AOI),
+        "aoi": TEST_UK_AOI,
         "bbox": None,
         "date_start": "2024-01-01T00:00:00Z",
         "date_end": "2024-01-01T00:00:00Z",
@@ -111,7 +103,7 @@ def test_raster_calculate_preset_validation_aoi_too_big() -> None:
 
 def test_raster_calculate_preset_validation_raises_if_both_aoi_and_bbox_provided() -> None:
     data = {
-        "aoi": TEST_AOI_JSON,
+        "aoi": TEST_HEATHROW_AOI,
         "bbox": TEST_BBOX,
         "date_start": "2024-01-01T00:00:00Z",
         "date_end": "2024-01-01T00:00:00Z",
@@ -143,9 +135,28 @@ def test_raster_calculate_preset_validation_uses_bbox_if_no_aoi() -> None:
     assert result.aoi == Polygon.from_bounds(*TEST_BBOX)
 
 
+def test_raster_calculate_preset_validation_parse_geojson() -> None:
+    # Arrange
+    data = {
+        "aoi": json.dumps(TEST_HEATHROW_AOI),
+        "bbox": None,
+        "date_start": "2024-01-01T00:00:00Z",
+        "date_end": "2024-01-01T00:00:00Z",
+        "stac_collection": "sentinel-2-l2a",
+        "index": "EVI",
+    }
+
+    # Act
+    result = RasterCalculatorFunctionInputs(**data)
+
+    # Assert
+    assert result.aoi is not None
+    assert result.aoi == Polygon(**TEST_HEATHROW_AOI)
+
+
 def test_raster_calculate_preset_validation_raises_for_unsupported_collection() -> None:
     data = {
-        "aoi": TEST_AOI_JSON,
+        "aoi": TEST_HEATHROW_AOI,
         "bbox": None,
         "date_start": "2024-01-01T00:00:00Z",
         "date_end": "2024-01-01T00:00:00Z",
@@ -160,7 +171,7 @@ def test_raster_calculate_preset_validation_raises_for_unsupported_collection() 
 
 def test_raster_calculate_preset_validation_uses_ndvi_if_index_not_provided() -> None:
     data = {
-        "aoi": TEST_AOI_JSON,
+        "aoi": TEST_HEATHROW_AOI,
         "bbox": None,
         "date_start": "2024-01-01T00:00:00Z",
         "date_end": "2024-01-01T00:00:00Z",
@@ -176,7 +187,7 @@ def test_raster_calculate_preset_validation_uses_ndvi_if_index_not_provided() ->
 
 def test_raster_calculate_preset_validation_happy_path() -> None:
     data = {
-        "aoi": TEST_AOI_JSON,
+        "aoi": TEST_HEATHROW_AOI,
         "bbox": None,
         "date_start": "2024-01-01T00:00:00Z",
         "date_end": "2024-01-01T00:00:00Z",
@@ -188,7 +199,7 @@ def test_raster_calculate_preset_validation_happy_path() -> None:
     result = RasterCalculatorFunctionInputs(**data)
 
     # Assert
-    assert result.aoi == Polygon(**json.loads(TEST_AOI_JSON))
+    assert result.aoi == Polygon(**TEST_HEATHROW_AOI)
     assert result.bbox is None
     assert result.date_start == datetime(2024, 1, 1, tzinfo=timezone.utc)
     assert result.date_end == datetime(2024, 1, 1, tzinfo=timezone.utc)
@@ -198,7 +209,7 @@ def test_raster_calculate_preset_validation_happy_path() -> None:
 
 def test_raster_calculation_inputs() -> None:
     data = {
-        "aoi": TEST_AOI_JSON,
+        "aoi": TEST_HEATHROW_AOI,
         "bbox": None,
         "date_start": "2024-01-01T00:00:00Z",
         "date_end": "2024-01-01T00:00:00Z",
@@ -210,7 +221,7 @@ def test_raster_calculation_inputs() -> None:
     result = RasterCalculatorFunctionInputs(**data).as_ogc_process_inputs()
 
     # Assert
-    assert result["aoi"] == TEST_AOI_JSON
+    assert json.loads(result["aoi"]) == TEST_HEATHROW_AOI
     assert "bbox" not in result
     assert result["date_start"] == "2024-01-01T00:00:00+00:00"
     assert result["date_end"] == "2024-01-01T00:00:00+00:00"

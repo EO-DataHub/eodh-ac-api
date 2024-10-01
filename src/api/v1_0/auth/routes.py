@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import PyJWKClient  # type: ignore[attr-defined]
 
-from src.api.v1_0.schemas.auth import IntrospectResponse, TokenRequest, TokenResponse
+from src.api.v1_0.auth.schemas import IntrospectResponse, TokenRequest, TokenResponse
 from src.core.settings import Settings, current_settings
 
 _HEADERS = {"Content-Type": "application/x-www-form-urlencoded"}

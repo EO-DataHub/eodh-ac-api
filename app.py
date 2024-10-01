@@ -3,9 +3,9 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.api.v1_0.routes.action_creator import action_creator_router_v1_0
-from src.api.v1_0.routes.auth import auth_router_v1_0
-from src.api.v1_0.routes.health import health_router_v1_0
+from src.api.v1_0.action_creator.routes import action_creator_router_v1_0
+from src.api.v1_0.auth.routes import auth_router_v1_0
+from src.api.v1_0.health.routes import health_router_v1_0
 from src.utils.logging import get_logger
 
 _logger = get_logger(__name__)
