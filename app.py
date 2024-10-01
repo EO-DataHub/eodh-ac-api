@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from src.api.v1_0.routes.action_creator import action_creator_router_v1_0
 from src.api.v1_0.routes.auth import auth_router_v1_0
@@ -26,3 +27,11 @@ v1_0_app.include_router(action_creator_router_v1_0)
 
 app.mount("/api/v1.0", v1_0_app)
 app.mount("/latest", v1_0_app)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins="*",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
