@@ -33,7 +33,7 @@ license = { text = "MIT" }
 Homepage = 'https://github.com/EO-DataHub/eodh-ac-api'
 
 [tool.setuptools.dynamic]
-readme = {file = ["README.md"]}
+readme = { file = ["README.md"] }
 
 [tool.ruff]
 show-fixes = true
@@ -102,10 +102,10 @@ select = [
     "RUF", # Ruff-specific rules
 ]
 ignore = [
-    "ANN101",  # see: https://pypi.org/project/flake8-annotations - Missing type annotation for self in method
-    "ANN102",  # see: https://pypi.org/project/flake8-annotations - Missing type annotation for cls in method
-    "ANN401",  # see: https://pypi.org/project/flake8-annotations - Dynamically typed expressions (typing.Any) are disallowed
-    "D1",  # see: https://pypi.org/project/pydocstyle - D1 - undocumented public member - too restrictive
+    "ANN101", # see: https://pypi.org/project/flake8-annotations - Missing type annotation for self in method
+    "ANN102", # see: https://pypi.org/project/flake8-annotations - Missing type annotation for cls in method
+    "ANN401", # see: https://pypi.org/project/flake8-annotations - Dynamically typed expressions (typing.Any) are disallowed
+    "D1", # see: https://pypi.org/project/pydocstyle - D1 - undocumented public member - too restrictive
     "COM", # see: https://pypi.org/project/flake8-commas - conflicts with formatter
     "ISC", # see: https://pypi.org/project/flake8-implicit-str-concat - conflicts with formatter
     "CPY", # see: https://pypi.org/project/flake8-copyright - not used
@@ -129,7 +129,9 @@ combine-as-imports = true
 
 [tool.ruff.lint.per-file-ignores]
 "**/{tests}/*" = ["S101"]  # Allow "use of assert detected" in tests
-"src/utils/gpu.py" = ["S605"]
+"src/services/validation_utils.py" = [
+    "RUF027", # see: https://pypi.org/project/Pylint - Possible f-string without an `f` prefix
+]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
@@ -195,6 +197,7 @@ module = [
     "mkdocs_gen_files.*",
     "pandas.*",
     "pydantic.*",
+    "pydantic_core.*",
     "pydantic_settings.*",
     "pyproj.*",
     "shapely.*",

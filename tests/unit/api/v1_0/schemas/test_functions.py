@@ -169,6 +169,21 @@ def test_raster_calculate_preset_validation_raises_for_unsupported_collection() 
         RasterCalculatorFunctionInputs(**data)
 
 
+def test_raster_calculate_preset_validation_raises_for_invalid_date_range() -> None:
+    data = {
+        "aoi": TEST_HEATHROW_AOI,
+        "bbox": None,
+        "date_start": "2024-01-01T00:00:00Z",
+        "date_end": "2023-01-01T00:00:00Z",
+        "stac_collection": "sentinel-2-l2a",
+        "index": "EVI",
+    }
+
+    # Act & Assert
+    with pytest.raises(ValueError, match="End date cannot be before start date."):
+        RasterCalculatorFunctionInputs(**data)
+
+
 def test_raster_calculate_preset_validation_uses_ndvi_if_index_not_provided() -> None:
     data = {
         "aoi": TEST_HEATHROW_AOI,

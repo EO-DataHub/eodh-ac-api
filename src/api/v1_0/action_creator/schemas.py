@@ -14,6 +14,7 @@ from src.services.validation_utils import (
     ensure_area_smaller_than,
     raise_if_both_aoi_and_bbox_provided,
     validate_aoi_or_bbox_provided,
+    validate_date_range,
     validate_stac_collection,
 )
 
@@ -108,11 +109,14 @@ class RasterCalculatorFunctionInputs(OGCProcessInputs):
             function_identifier="raster-calculate",
         )
 
+        # Validate proper date range
+        validate_date_range(v)
+
         return v
 
     @model_validator(mode="before")
     @classmethod
-    def validate(cls, v: dict[str, Any]) -> dict[str, Any]:
+    def validate_before_init(cls, v: dict[str, Any]) -> dict[str, Any]:
         return cls.validate_model(v)
 
     def as_ogc_process_inputs(self) -> dict[str, Any]:
