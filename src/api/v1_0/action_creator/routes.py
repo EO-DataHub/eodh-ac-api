@@ -7,8 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.security import HTTPAuthorizationCredentials  # noqa: TCH002
 from starlette import status
 
-from src.api.v1_0.routes.auth import decode_token, validate_access_token
-from src.api.v1_0.schemas import (
+from src.api.v1_0.action_creator.schemas import (
     FUNCTION_TO_INPUTS_LOOKUP,
     ActionCreatorFunctionSpec,
     ActionCreatorJob,
@@ -18,6 +17,7 @@ from src.api.v1_0.schemas import (
     ErrorResponse,
     FunctionsResponse,
 )
+from src.api.v1_0.auth.routes import decode_token, validate_access_token
 from src.services.action_creator_repo import ActionCreatorRepository, get_function_repo  # noqa: TCH001
 from src.services.ades.client import ades_client
 
@@ -78,11 +78,13 @@ async def submit_function(
 
     username = introspected_token["preferred_username"]
     ades = ades_client(workspace=username, token=credential.credentials)
+
     inputs_cls = FUNCTION_TO_INPUTS_LOOKUP[creation_spec.preset_function.function_identifier]
-    validated_func_inputs = inputs_cls(**creation_spec.preset_function.inputs).as_ogc_process_inputs()
+    inputs = inputs_cls(**creation_spec.preset_function.inputs).as_ogc_process_inputs()
+
     err, response = await ades.execute_process(
         process_identifier=creation_spec.preset_function.function_identifier,
-        process_inputs=validated_func_inputs,
+        process_inputs=inputs,
     )
 
     if err is not None:  # Will happen if there are race conditions and the process was deleted or ADES is unresponsive

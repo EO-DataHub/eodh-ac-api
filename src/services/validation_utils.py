@@ -50,7 +50,7 @@ def datetime_or_current_time(dt: datetime | None) -> datetime:
 
 def aoi_from_geojson_if_necessary(v: dict[str, Any]) -> dict[str, Any]:
     if v.get("aoi") is not None and v.get("bbox") is None and isinstance(v.get("aoi"), str):
-        v["aoi"] = parse_geometry_obj(json.loads(v["aoi"]))
+        v["aoi"] = parse_geometry_obj(json.loads(v["aoi"])).model_dump(mode="json")
     return v
 
 
@@ -59,7 +59,7 @@ def aoi_from_bbox_if_necessary(v: dict[str, Any]) -> dict[str, Any]:
         if len(v["bbox"]) != EXPECTED_BBOX_ELEMENT_COUNT:
             msg = "BBOX object must be an array of 4 values: [xmin, ymin, xmax, ymax]"
             raise ValueError(msg)
-        v["aoi"] = Polygon.from_bounds(*v["bbox"])
+        v["aoi"] = Polygon.from_bounds(*v["bbox"]).model_dump(mode="json")
     return v
 
 

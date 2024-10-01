@@ -5,7 +5,7 @@ from starlette import status
 from starlette.testclient import TestClient
 
 from app import app
-from src.api.v1_0.schemas import ActionCreatorJob, ActionCreatorJobsResponse
+from src.api.v1_0.action_creator.schemas import ActionCreatorJob, ActionCreatorJobsResponse
 
 client = TestClient(app)
 
