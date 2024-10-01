@@ -45,6 +45,9 @@ jobs:
           echo "EODH_AUTH__PASSWORD=${{ secrets.EODH_AUTH__PASSWORD }}" >> envs.env
           echo "EODH_AUTH__REALM=${{ secrets.EODH_AUTH__REALM }}" >> envs.env
           echo "EODH_AUTH__USERNAME=${{ secrets.EODH_AUTH__USERNAME }}" >> envs.env
+          echo "ADES__URL=${{ secrets.ADES__URL }}" >> envs.env
+          echo "ADES__OGC_PROCESSES_API_PATH=${{ secrets.ADES__OGC_PROCESSES_API_PATH }}" >> envs.env
+          echo "ADES__OGC_JOBS_API_PATH=${{ secrets.ADES__OGC_JOBS_API_PATH }}" >> envs.env
       - name: Upload file as artifact
         run: |
           aws s3 cp envs.env s3://ukri-task-definition-variables/${{ vars.TAGS }}/
@@ -56,8 +59,8 @@ jobs:
     environment: qa
     needs: build-push-release-dev
     permissions:
-       id-token: write
-       contents: read
+      id-token: write
+      contents: read
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
@@ -82,6 +85,9 @@ jobs:
           echo "EODH_AUTH__PASSWORD=${{ secrets.EODH_AUTH__PASSWORD }}" >> envs.env
           echo "EODH_AUTH__REALM=${{ secrets.EODH_AUTH__REALM }}" >> envs.env
           echo "EODH_AUTH__USERNAME=${{ secrets.EODH_AUTH__USERNAME }}" >> envs.env
+          echo "ADES__URL=${{ secrets.ADES__URL }}" >> envs.env
+          echo "ADES__OGC_PROCESSES_API_PATH=${{ secrets.ADES__OGC_PROCESSES_API_PATH }}" >> envs.env
+          echo "ADES__OGC_JOBS_API_PATH=${{ secrets.ADES__OGC_JOBS_API_PATH }}" >> envs.env
       - name: Upload file as artifact
         run: |
           aws s3 cp envs.env s3://ukri-task-definition-variables/${{ vars.TAGS }}/
@@ -89,39 +95,42 @@ jobs:
         run: |
           aws --region ${{ vars.AWS_REGION }} ecs update-service --cluster ${{ vars.TAGS }} --service ${{ secrets.ECR_REPOSITORY }} --force-new-deployment
   release-staging:
-     runs-on: ubuntu-latest
-     environment: staging
-     needs: release-qa
-     permissions:
-       id-token: write
-       contents: read
-     steps:
-       - name: Check out the repository
-         uses: actions/checkout@v4
-       - name: Configure AWS credentials using OIDC
-         uses: aws-actions/configure-aws-credentials@v3
-         with:
-           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-           aws-region: ${{ vars.AWS_REGION }}
-       - name: Log in to Amazon ECR
-         run: |
+    runs-on: ubuntu-latest
+    environment: staging
+    needs: release-qa
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - name: Log in to Amazon ECR
+        run: |
           aws ecr get-login-password --region ${{ vars.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
-       - name: Tag and push Docker image to Amazon ECR
-         run: |
-           # Get the ECR URI
-           MANIFEST=$(aws ecr batch-get-image --repository-name ${{ secrets.ECR_REPOSITORY }} --region ${{ vars.AWS_REGION }} --image-ids imageTag=${GITHUB_SHA} --query 'images[].imageManifest' --output text)
-           aws ecr put-image --repository-name ${{ secrets.ECR_REPOSITORY }} --image-tag ${{ vars.TAGS }} --image-manifest "$MANIFEST" --region ${{ vars.AWS_REGION }}
-       - name: Create file with environment variables
-         run: |
-           echo "EODH_AUTH__BASE_URL=${{ secrets.EODH_AUTH__BASE_URL }}" > envs.env
-           echo "EODH_AUTH__CLIENT_ID=${{ secrets.EODH_AUTH__CLIENT_ID }}" >> envs.env
-           echo "EODH_AUTH__CLIENT_SECRET=${{ secrets.EODH_AUTH__CLIENT_SECRET }}" >> envs.env
-           echo "EODH_AUTH__PASSWORD=${{ secrets.EODH_AUTH__PASSWORD }}" >> envs.env
-           echo "EODH_AUTH__REALM=${{ secrets.EODH_AUTH__REALM }}" >> envs.env
-           echo "EODH_AUTH__USERNAME=${{ secrets.EODH_AUTH__USERNAME }}" >> envs.env
-       - name: Upload file as artifact
-         run: |
-           aws s3 cp envs.env s3://ukri-task-definition-variables/${{ vars.TAGS }}/
-       - name: Update ECS service
-         run: |
-           aws --region ${{ vars.AWS_REGION }} ecs update-service --cluster ${{ vars.TAGS }} --service ${{ secrets.ECR_REPOSITORY }} --force-new-deployment
+      - name: Tag and push Docker image to Amazon ECR
+        run: |
+          # Get the ECR URI
+          MANIFEST=$(aws ecr batch-get-image --repository-name ${{ secrets.ECR_REPOSITORY }} --region ${{ vars.AWS_REGION }} --image-ids imageTag=${GITHUB_SHA} --query 'images[].imageManifest' --output text)
+          aws ecr put-image --repository-name ${{ secrets.ECR_REPOSITORY }} --image-tag ${{ vars.TAGS }} --image-manifest "$MANIFEST" --region ${{ vars.AWS_REGION }}
+      - name: Create file with environment variables
+        run: |
+          echo "EODH_AUTH__BASE_URL=${{ secrets.EODH_AUTH__BASE_URL }}" > envs.env
+          echo "EODH_AUTH__CLIENT_ID=${{ secrets.EODH_AUTH__CLIENT_ID }}" >> envs.env
+          echo "EODH_AUTH__CLIENT_SECRET=${{ secrets.EODH_AUTH__CLIENT_SECRET }}" >> envs.env
+          echo "EODH_AUTH__PASSWORD=${{ secrets.EODH_AUTH__PASSWORD }}" >> envs.env
+          echo "EODH_AUTH__REALM=${{ secrets.EODH_AUTH__REALM }}" >> envs.env
+          echo "EODH_AUTH__USERNAME=${{ secrets.EODH_AUTH__USERNAME }}" >> envs.env
+          echo "ADES__URL=${{ secrets.ADES__URL }}" >> envs.env
+          echo "ADES__OGC_PROCESSES_API_PATH=${{ secrets.ADES__OGC_PROCESSES_API_PATH }}" >> envs.env
+          echo "ADES__OGC_JOBS_API_PATH=${{ secrets.ADES__OGC_JOBS_API_PATH }}" >> envs.env
+      - name: Upload file as artifact
+        run: |
+          aws s3 cp envs.env s3://ukri-task-definition-variables/${{ vars.TAGS }}/
+      - name: Update ECS service
+        run: |
+          aws --region ${{ vars.AWS_REGION }} ecs update-service --cluster ${{ vars.TAGS }} --service ${{ secrets.ECR_REPOSITORY }} --force-new-deployment
