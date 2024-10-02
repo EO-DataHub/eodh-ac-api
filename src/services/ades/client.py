@@ -350,6 +350,7 @@ class ADESClient:
 
 def ades_client(workspace: str, token: str) -> ADESClient:
     settings = current_settings()
+    workspace = workspace.lower().replace("-", "_")
     return ADESClient(
         url=settings.ades.url,
         ogc_processes_api_path=settings.ades.ogc_processes_api_path,
