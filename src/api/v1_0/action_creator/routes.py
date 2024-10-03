@@ -18,8 +18,8 @@ from src.api.v1_0.action_creator.schemas import (
     FunctionsResponse,
 )
 from src.api.v1_0.auth.routes import decode_token, validate_access_token
-from src.services.action_creator_repo import ActionCreatorRepository, get_function_repo  # noqa: TCH001
 from src.services.ades.client import ades_client
+from src.services.db.action_creator_repo import ActionCreatorRepository, get_function_repo  # noqa: TCH001
 
 action_creator_router_v1_0 = APIRouter(
     prefix="/action-creator",

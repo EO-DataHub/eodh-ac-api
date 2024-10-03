@@ -4,7 +4,7 @@ from collections import defaultdict
 from typing import Any
 
 from src.consts.action_creator import FUNCTIONS
-from src.services.db import AbstractActionCreatorRepository
+from src.services.db.base import AbstractActionCreatorRepository
 
 
 class ActionCreatorRepository(AbstractActionCreatorRepository):
