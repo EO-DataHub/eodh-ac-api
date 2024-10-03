@@ -82,6 +82,14 @@ async def submit_function(
     inputs_cls = FUNCTION_TO_INPUTS_LOOKUP[creation_spec.preset_function.function_identifier]
     inputs = inputs_cls(**creation_spec.preset_function.inputs).as_ogc_process_inputs()
 
+    err = await ades.ensure_process_exists(creation_spec.preset_function.function_identifier)
+
+    if err is not None:
+        raise HTTPException(
+            status_code=err.code,
+            detail=err.detail,
+        )
+
     err, response = await ades.execute_process(
         process_identifier=creation_spec.preset_function.function_identifier,
         process_inputs=inputs,
