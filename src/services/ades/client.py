@@ -4,13 +4,11 @@ from typing import TYPE_CHECKING, Any
 
 from aiohttp import ClientSession
 from aiohttp_retry import ExponentialRetry, RetryClient
-from pydantic import BaseModel
 from starlette import status
 
 from src.consts.action_creator import FUNCTIONS_REGISTRY
-from src.core.settings import current_settings
+from src.services.ades.base_client import ADESClientBase, ErrorResponse
 from src.services.ades.schemas import JobList, Process, ProcessList, ProcessSummary, StatusInfo
-from src.utils.logging import get_logger
 
 if TYPE_CHECKING:
     from logging import Logger
@@ -20,12 +18,7 @@ if TYPE_CHECKING:
     from aiohttp.client_exceptions import ClientResponse
 
 
-class ErrorResponse(BaseModel):
-    code: int
-    detail: str | dict[str, Any] | None = None
-
-
-class ADESClient:
+class ADESClient(ADESClientBase):
     def __init__(
         self,
         url: str,
@@ -346,16 +339,3 @@ class ADESClient:
             return ErrorResponse(code=response.status, detail=await response.text())
 
         return None
-
-
-def ades_client(workspace: str, token: str) -> ADESClient:
-    settings = current_settings()
-    workspace = workspace.lower().replace("-", "_")
-    return ADESClient(
-        url=settings.ades.url,
-        ogc_processes_api_path=settings.ades.ogc_processes_api_path,
-        ogc_jobs_api_path=settings.ades.ogc_jobs_api_path,
-        workspace=workspace,
-        logger=get_logger(__name__),
-        token=token,
-    )

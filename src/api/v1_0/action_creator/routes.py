@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import asyncio
 import uuid  # noqa: TCH003
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, WebSocket, WebSocketDisconnect, WebSocketException
 from fastapi.security import HTTPAuthorizationCredentials  # noqa: TCH002
+from pydantic import ValidationError
 from starlette import status
 
 from src.api.v1_0.action_creator.schemas import (
@@ -17,9 +19,13 @@ from src.api.v1_0.action_creator.schemas import (
     ErrorResponse,
     FunctionsResponse,
 )
-from src.api.v1_0.auth.routes import decode_token, validate_access_token
-from src.services.ades.client import ades_client
+from src.api.v1_0.auth.routes import decode_token, validate_access_token, validate_token_from_websocket
+from src.services.ades.factory import ades_client_factory
+from src.services.ades.schemas import StatusCode
 from src.services.db.action_creator_repo import ActionCreatorRepository, get_function_repo  # noqa: TCH001
+from src.utils.logging import get_logger
+
+_logger = get_logger(__name__)
 
 action_creator_router_v1_0 = APIRouter(
     prefix="/action-creator",
@@ -67,7 +73,7 @@ async def submit_function(
     creation_spec: ActionCreatorSubmissionRequest,
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
 ) -> ActionCreatorJob:
-    introspected_token = await decode_token(credential)
+    introspected_token = await decode_token(credential.credentials)
 
     if creation_spec.preset_function.function_identifier not in FUNCTION_TO_INPUTS_LOOKUP:
         raise HTTPException(
@@ -76,8 +82,7 @@ async def submit_function(
             "Please use `/functions` endpoint to get list of supported functions.",
         )
 
-    username = introspected_token["preferred_username"]
-    ades = ades_client(workspace=username, token=credential.credentials)
+    ades = ades_client_factory(workspace=introspected_token["preferred_username"], token=credential.credentials)
 
     inputs_cls = FUNCTION_TO_INPUTS_LOOKUP[creation_spec.preset_function.function_identifier]
     inputs = inputs_cls(**creation_spec.preset_function.inputs).as_ogc_process_inputs()
@@ -115,6 +120,128 @@ async def submit_function(
     )
 
 
+@action_creator_router_v1_0.websocket("/ws/submissions")
+async def submit_function_websocket(  # noqa: C901
+    websocket: WebSocket,
+) -> None:
+    await websocket.accept()
+
+    try:
+        # Manually get the Authorization header and validate it
+        token, introspected_token = await validate_token_from_websocket(websocket.headers.get("Authorization"))
+
+        # Receive the submission request from the client
+        try:
+            creation_spec = ActionCreatorSubmissionRequest(**await websocket.receive_json())
+        except ValidationError as e:
+            # Manually construct a validation error response
+            error_response = {
+                "detail": [{"loc": ["body", *err["loc"]], "msg": err["msg"], "type": err["type"]} for err in e.errors()]
+            }
+            await websocket.send_json({"status_code": status.HTTP_422_UNPROCESSABLE_ENTITY, "result": error_response})
+            raise WebSocketException(code=status.WS_1003_UNSUPPORTED_DATA, reason="Data validation error") from e
+
+        if creation_spec.preset_function.function_identifier not in FUNCTION_TO_INPUTS_LOOKUP:
+            raise WebSocketException(
+                code=status.WS_1003_UNSUPPORTED_DATA,
+                reason=f"Function '{creation_spec.preset_function.function_identifier}' not found. "
+                "Please use `/functions` endpoint to get list of supported functions.",
+            )
+
+        inputs_cls = FUNCTION_TO_INPUTS_LOOKUP[creation_spec.preset_function.function_identifier]
+        inputs = inputs_cls(**creation_spec.preset_function.inputs).as_ogc_process_inputs()
+
+        ades = ades_client_factory(workspace=token, token=introspected_token["preferred_username"])
+
+        err = await ades.ensure_process_exists(creation_spec.preset_function.function_identifier)
+
+        if err is not None:
+            await websocket.send_json({
+                "status_code": err.code,
+                "result": err.detail,
+            })
+            raise WebSocketException(
+                code=status.WS_1011_INTERNAL_ERROR,
+                reason=err.detail,
+            )
+
+        err, execution_result = await ades.execute_process(
+            process_identifier=creation_spec.preset_function.function_identifier,
+            process_inputs=inputs,
+        )
+
+        if (
+            err is not None
+        ):  # Will happen if there are race conditions and the process was deleted or ADES is unresponsive
+            await websocket.send_json({
+                "status_code": err.code,
+                "result": err.detail,
+            })
+            raise WebSocketException(
+                code=status.WS_1011_INTERNAL_ERROR,
+                reason=err.detail,
+            )
+
+        if execution_result is None:  # Impossible case
+            await websocket.send_json({
+                "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "result": "An error occurred while executing function",
+            })
+            raise WebSocketException(
+                code=status.WS_1011_INTERNAL_ERROR,
+                reason="An error occurred while executing function",
+            )
+
+        await websocket.send_json(
+            ActionCreatorJob(
+                submission_id=execution_result.job_id,
+                spec=creation_spec,
+                status=execution_result.status.value,
+                submitted_at=execution_result.created,
+            ).model_dump(mode="json")
+        )
+
+        while True:
+            err, status_result = await ades.get_job_details(execution_result.job_id)
+
+            if err is not None:
+                await websocket.send_json({
+                    "status_code": err.code,
+                    "result": err.detail,
+                })
+                raise WebSocketException(
+                    code=status.WS_1011_INTERNAL_ERROR,
+                    reason=err.detail,
+                )
+
+            if status_result is None:
+                raise WebSocketException(
+                    code=status.WS_1011_INTERNAL_ERROR,
+                    reason="An unknown error occurred while polling for the Job execution status",
+                )
+
+            if status_result.status != StatusCode.running:
+                break
+
+            await asyncio.sleep(5)
+
+        await websocket.send_json({
+            "status_code": status.HTTP_200_OK,
+            "result": ActionCreatorJobSummary(
+                submission_id=status_result.job_id,
+                function_identifier=status_result.process_id,
+                status=status_result.status.value,
+                submitted_at=status_result.created,
+                finished_at=status_result.finished,
+            ).model_dump(mode="json"),
+        })
+    except WebSocketDisconnect:
+        _logger.info("Websocket disconnected")
+        raise
+    finally:
+        await websocket.close()
+
+
 @action_creator_router_v1_0.get(
     "/submissions",
     response_model=ActionCreatorJobsResponse,
@@ -125,9 +252,9 @@ async def submit_function(
 async def get_function_submissions(
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
 ) -> ActionCreatorJobsResponse:
-    introspected_token = await decode_token(credential)
+    introspected_token = await decode_token(credential.credentials)
     username = introspected_token["preferred_username"]
-    ades = ades_client(workspace=username, token=credential.credentials)
+    ades = ades_client_factory(workspace=username, token=credential.credentials)
     err, ades_jobs = await ades.list_job_submissions()
 
     if err is not None:
@@ -165,9 +292,9 @@ async def get_function_submission_status(
     submission_id: uuid.UUID,
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
 ) -> ActionCreatorJobSummary:
-    introspected_token = await decode_token(credential)
+    introspected_token = await decode_token(credential.credentials)
     username = introspected_token["preferred_username"]
-    ades = ades_client(workspace=username, token=credential.credentials)
+    ades = ades_client_factory(workspace=username, token=credential.credentials)
     err, job = await ades.get_job_details(job_id=submission_id)
 
     if err:
