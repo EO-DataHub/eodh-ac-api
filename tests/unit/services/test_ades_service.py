@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, patch
 
-from src.services.ades.client import ades_client
+from src.services.ades.factory import ades_client_factory
 
 
-@patch("src.services.ades.client.current_settings")
+@patch("src.services.ades.factory.current_settings")
 def test_ades_client_factory_function_should_create_ades_service_instance(mocked_current_settings: MagicMock) -> None:
     settings = MagicMock()
     mocked_current_settings.return_value = settings
@@ -13,7 +13,7 @@ def test_ades_client_factory_function_should_create_ades_service_instance(mocked
     settings.ades.ogc_processes_api_path = "ogc/processes"
     settings.ades.ogc_jobs_api_path = "ogc/jobs"
 
-    result = ades_client(workspace="test", token="test_token")  # noqa: S106
+    result = ades_client_factory(workspace="test", token="test_token")  # noqa: S106
 
     assert result is not None
     assert result.url == settings.ades.url
@@ -29,7 +29,7 @@ def test_ades_client_factory_function_should_create_ades_service_instance(mocked
     assert result.jobs_endpoint_url == "https://test.ades.com/test/ogc/jobs"
 
 
-@patch("src.services.ades.client.current_settings")
+@patch("src.services.ades.factory.current_settings")
 def test_ades_client_factory_function_should_normalize_workspace_name(mocked_current_settings: MagicMock) -> None:
     settings = MagicMock()
     mocked_current_settings.return_value = settings
@@ -37,7 +37,7 @@ def test_ades_client_factory_function_should_normalize_workspace_name(mocked_cur
     settings.ades.ogc_processes_api_path = "ogc/processes"
     settings.ades.ogc_jobs_api_path = "ogc/jobs"
 
-    result = ades_client(workspace="test-WORKSPACE", token="test_token")  # noqa: S106
+    result = ades_client_factory(workspace="test-WORKSPACE", token="test_token")  # noqa: S106
 
     assert result is not None
     assert result.url == settings.ades.url

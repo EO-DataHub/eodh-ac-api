@@ -9,13 +9,15 @@ from aiohttp import ClientSession
 from starlette import status
 
 from src.core.settings import current_settings
-from src.services.ades.client import ADESClient, ades_client
+from src.services.ades.factory import ades_client_factory
 from src.services.ades.schemas import StatusCode
 
 if TYPE_CHECKING:
     from pathlib import Path
 
-TEST_PROCESS_IDENTIFIER = "water_bodies"
+    from src.services.ades.client import ADESClient
+
+
 RASTER_CALCULATOR_PROCESS_IDENTIFIER = "raster-calculate"
 TEST_WATER_BODIES_CWL_HREF = "https://raw.githubusercontent.com/Terradue/ogc-eo-application-package-hands-on/refs/heads/master/water-bodies/app-package.cwl"
 TEST_PROCESS_INPUTS = {
@@ -32,7 +34,7 @@ NON_EXISTENT_PROCESS_ID = NON_EXISTENT_JOB_ID = "i-dont-exist"
 @pytest.fixture
 def ades(auth_token: str) -> ADESClient:
     settings = current_settings()
-    return ades_client(
+    return ades_client_factory(
         workspace=settings.eodh_auth.username,
         token=auth_token,
     )
@@ -50,7 +52,7 @@ async def get_cwl_from_href(cwl_href: str, save_dir: Path) -> Path:
 @pytest.mark.asyncio(scope="function")
 async def test_ades_registering_process_from_url(ades: ADESClient) -> None:
     # Arrange - ensure process not registered
-    err = await ades.unregister_process(TEST_PROCESS_IDENTIFIER)
+    err = await ades.unregister_process(RASTER_CALCULATOR_PROCESS_IDENTIFIER)
     assert err is None or err.code == status.HTTP_404_NOT_FOUND
 
     # Act
@@ -59,7 +61,7 @@ async def test_ades_registering_process_from_url(ades: ADESClient) -> None:
     # Assert
     assert err is None
     assert result is not None
-    assert result.id == TEST_PROCESS_IDENTIFIER
+    assert result.id == RASTER_CALCULATOR_PROCESS_IDENTIFIER
 
 
 @pytest.mark.asyncio(scope="function")
@@ -97,7 +99,7 @@ async def test_ades_registering_process_twice_results_in_conflict(ades: ADESClie
 @pytest.mark.asyncio(scope="function")
 async def test_ades_registering_process_from_file(ades: ADESClient, tmp_path: Path) -> None:
     # Arrange - ensure process not registered
-    err = await ades.unregister_process(TEST_PROCESS_IDENTIFIER)
+    err = await ades.unregister_process(RASTER_CALCULATOR_PROCESS_IDENTIFIER)
     assert err is None or err.code == status.HTTP_404_NOT_FOUND
 
     # Get the CWL file content
@@ -109,8 +111,8 @@ async def test_ades_registering_process_from_file(ades: ADESClient, tmp_path: Pa
     # Assert
     assert err is None
     assert result is not None
-    assert result.id == TEST_PROCESS_IDENTIFIER
-    assert await ades.process_exists(TEST_PROCESS_IDENTIFIER)
+    assert result.id == RASTER_CALCULATOR_PROCESS_IDENTIFIER
+    assert await ades.process_exists(RASTER_CALCULATOR_PROCESS_IDENTIFIER)
 
 
 @pytest.mark.asyncio(scope="function")
@@ -169,12 +171,12 @@ async def test_ades_listing_process(ades: ADESClient) -> None:
 @pytest.mark.asyncio(scope="function")
 async def test_ades_get_process_details(ades: ADESClient) -> None:
     # Act
-    err, result = await ades.get_process_details(TEST_PROCESS_IDENTIFIER)
+    err, result = await ades.get_process_details(RASTER_CALCULATOR_PROCESS_IDENTIFIER)
 
     # Assert
     assert err is None
     assert result is not None
-    assert result.id == TEST_PROCESS_IDENTIFIER
+    assert result.id == RASTER_CALCULATOR_PROCESS_IDENTIFIER
 
 
 @pytest.mark.asyncio(scope="function")
@@ -198,7 +200,7 @@ async def test_ades_executing_job(ades: ADESClient) -> None:
     # Act
     # Execute the process
     err, execution_result = await ades.execute_process(
-        process_identifier=TEST_PROCESS_IDENTIFIER,
+        process_identifier=RASTER_CALCULATOR_PROCESS_IDENTIFIER,
         process_inputs=TEST_PROCESS_INPUTS,
     )
     assert err is None
@@ -216,7 +218,7 @@ async def test_ades_executing_job(ades: ADESClient) -> None:
     # Assert
     assert err is None
     assert execution_result is not None
-    assert execution_result.process_id == TEST_PROCESS_IDENTIFIER
+    assert execution_result.process_id == RASTER_CALCULATOR_PROCESS_IDENTIFIER
     assert execution_result.job_id
     assert execution_result.status == StatusCode.running
     assert status_result.status in {StatusCode.failed, StatusCode.successful}
@@ -226,7 +228,7 @@ async def test_ades_executing_job(ades: ADESClient) -> None:
 async def test_ades_listing_job_executions(ades: ADESClient) -> None:
     # Arrange
     err, _ = await ades.execute_process(
-        process_identifier=TEST_PROCESS_IDENTIFIER,
+        process_identifier=RASTER_CALCULATOR_PROCESS_IDENTIFIER,
         process_inputs=TEST_PROCESS_INPUTS,
     )
     assert err is None
@@ -256,7 +258,7 @@ async def test_ades_get_non_existent_job_details_returns_404_not_found(ades: ADE
 async def test_ades_getting_job_results(ades: ADESClient, tmp_path: Path) -> None:
     # Arrange
     # Ensure process not registered
-    err = await ades.unregister_process(TEST_PROCESS_IDENTIFIER)
+    err = await ades.unregister_process(RASTER_CALCULATOR_PROCESS_IDENTIFIER)
     assert err is None or err.code == status.HTTP_404_NOT_FOUND
     tmp_file = await get_cwl_from_href(cwl_href=TEST_WATER_BODIES_CWL_HREF, save_dir=tmp_path)
     err, _ = await ades.register_process_from_local_cwl_file(tmp_file)
@@ -264,7 +266,7 @@ async def test_ades_getting_job_results(ades: ADESClient, tmp_path: Path) -> Non
 
     # Execute the process
     err, execution_result = await ades.execute_process(
-        process_identifier=TEST_PROCESS_IDENTIFIER,
+        process_identifier=RASTER_CALCULATOR_PROCESS_IDENTIFIER,
         process_inputs=TEST_PROCESS_INPUTS,
     )
     assert err is None
@@ -304,7 +306,7 @@ async def test_ades_cancelling_job_returns_501_not_implemented(ades: ADESClient)
     # Arrange
     # Execute the process
     err, execution_result = await ades.execute_process(
-        process_identifier=TEST_PROCESS_IDENTIFIER,
+        process_identifier=RASTER_CALCULATOR_PROCESS_IDENTIFIER,
         process_inputs=TEST_PROCESS_INPUTS,
     )
     assert err is None

@@ -132,6 +132,13 @@ combine-as-imports = true
 "src/services/validation_utils.py" = [
     "RUF027", # see: https://pypi.org/project/Pylint - Possible f-string without an `f` prefix
 ]
+"src/api/v1_0/action_creator/routes.py" = [
+    "PLR0912", # see: https://pypi.org/project/Pylint - Too many branches
+]
+"src/services/ades/fake_client.py" = [
+    "ARG002", # see: https://pypi.org/project/flake8-unused-arguments - Unused method argument
+    "PLR6301", # see: https://pypi.org/project/Pylint - Method `X` could be a function, class method, or static method
+]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"

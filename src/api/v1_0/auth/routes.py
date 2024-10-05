@@ -5,7 +5,7 @@ from typing import Annotated, Any
 import aiohttp
 import jwt
 import jwt.exceptions
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, WebSocketException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import PyJWKClient  # type: ignore[attr-defined]
 
@@ -23,22 +23,25 @@ jwt_bearer_scheme = HTTPBearer()
 TIMEOUT = 30
 
 
-async def decode_token(
-    credential: Annotated[HTTPAuthorizationCredentials, Depends(jwt_bearer_scheme)],
-) -> dict[str, Any]:
+async def decode_token(token: str, *, ws: bool = False) -> dict[str, Any]:
     optional_custom_headers = {"User-agent": "custom-user-agent"}
     jwks_client = PyJWKClient(current_settings().eodh_auth.certs_url, headers=optional_custom_headers)
 
     try:
-        signing_key = jwks_client.get_signing_key_from_jwt(credential.credentials)
+        signing_key = jwks_client.get_signing_key_from_jwt(token)
         return jwt.decode(
-            credential.credentials,
+            token,
             signing_key.key,
             audience=["oauth2-proxy-workspaces", "oauth2-proxy", "account"],
             algorithms=["RS256"],
             options={"verify_exp": True},
         )
     except jwt.exceptions.InvalidTokenError as ex:
+        if ws:
+            raise WebSocketException(
+                code=status.WS_1008_POLICY_VIOLATION,
+                reason="Invalid authentication credentials",
+            ) from ex
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials",
@@ -49,8 +52,17 @@ async def decode_token(
 async def validate_access_token(
     credential: Annotated[HTTPAuthorizationCredentials, Depends(jwt_bearer_scheme)],
 ) -> HTTPAuthorizationCredentials:
-    await decode_token(credential)
+    await decode_token(credential.credentials)
     return credential
+
+
+async def validate_token_from_websocket(token: str) -> tuple[str, dict[str, Any]]:
+    if not token or not token.startswith("Bearer "):
+        raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION, reason="Unauthorized - Invalid token")
+
+    token = token.replace("Bearer ", "")
+
+    return token, await decode_token(token, ws=True)
 
 
 @auth_router_v1_0.post(
