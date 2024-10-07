@@ -102,6 +102,7 @@ select = [
     "RUF", # Ruff-specific rules
 ]
 ignore = [
+    "A005", # see: https://pypi.org/project/flake8-builtins - A005 Module `XXX` is shadowing a Python builtin module
     "ANN101", # see: https://pypi.org/project/flake8-annotations - Missing type annotation for self in method
     "ANN102", # see: https://pypi.org/project/flake8-annotations - Missing type annotation for cls in method
     "ANN401", # see: https://pypi.org/project/flake8-annotations - Dynamically typed expressions (typing.Any) are disallowed

@@ -23,7 +23,7 @@ jwt_bearer_scheme = HTTPBearer()
 TIMEOUT = 30
 
 
-async def decode_token(token: str, *, ws: bool = False) -> dict[str, Any]:
+def decode_token(token: str, *, ws: bool = False) -> dict[str, Any]:
     optional_custom_headers = {"User-agent": "custom-user-agent"}
     jwks_client = PyJWKClient(current_settings().eodh_auth.certs_url, headers=optional_custom_headers)
 
@@ -49,20 +49,20 @@ async def decode_token(token: str, *, ws: bool = False) -> dict[str, Any]:
         ) from ex
 
 
-async def validate_access_token(
+def validate_access_token(
     credential: Annotated[HTTPAuthorizationCredentials, Depends(jwt_bearer_scheme)],
 ) -> HTTPAuthorizationCredentials:
-    await decode_token(credential.credentials)
+    decode_token(credential.credentials)
     return credential
 
 
-async def validate_token_from_websocket(token: str) -> tuple[str, dict[str, Any]]:
+def validate_token_from_websocket(token: str) -> tuple[str, dict[str, Any]]:
     if not token or not token.startswith("Bearer "):
         raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION, reason="Unauthorized - Invalid token")
 
     token = token.replace("Bearer ", "")
 
-    return token, await decode_token(token, ws=True)
+    return token, decode_token(token, ws=True)
 
 
 @auth_router_v1_0.post(

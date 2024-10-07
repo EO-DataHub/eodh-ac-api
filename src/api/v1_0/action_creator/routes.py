@@ -73,7 +73,7 @@ async def submit_function(
     creation_spec: ActionCreatorSubmissionRequest,
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
 ) -> ActionCreatorJob:
-    introspected_token = await decode_token(credential.credentials)
+    introspected_token = decode_token(credential.credentials)
 
     if creation_spec.preset_function.function_identifier not in FUNCTION_TO_INPUTS_LOOKUP:
         raise HTTPException(
@@ -128,7 +128,7 @@ async def submit_function_websocket(  # noqa: C901
 
     try:
         # Manually get the Authorization header and validate it
-        token, introspected_token = await validate_token_from_websocket(websocket.headers.get("Authorization"))
+        token, introspected_token = validate_token_from_websocket(websocket.headers.get("Authorization"))
 
         # Receive the submission request from the client
         try:
@@ -252,7 +252,7 @@ async def submit_function_websocket(  # noqa: C901
 async def get_function_submissions(
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
 ) -> ActionCreatorJobsResponse:
-    introspected_token = await decode_token(credential.credentials)
+    introspected_token = decode_token(credential.credentials)
     username = introspected_token["preferred_username"]
     ades = ades_client_factory(workspace=username, token=credential.credentials)
     err, ades_jobs = await ades.list_job_submissions()
@@ -292,7 +292,7 @@ async def get_function_submission_status(
     submission_id: uuid.UUID,
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
 ) -> ActionCreatorJobSummary:
-    introspected_token = await decode_token(credential.credentials)
+    introspected_token = decode_token(credential.credentials)
     username = introspected_token["preferred_username"]
     ades = ades_client_factory(workspace=username, token=credential.credentials)
     err, job = await ades.get_job_details(job_id=submission_id)
