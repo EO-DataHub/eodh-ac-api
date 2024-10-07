@@ -11,8 +11,10 @@ from jwt import PyJWKClient  # type: ignore[attr-defined]
 
 from src.api.v1_0.auth.schemas import IntrospectResponse, TokenRequest, TokenResponse
 from src.core.settings import Settings, current_settings
+from src.utils.logging import get_logger
 
 _HEADERS = {"Content-Type": "application/x-www-form-urlencoded"}
+_logger = get_logger(__name__)
 
 auth_router_v1_0 = APIRouter(
     prefix="/auth",
@@ -36,7 +38,8 @@ def decode_token(token: str, *, ws: bool = False) -> dict[str, Any]:
             algorithms=["RS256"],
             options={"verify_exp": True},
         )
-    except jwt.exceptions.InvalidTokenError as ex:
+    except jwt.exceptions.PyJWTError as ex:
+        _logger.exception("Error decoding JWK")
         if ws:
             raise WebSocketException(
                 code=status.WS_1008_POLICY_VIOLATION,
@@ -58,7 +61,7 @@ def validate_access_token(
 
 def validate_token_from_websocket(token: str) -> tuple[str, dict[str, Any]]:
     if not token or not token.startswith("Bearer "):
-        raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION, reason="Unauthorized - Invalid token")
+        raise WebSocketException(code=status.WS_1008_POLICY_VIOLATION, reason="Invalid authentication credentials")
 
     token = token.replace("Bearer ", "")
 

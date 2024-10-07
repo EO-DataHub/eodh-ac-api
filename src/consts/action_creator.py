@@ -1,12 +1,23 @@
 from __future__ import annotations
 
+import functools
 from typing import Any
+
+from src.consts.directories import ASSETS_DIR
+
+
+@functools.lru_cache
+def _load_base_64_thumbnail(function_identifier: str) -> str | None:
+    fp = ASSETS_DIR / f"{function_identifier}-b64.txt"
+    return fp.read_text() if fp.exists() else None
+
 
 RASTER_CALCULATOR_FUNCTION_SPEC = {
     "identifier": "raster-calculate",
     "name": "Raster Calculator",
     "description": "Raster calculator - calculates spectral indices.",
     "preset": True,
+    "thumbnail_b64": _load_base_64_thumbnail("raster-calculate"),
     "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/raster-calculate-app.cwl",
     "inputs": {
         "stac_collection": {
@@ -61,6 +72,7 @@ LAND_COVER_CHANGE_DETECTION_FUNCTION_SPEC = {
     "name": "Land Cover Change Detection",
     "description": "Land Cover change detection.",
     "preset": True,
+    "thumbnail_b64": _load_base_64_thumbnail("lulc-change"),
     "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/lulc-change-app.cwl",
     "inputs": {
         "stac_collection": {
@@ -103,6 +115,7 @@ WATER_QUALITY_FUNCTION_SPEC = {
     "name": "Water Quality",
     "description": "Water Quality with calibration using DEFRA's in-situ data.",
     "preset": True,
+    "thumbnail_b64": _load_base_64_thumbnail("water-quality"),
     "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/water-quality-app.cwl",
     "inputs": {
         "stac_collection": {
