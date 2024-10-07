@@ -192,14 +192,15 @@ async def submit_function_websocket(  # noqa: C901
                 reason="An error occurred while executing function",
             )
 
-        await websocket.send_json(
-            ActionCreatorJob(
+        await websocket.send_json({
+            "status_code": status.HTTP_202_ACCEPTED,
+            "result": ActionCreatorJob(
                 submission_id=execution_result.job_id,
                 spec=creation_spec,
                 status=execution_result.status.value,
                 submitted_at=execution_result.created,
-            ).model_dump(mode="json")
-        )
+            ).model_dump(mode="json"),
+        })
 
         while True:
             err, status_result = await ades.get_job_details(execution_result.job_id)
