@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import abc
 from datetime import datetime  # noqa: TCH003
-from enum import Enum
-from typing import Any, Sequence
+from enum import Enum, StrEnum
+from typing import Any, ClassVar, Sequence
 
 from geojson_pydantic.geometries import Geometry, Polygon
 from pydantic import BaseModel, Field, model_validator
@@ -59,11 +59,24 @@ class FunctionsResponse(BaseModel):
     total: int
 
 
-class RasterCalculatorIndex(str, Enum):
+class RasterCalculatorIndex(StrEnum):
     NDVI = "NDVI"
     EVI = "EVI"
     NDWI = "NDWI"
     SAVI = "SAVI"
+
+
+class WaterQualityIndex(StrEnum):
+    NDWI = "NDWI"
+    CDOM = "CDOM"
+    DOC = "DOC"
+    CYA = "CYA"
+
+
+class PresetFunctionIdentifier(StrEnum):
+    RASTER_CALCULATOR = "raster-calculate"
+    LAND_COVER_CHANGE_DETECTION = "lulc-change"
+    WATER_QUALITY = "water-quality"
 
 
 class OGCProcessInputs(BaseModel, abc.ABC):
@@ -75,13 +88,14 @@ class OGCProcessInputs(BaseModel, abc.ABC):
     def as_ogc_process_inputs(self) -> dict[str, Any]: ...
 
 
-class RasterCalculatorFunctionInputs(OGCProcessInputs):
+class CommonPresetFunctionInputs(OGCProcessInputs, abc.ABC):
+    function_identifier: ClassVar[str] = "common"
+
     aoi: Geometry
     bbox: tuple[float, float, float, float] | None = None
     date_start: datetime | None = None
     date_end: datetime | None = None
     stac_collection: str
-    index: RasterCalculatorIndex = RasterCalculatorIndex.NDVI
 
     @classmethod
     def validate_model(cls, v: dict[str, Any]) -> dict[str, Any]:
@@ -106,7 +120,7 @@ class RasterCalculatorFunctionInputs(OGCProcessInputs):
         # Validate STAC collection
         validate_stac_collection(
             specified_collection=v["stac_collection"],
-            function_identifier="raster-calculate",
+            function_identifier=cls.function_identifier,
         )
 
         # Validate proper date range
@@ -125,7 +139,6 @@ class RasterCalculatorFunctionInputs(OGCProcessInputs):
             "stac_collection": self.stac_collection,
             "date_start": self.date_start.isoformat() if self.date_start else None,
             "date_end": self.date_end.isoformat() if self.date_end else None,
-            "index": self.index.value,
         }
         keys_to_pop = [k for k in vals if vals[k] is None]
         for k in keys_to_pop:
@@ -133,8 +146,34 @@ class RasterCalculatorFunctionInputs(OGCProcessInputs):
         return vals
 
 
+class RasterCalculatorFunctionInputs(CommonPresetFunctionInputs):
+    function_identifier: ClassVar[str] = PresetFunctionIdentifier.RASTER_CALCULATOR
+    index: RasterCalculatorIndex = RasterCalculatorIndex.NDVI
+
+    def as_ogc_process_inputs(self) -> dict[str, Any]:
+        outputs = super().as_ogc_process_inputs()
+        outputs["index"] = self.index.value
+        return outputs
+
+
+class LandCoverChangeDetectionFunctionInputs(CommonPresetFunctionInputs):
+    function_identifier: ClassVar[str] = PresetFunctionIdentifier.LAND_COVER_CHANGE_DETECTION
+
+
+class WaterQualityFunctionInputs(CommonPresetFunctionInputs):
+    function_identifier: ClassVar[str] = PresetFunctionIdentifier.WATER_QUALITY
+    index: WaterQualityIndex = WaterQualityIndex.NDWI
+
+    def as_ogc_process_inputs(self) -> dict[str, Any]:
+        outputs = super().as_ogc_process_inputs()
+        outputs["index"] = self.index.value
+        return outputs
+
+
 FUNCTION_TO_INPUTS_LOOKUP = {
-    "raster-calculate": RasterCalculatorFunctionInputs,
+    PresetFunctionIdentifier.RASTER_CALCULATOR: RasterCalculatorFunctionInputs,
+    PresetFunctionIdentifier.LAND_COVER_CHANGE_DETECTION: LandCoverChangeDetectionFunctionInputs,
+    PresetFunctionIdentifier.WATER_QUALITY: WaterQualityFunctionInputs,
 }
 
 
@@ -148,7 +187,7 @@ class ActionCreatorJobStatus(str, Enum):
 
 
 class PresetFunctionExecutionRequest(BaseModel):
-    function_identifier: str = Field(..., examples=["raster-calculate", "lulc-change"])
+    function_identifier: PresetFunctionIdentifier
     inputs: dict[str, Any] = Field(
         ...,
         examples=[
@@ -176,17 +215,18 @@ class PresetFunctionExecutionRequest(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def validate_model(cls, v: dict[str, Any]) -> dict[str, Any]:
-        inputs = v["inputs"]
-        if v["function_identifier"] == "raster-calculate":
-            inputs = RasterCalculatorFunctionInputs.validate_model(inputs)
-            v["inputs"] = inputs
-            return v
+        if v["function_identifier"] not in FUNCTION_TO_INPUTS_LOOKUP:
+            msg = (
+                f"Function {v['function_identifier']} not recognized. "
+                "Please use `get_available_functions` endpoint to get list of valid functions"
+            )
+            raise ValueError(msg)
 
-        msg = (
-            f"Function {v['function_identifier']} not recognized. "
-            "Please use `get_available_functions` endpoint to get list of valid functions"
-        )
-        raise ValueError(msg)
+        inputs = v["inputs"]
+        inputs_cls = FUNCTION_TO_INPUTS_LOOKUP[v["function_identifier"]]
+        inputs = inputs_cls.validate_model(inputs)
+        v["inputs"] = inputs
+        return v
 
 
 class ActionCreatorSubmissionRequest(BaseModel):

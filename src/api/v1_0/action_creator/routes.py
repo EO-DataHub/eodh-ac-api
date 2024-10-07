@@ -75,13 +75,6 @@ async def submit_function(
 ) -> ActionCreatorJob:
     introspected_token = decode_token(credential.credentials)
 
-    if creation_spec.preset_function.function_identifier not in FUNCTION_TO_INPUTS_LOOKUP:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Function '{creation_spec.preset_function.function_identifier}' not found. "
-            "Please use `/functions` endpoint to get list of supported functions.",
-        )
-
     ades = ades_client_factory(workspace=introspected_token["preferred_username"], token=credential.credentials)
 
     inputs_cls = FUNCTION_TO_INPUTS_LOOKUP[creation_spec.preset_function.function_identifier]
