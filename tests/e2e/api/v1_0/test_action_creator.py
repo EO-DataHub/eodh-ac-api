@@ -24,7 +24,7 @@ def app_fixture() -> FastAPI:
 
 
 @pytest.fixture
-def mocked_ades_factory() -> Generator[MagicMock, None, None]:
+def mocked_ades_factory() -> Generator[MagicMock]:
     ades_client_factory_mock: MagicMock
     with patch(  # type: ignore[assignment]
         "src.api.v1_0.action_creator.routes.ades_client_factory",
@@ -57,8 +57,7 @@ def raster_calculator_request_body() -> dict[str, Any]:
     }
 
 
-@pytest.mark.asyncio(scope="function")
-async def test_get_job_submissions_endpoint_returns_forbidden_error_when_no_token_specified(client: TestClient) -> None:
+def test_get_job_submissions_endpoint_returns_forbidden_error_when_no_token_specified(client: TestClient) -> None:
     # Act
     response = client.get("/api/v1.0/action-creator/submissions")
 
@@ -66,8 +65,7 @@ async def test_get_job_submissions_endpoint_returns_forbidden_error_when_no_toke
     assert response.status_code == status.HTTP_403_FORBIDDEN
 
 
-@pytest.mark.asyncio(scope="function")
-async def test_get_job_submissions_endpoint_returns_unauthorized_error_when_bad_token(client: TestClient) -> None:
+def test_get_job_submissions_endpoint_returns_unauthorized_error_when_bad_token(client: TestClient) -> None:
     # Act
     response = client.get("/api/v1.0/action-creator/submissions", headers={"Authorization": "Bearer bad_token"})
 
@@ -75,8 +73,7 @@ async def test_get_job_submissions_endpoint_returns_unauthorized_error_when_bad_
     assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
 
-@pytest.mark.asyncio(scope="function")
-async def test_get_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
+def test_get_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
     client: TestClient,
     auth_token: str,
 ) -> None:
@@ -88,8 +85,7 @@ async def test_get_job_submissions_endpoint_returns_valid_response_when_all_is_o
     assert ActionCreatorJobsResponse(**response.json())
 
 
-@pytest.mark.asyncio(scope="function")
-async def test_post_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
+def test_post_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
     mocked_ades_factory: MagicMock,  # noqa: ARG001
     client: TestClient,
     auth_token: str,
@@ -107,8 +103,7 @@ async def test_post_job_submissions_endpoint_returns_valid_response_when_all_is_
     assert ActionCreatorJob(**response.json())
 
 
-@pytest.mark.asyncio(scope="function")
-async def test_post_job_submissions_endpoint_returns_422_when_invalid_stac_collection_was_provided(
+def test_post_job_submissions_endpoint_returns_422_when_invalid_stac_collection_was_provided(
     mocked_ades_factory: MagicMock,  # noqa: ARG001
     client: TestClient,
     auth_token: str,
@@ -135,8 +130,7 @@ async def test_post_job_submissions_endpoint_returns_422_when_invalid_stac_colle
     )
 
 
-@pytest.mark.asyncio(scope="function")
-async def test_post_job_submissions_endpoint_returns_422_when_misconfigured_aoi_and_bbox_was_provided(
+def test_post_job_submissions_endpoint_returns_422_when_misconfigured_aoi_and_bbox_was_provided(
     mocked_ades_factory: MagicMock,  # noqa: ARG001
     client: TestClient,
     auth_token: str,
@@ -160,8 +154,7 @@ async def test_post_job_submissions_endpoint_returns_422_when_misconfigured_aoi_
     assert err["detail"][0]["msg"] == "AOI and BBOX are mutually exclusive, provide only one of them."
 
 
-@pytest.mark.asyncio(scope="function")
-async def test_post_job_submissions_endpoint_returns_422_when_missing_geometry(
+def test_post_job_submissions_endpoint_returns_422_when_missing_geometry(
     mocked_ades_factory: MagicMock,  # noqa: ARG001
     client: TestClient,
     auth_token: str,
@@ -185,8 +178,7 @@ async def test_post_job_submissions_endpoint_returns_422_when_missing_geometry(
     assert err["detail"][0]["msg"] == "At least one of AOI or BBOX must be provided."
 
 
-@pytest.mark.asyncio(scope="function")
-async def test_post_job_submissions_endpoint_returns_422_when_invalid_date_range_was_provided(
+def test_post_job_submissions_endpoint_returns_422_when_invalid_date_range_was_provided(
     mocked_ades_factory: MagicMock,  # noqa: ARG001
     client: TestClient,
     auth_token: str,
@@ -210,8 +202,7 @@ async def test_post_job_submissions_endpoint_returns_422_when_invalid_date_range
     assert err["detail"][0]["msg"] == "End date cannot be before start date."
 
 
-@pytest.mark.asyncio(scope="function")
-async def test_post_job_submissions_endpoint_returns_422_when_invalid_bbox_was_provided(
+def test_post_job_submissions_endpoint_returns_422_when_invalid_bbox_was_provided(
     mocked_ades_factory: MagicMock,  # noqa: ARG001
     client: TestClient,
     auth_token: str,
@@ -236,8 +227,7 @@ async def test_post_job_submissions_endpoint_returns_422_when_invalid_bbox_was_p
     assert err["detail"][0]["msg"] == "BBOX object must be an array of 4 values: [xmin, ymin, xmax, ymax]."
 
 
-@pytest.mark.asyncio(scope="function")
-async def test_ws_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
+def test_ws_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
     mocked_ades_factory: MagicMock,  # noqa: ARG001
     client: TestClient,
     auth_token: str,
@@ -266,8 +256,7 @@ async def test_ws_job_submissions_endpoint_returns_valid_response_when_all_is_ok
         assert final_response["finished_at"] is not None
 
 
-@pytest.mark.asyncio(scope="function")
-async def test_ws_job_submissions_endpoint_returns_422_when_invalid_stac_collection_was_provided(
+def test_ws_job_submissions_endpoint_returns_422_when_invalid_stac_collection_was_provided(
     mocked_ades_factory: MagicMock,  # noqa: ARG001
     client: TestClient,
     auth_token: str,
@@ -297,8 +286,7 @@ async def test_ws_job_submissions_endpoint_returns_422_when_invalid_stac_collect
         websocket.close()
 
 
-@pytest.mark.asyncio(scope="function")
-async def test_ws_job_submissions_endpoint_returns_422_when_misconfigured_aoi_and_bbox_was_provided(
+def test_ws_job_submissions_endpoint_returns_422_when_misconfigured_aoi_and_bbox_was_provided(
     mocked_ades_factory: MagicMock,  # noqa: ARG001
     client: TestClient,
     auth_token: str,
@@ -327,8 +315,7 @@ async def test_ws_job_submissions_endpoint_returns_422_when_misconfigured_aoi_an
         )
 
 
-@pytest.mark.asyncio(scope="function")
-async def test_ws_job_submissions_endpoint_returns_422_when_missing_geometry(
+def test_ws_job_submissions_endpoint_returns_422_when_missing_geometry(
     mocked_ades_factory: MagicMock,  # noqa: ARG001
     client: TestClient,
     auth_token: str,
@@ -355,8 +342,7 @@ async def test_ws_job_submissions_endpoint_returns_422_when_missing_geometry(
         assert response["result"]["detail"][0]["msg"] == "At least one of AOI or BBOX must be provided."
 
 
-@pytest.mark.asyncio(scope="function")
-async def test_ws_job_submissions_endpoint_returns_422_when_invalid_date_range_was_provided(
+def test_ws_job_submissions_endpoint_returns_422_when_invalid_date_range_was_provided(
     mocked_ades_factory: MagicMock,  # noqa: ARG001
     client: TestClient,
     auth_token: str,
@@ -383,8 +369,7 @@ async def test_ws_job_submissions_endpoint_returns_422_when_invalid_date_range_w
         assert response["result"]["detail"][0]["msg"] == "End date cannot be before start date."
 
 
-@pytest.mark.asyncio(scope="function")
-async def test_ws_job_submissions_endpoint_returns_422_when_invalid_bbox_was_provided(
+def test_ws_job_submissions_endpoint_returns_422_when_invalid_bbox_was_provided(
     mocked_ades_factory: MagicMock,  # noqa: ARG001
     client: TestClient,
     auth_token: str,
