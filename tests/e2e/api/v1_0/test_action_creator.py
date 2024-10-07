@@ -126,7 +126,7 @@ def test_post_job_submissions_endpoint_returns_422_when_invalid_stac_collection_
     assert err["detail"][0]["type"] == "collection_not_supported_error"
     assert err["detail"][0]["msg"] == (
         "Collection 'dummy-collection' cannot be used with 'raster-calculate' function! "
-        "Valid options are: ['sentinel-2-l1c', 'sentinel-2-l2a']."
+        "Valid options are: ['sentinel-2-l2a']."
     )
 
 
@@ -283,7 +283,7 @@ def test_ws_job_submissions_endpoint_returns_422_when_invalid_stac_collection_wa
         assert response["result"]["detail"][0]["type"] == "collection_not_supported_error"
         assert response["result"]["detail"][0]["msg"] == (
             "Collection 'dummy-collection' cannot be used with 'raster-calculate' function! "
-            "Valid options are: ['sentinel-2-l1c', 'sentinel-2-l2a']."
+            "Valid options are: ['sentinel-2-l2a']."
         )
         websocket.close()
 

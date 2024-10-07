@@ -25,7 +25,7 @@ RASTER_CALCULATOR_FUNCTION_SPEC = {
             "required": False,
             "default": "sentinel-2-l2a",
             "description": "The STAC collection to use.",
-            "options": ["sentinel-2-l1c", "sentinel-2-l2a"],
+            "options": ["sentinel-2-l2a"],
         },
         "date_start": {
             "type": "datetime",
@@ -80,7 +80,7 @@ LAND_COVER_CHANGE_DETECTION_FUNCTION_SPEC = {
             "required": False,
             "default": "global-land-cover",
             "description": "The STAC collection to use.",
-            "options": ["global-land-cover", "corine-land-cover"],
+            "options": ["land_cover", "corine-land-cover", "CLC-backbone", "water-bodies"],
         },
         "date_start": {
             "type": "datetime",
@@ -123,7 +123,7 @@ WATER_QUALITY_FUNCTION_SPEC = {
             "required": False,
             "default": "sentinel-2-l2a",
             "description": "The STAC collection to use.",
-            "options": ["sentinel-2-l1c", "sentinel-2-l2a"],
+            "options": ["sentinel-2-l2a"],
         },
         "date_start": {
             "type": "datetime",
@@ -156,9 +156,8 @@ WATER_QUALITY_FUNCTION_SPEC = {
             "type": "string",
             "description": "The spectral index to calculate.",
             "required": False,
-            "default": "all",
+            "default": "NDWI",
             "options": [
-                "all",
                 "NDWI",
                 "CDOM",
                 "DOC",
@@ -172,10 +171,6 @@ WATER_QUALITY_FUNCTION_SPEC = {
             "description": "The STAC collection with results.",
         }
     },
-}
-
-PRESET_FUNCTION_CWL_FILE_LOCATION = {
-    "raster-calculator": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/raster-calculate-app.cwl",
 }
 
 FUNCTIONS = [
