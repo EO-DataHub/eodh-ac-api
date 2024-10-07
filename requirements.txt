@@ -1,4 +1,4 @@
-aiodns==3.0.0
+aiodns==3.2.0
 aiohttp-retry==2.8.3
 aiohttp[speedups]==3.10.8
 cryptography==43.0.1
