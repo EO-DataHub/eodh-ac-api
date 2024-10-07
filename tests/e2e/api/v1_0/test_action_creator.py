@@ -245,15 +245,17 @@ def test_ws_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
         submit_response = websocket.receive_json()
 
         # Assert the initial response (running status)
-        assert submit_response["status"] == StatusCode.running.value
-        assert submit_response["finished_at"] is None
+        assert submit_response["status_code"] == status.HTTP_202_ACCEPTED
+        assert submit_response["result"]["status"] == StatusCode.running.value
+        assert submit_response["result"]["finished_at"] is None
 
         # Simulate polling for status update until job is finished
         final_response = websocket.receive_json()
 
         # Assert final job status
-        assert final_response["status"] == StatusCode.successful.value
-        assert final_response["finished_at"] is not None
+        assert final_response["status_code"] == status.HTTP_200_OK
+        assert final_response["result"]["status"] == StatusCode.successful.value
+        assert final_response["result"]["finished_at"] is not None
 
 
 def test_ws_job_submissions_endpoint_returns_422_when_invalid_stac_collection_was_provided(
