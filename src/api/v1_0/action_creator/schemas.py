@@ -163,10 +163,12 @@ class LandCoverChangeDetectionFunctionInputs(CommonPresetFunctionInputs):
 class WaterQualityFunctionInputs(CommonPresetFunctionInputs):
     function_identifier: ClassVar[str] = PresetFunctionIdentifier.WATER_QUALITY
     index: WaterQualityIndex = WaterQualityIndex.NDWI
+    calibrate: bool = False
 
     def as_ogc_process_inputs(self) -> dict[str, Any]:
         outputs = super().as_ogc_process_inputs()
         outputs["index"] = self.index.value
+        outputs["calibrate"] = self.calibrate
         return outputs
 
 
