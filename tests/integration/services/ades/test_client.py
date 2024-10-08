@@ -71,6 +71,21 @@ async def test_ades_registering_process_from_url(ades: ADESClient) -> None:
 
 
 @pytest.mark.asyncio(scope="function")
+async def test_ades_registering_process_from_url_with_download(ades: ADESClient) -> None:
+    # Arrange - ensure process not registered
+    err = await ades.unregister_process(WATER_BODIES_PROCESS_IDENTIFIER)
+    assert err is None or err.code == status.HTTP_404_NOT_FOUND
+
+    # Act
+    err, result = await ades.register_process_from_cwl_href_with_download(WATER_BODIES_CWL_HREF)
+
+    # Assert
+    assert err is None
+    assert result is not None
+    assert result.id == WATER_BODIES_PROCESS_IDENTIFIER
+
+
+@pytest.mark.asyncio(scope="function")
 async def test_ades_ensure_process_exists(ades: ADESClient) -> None:
     # Arrange - ensure process not registered
     err = await ades.unregister_process(RASTER_CALCULATOR_PROCESS_IDENTIFIER)
