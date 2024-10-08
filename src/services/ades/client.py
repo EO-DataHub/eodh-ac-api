@@ -1,21 +1,43 @@
 from __future__ import annotations
 
+import os
+import re
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import TYPE_CHECKING, Any
+from urllib.parse import urlparse
 
 from aiohttp import ClientSession
 from aiohttp_retry import ExponentialRetry, RetryClient
 from starlette import status
 
 from src.consts.action_creator import FUNCTIONS_REGISTRY
+from src.core.settings import current_settings
 from src.services.ades.base_client import ADESClientBase, ErrorResponse
 from src.services.ades.schemas import JobList, Process, ProcessList, ProcessSummary, StatusInfo
+from src.utils.logging import get_logger
 
 if TYPE_CHECKING:
     from logging import Logger
-    from pathlib import Path
     from uuid import UUID
 
     from aiohttp.client_exceptions import ClientResponse
+
+_logger = get_logger(__name__)
+
+
+def replace_placeholders_in_cwl_file(file_path: Path) -> None:
+    _ = current_settings()
+
+    content = file_path.read_text()
+    pattern = re.compile(r"<<([A-Za-z\-_ ]+)>>")
+    placeholders = re.findall(pattern=pattern, string=content)
+
+    for placeholder in placeholders:
+        replacement = os.environ.get(placeholder.strip(), '""')
+        content = content.replace(f"<<{placeholder}>>", replacement)
+
+    file_path.write_text(content)
 
 
 class ADESClient(ADESClientBase):
@@ -65,6 +87,21 @@ class ADESClient(ADESClientBase):
             logger=self.logger,
         )
         return client_session, retry_client
+
+    async def _download_file(self, file_url: str, output_path: Path) -> tuple[ErrorResponse | None, Path | None]:
+        client_session, retry_client = self._get_retry_client()
+
+        try:
+            async with retry_client.get(file_url) as response:
+                if err := await self._handle_common_errors_if_necessary(response):
+                    return err, None
+                parsed = urlparse(file_url)
+                fname = parsed.path.split("/")[-1]
+                fp = output_path / fname
+                fp.write_bytes(await response.content.read())
+                return None, fp
+        finally:
+            await client_session.close()
 
     async def get_job_details(self, job_id: str | UUID) -> tuple[ErrorResponse | None, StatusInfo | None]:
         client_session, retry_client = self._get_retry_client()
@@ -171,6 +208,20 @@ class ADESClient(ADESClientBase):
         finally:
             await client_session.close()
 
+    async def register_process_from_cwl_href_with_download(
+        self,
+        cwl_href: str,
+    ) -> tuple[ErrorResponse | None, ProcessSummary | None]:
+        with TemporaryDirectory() as tmp_dir:
+            tmp_dir_path = Path(tmp_dir)
+            err, fp = await self._download_file(file_url=cwl_href, output_path=tmp_dir_path)
+            if err:
+                return err, None
+            if fp is None:
+                return ErrorResponse(code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error."), None
+            replace_placeholders_in_cwl_file(fp)
+            return await self.register_process_from_local_cwl_file(fp)
+
     async def register_process_from_local_cwl_file(
         self,
         cwl_location: Path,
@@ -217,7 +268,7 @@ class ADESClient(ADESClientBase):
             return None
 
         cwl_href = FUNCTIONS_REGISTRY[process_identifier]["cwl_href"]
-        err, _ = await self.register_process_from_cwl_href(cwl_href=cwl_href)
+        err, _ = await self.register_process_from_cwl_href_with_download(cwl_href=cwl_href)
 
         return err
 
@@ -317,6 +368,14 @@ class ADESClient(ADESClientBase):
 
     @staticmethod
     async def _handle_common_errors_if_necessary(response: ClientResponse) -> ErrorResponse | None:
+        if response.status >= status.HTTP_400_BAD_REQUEST:
+            _logger.warning(
+                "Response for %s %s, does not indicate success. Status code: %s",
+                response.method,
+                response.url,
+                response.status,
+            )
+
         if response.status == status.HTTP_400_BAD_REQUEST:
             return ErrorResponse(
                 code=status.HTTP_400_BAD_REQUEST,

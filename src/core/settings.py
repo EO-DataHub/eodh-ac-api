@@ -43,12 +43,18 @@ class ADESSettings(BaseModel):
     ogc_jobs_api_path: str = "ogc-api/jobs"
 
 
+class OAuthClientSettings(BaseModel):
+    client_id: str
+    client_secret: str
+
+
 class Settings(BaseSettings):
     """Represents Application Settings with nested configuration sections."""
 
     environment: str = "local"
     eodh_auth: OAuth2Settings
     ades: ADESSettings
+    sentinel_hub: OAuthClientSettings | None = None
 
     model_config = SettingsConfigDict(
         env_file=consts.directories.ROOT_DIR / ".env",
