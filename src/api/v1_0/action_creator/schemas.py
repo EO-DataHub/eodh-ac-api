@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 from datetime import datetime  # noqa: TCH003
-from enum import Enum, StrEnum
+from enum import Enum, StrEnum, auto
 from typing import Annotated, Any, ClassVar, Generic, Literal, Sequence, TypeVar
 
 from geojson_pydantic.geometries import Geometry, Polygon
@@ -19,6 +19,12 @@ from src.services.validation_utils import (
 )
 
 T = TypeVar("T", bound=BaseModel)
+
+DEFAULT_PAGE_IDX = 1
+MIN_PAGE_IDX = 1
+DEFAULT_RESULTS_PER_PAGE = 25
+MIN_RESULTS_PER_PAGE = 1
+MAX_RESULTS_PER_PAGE = 100
 
 
 class ErrorResponse(BaseModel):
@@ -270,22 +276,32 @@ class ActionCreatorJobSummary(BaseModel):
         return v
 
 
+class OrderDirection(StrEnum):
+    asc = auto()
+    desc = auto()
+
+
 class ActionCreatorSubmissionsQueryParams(BaseModel):
     order_by: Annotated[
         Literal["submission_id", "status", "function_identifier", "submitted_at", "finished_at", "successful"],
         Field("submitted_at", description="Field to use for ordering - `submitted_at` by default"),
     ]
     order_direction: Annotated[
-        Literal["asc", "desc"],
+        OrderDirection,
         Field("asc", description="Order direction - `asc` by default"),
     ]
     page: Annotated[
         int,
-        Field(1, description="Page number - 1 by default", ge=1),
+        Field(DEFAULT_PAGE_IDX, description="Page number - 1 by default", ge=MIN_PAGE_IDX),
     ]
     per_page: Annotated[
         int,
-        Field(25, description="Number of results to return - 25 by default", ge=1, le=100),
+        Field(
+            DEFAULT_RESULTS_PER_PAGE,
+            description="Number of results to return - 25 by default",
+            ge=MIN_RESULTS_PER_PAGE,
+            le=MAX_RESULTS_PER_PAGE,
+        ),
     ]
 
     @classmethod
@@ -301,12 +317,12 @@ class ActionCreatorSubmissionsQueryParams(BaseModel):
     @classmethod
     @field_validator("page", mode="before")
     def validate_page(cls, v: int | None) -> int:
-        return 1 if v is None else v
+        return DEFAULT_PAGE_IDX if v is None else v
 
     @classmethod
     @field_validator("per_page", mode="before")
     def validate_per_page(cls, v: int | None) -> int:
-        return 25 if v is None else v
+        return DEFAULT_RESULTS_PER_PAGE if v is None else v
 
 
 class PaginationResults(BaseModel, Generic[T]):
@@ -317,4 +333,4 @@ class PaginationResults(BaseModel, Generic[T]):
     results_on_current_page: int
     results_per_page: int
     ordered_by: str
-    order_direction: Literal["asc", "desc"]
+    order_direction: OrderDirection
