@@ -1,15 +1,16 @@
 from __future__ import annotations
 
-from fastapi import status
-from fastapi.testclient import TestClient
+from typing import TYPE_CHECKING
 
-from app import app
+from fastapi import status
+
 from src.core.settings import current_settings
 
-client = TestClient(app)
+if TYPE_CHECKING:
+    from fastapi.testclient import TestClient
 
 
-def test_authenticate_success() -> None:
+def test_authenticate_success(client: TestClient) -> None:
     settings = current_settings()
 
     response = client.post(
@@ -22,7 +23,7 @@ def test_authenticate_success() -> None:
     assert response.json()["refresh_token"] is not None
 
 
-def test_authenticate_failure() -> None:
+def test_authenticate_failure(client: TestClient) -> None:
     response = client.post(
         "/api/v1.0/auth/token",
         json={"username": "test", "password": "test"},
@@ -32,7 +33,7 @@ def test_authenticate_failure() -> None:
     assert response.json()["detail"]["error_description"] == "Invalid user credentials"
 
 
-def test_introspect_success() -> None:
+def test_introspect_success(client: TestClient) -> None:
     settings = current_settings()
 
     token_response = client.post(
