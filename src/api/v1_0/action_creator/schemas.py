@@ -3,10 +3,10 @@ from __future__ import annotations
 import abc
 from datetime import datetime  # noqa: TCH003
 from enum import Enum, StrEnum
-from typing import Any, ClassVar, Sequence
+from typing import Annotated, Any, ClassVar, Generic, Literal, Sequence, TypeVar
 
 from geojson_pydantic.geometries import Geometry, Polygon
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from src.services.validation_utils import (
     aoi_from_bbox_if_necessary,
@@ -17,6 +17,8 @@ from src.services.validation_utils import (
     validate_date_range,
     validate_stac_collection,
 )
+
+T = TypeVar("T", bound=BaseModel)
 
 
 class ErrorResponse(BaseModel):
@@ -268,6 +270,51 @@ class ActionCreatorJobSummary(BaseModel):
         return v
 
 
-class ActionCreatorJobsResponse(BaseModel):
-    submitted_jobs: Sequence[ActionCreatorJobSummary]
-    total: int
+class ActionCreatorSubmissionsQueryParams(BaseModel):
+    order_by: Annotated[
+        Literal["submission_id", "status", "function_identifier", "submitted_at", "finished_at", "successful"],
+        Field("submitted_at", description="Field to use for ordering - `submitted_at` by default"),
+    ]
+    order_direction: Annotated[
+        Literal["asc", "desc"],
+        Field("asc", description="Order direction - `asc` by default"),
+    ]
+    page: Annotated[
+        int,
+        Field(1, description="Page number - 1 by default", ge=1),
+    ]
+    per_page: Annotated[
+        int,
+        Field(25, description="Number of results to return - 25 by default", ge=1, le=100),
+    ]
+
+    @classmethod
+    @field_validator("order_by", mode="before")
+    def validate_order_by(cls, v: str | None) -> str:
+        return "submitted_at" if v is None else v
+
+    @classmethod
+    @field_validator("order_direction", mode="before")
+    def validate_order_direction(cls, v: str | None) -> str:
+        return "asc" if v is None else v
+
+    @classmethod
+    @field_validator("page", mode="before")
+    def validate_page(cls, v: int | None) -> int:
+        return 1 if v is None else v
+
+    @classmethod
+    @field_validator("per_page", mode="before")
+    def validate_per_page(cls, v: int | None) -> int:
+        return 25 if v is None else v
+
+
+class PaginationResults(BaseModel, Generic[T]):
+    results: Sequence[T]
+    total_items: int
+    current_page: int
+    total_pages: int
+    results_on_current_page: int
+    results_per_page: int
+    ordered_by: str
+    order_direction: Literal["asc", "desc"]

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import math
 import uuid  # noqa: TCH003
 from typing import Annotated
 
@@ -13,11 +14,12 @@ from src.api.v1_0.action_creator.schemas import (
     FUNCTION_TO_INPUTS_LOOKUP,
     ActionCreatorFunctionSpec,
     ActionCreatorJob,
-    ActionCreatorJobsResponse,
     ActionCreatorJobSummary,
     ActionCreatorSubmissionRequest,
+    ActionCreatorSubmissionsQueryParams,
     ErrorResponse,
     FunctionsResponse,
+    PaginationResults,
 )
 from src.api.v1_0.auth.routes import decode_token, validate_access_token, validate_token_from_websocket
 from src.services.ades.factory import ades_client_factory
@@ -238,17 +240,20 @@ async def submit_function_websocket(  # noqa: C901
 
 @action_creator_router_v1_0.get(
     "/submissions",
-    response_model=ActionCreatorJobsResponse,
+    response_model=PaginationResults[ActionCreatorJobSummary],
     response_model_exclude_unset=False,
     response_model_exclude_none=False,
     status_code=status.HTTP_200_OK,
 )
 async def get_function_submissions(
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
-) -> ActionCreatorJobsResponse:
+    params: Annotated[ActionCreatorSubmissionsQueryParams, Query()],
+) -> PaginationResults[ActionCreatorJobSummary]:
     introspected_token = decode_token(credential.credentials)
     username = introspected_token["preferred_username"]
     ades = ades_client_factory(workspace=username, token=credential.credentials)
+
+    # Get the jobs
     err, ades_jobs = await ades.list_job_submissions()
 
     if err is not None:
@@ -260,18 +265,38 @@ async def get_function_submissions(
             detail="An error occurred while executing preset function",
         )
 
-    return ActionCreatorJobsResponse(
-        submitted_jobs=[
-            ActionCreatorJobSummary(
-                submission_id=job.job_id,
-                function_identifier=job.process_id,
-                status=job.status.value,
-                submitted_at=job.created,
-                finished_at=job.finished,
-            )
-            for job in ades_jobs.jobs
-        ],
-        total=len(ades_jobs.jobs),  # Use len() as ADES returns count for the unregistered processes too
+    # To result schema
+    results = [
+        ActionCreatorJobSummary(
+            submission_id=job.job_id,
+            function_identifier=job.process_id,
+            status=job.status.value,
+            submitted_at=job.created,
+            finished_at=job.finished,
+        )
+        for job in ades_jobs.jobs
+    ]
+
+    # Order by
+    results.sort(
+        key=lambda x: x.model_dump(mode="json")[params.order_by],
+        reverse=params.order_direction == "desc",
+    )
+
+    # Paginate
+    offset = (params.page - 1) * params.per_page
+    total_pages = math.ceil(len(ades_jobs.jobs) / params.per_page)
+    limited_jobs = results[offset : offset + params.per_page]
+
+    return PaginationResults(
+        results=limited_jobs,
+        total_items=len(ades_jobs.jobs),  # Use len() as ADES returns count for the unregistered processes too
+        total_pages=total_pages,
+        ordered_by=params.order_by,
+        order_direction=params.order_direction,
+        current_page=params.page,
+        results_on_current_page=len(limited_jobs),
+        results_per_page=params.per_page,
     )
 
 

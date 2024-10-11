@@ -8,7 +8,7 @@ from starlette import status
 from starlette.testclient import TestClient
 
 from app import app as fast_api_app
-from src.api.v1_0.action_creator.schemas import ActionCreatorJob, ActionCreatorJobsResponse
+from src.api.v1_0.action_creator.schemas import ActionCreatorJob, ActionCreatorJobSummary, PaginationResults
 from src.services.ades.factory import fake_ades_client_factory
 from src.services.ades.fake_client import FakeADESClient
 from src.services.ades.schemas import StatusCode
@@ -82,7 +82,7 @@ def test_get_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
 
     # Assert
     assert response.status_code == status.HTTP_200_OK
-    assert ActionCreatorJobsResponse(**response.json())
+    assert PaginationResults[ActionCreatorJobSummary](**response.json())
 
 
 def test_post_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
