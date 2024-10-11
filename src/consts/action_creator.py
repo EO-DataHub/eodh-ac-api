@@ -15,7 +15,8 @@ def _load_base_64_thumbnail(function_identifier: str) -> str | None:
 RASTER_CALCULATOR_FUNCTION_SPEC = {
     "identifier": "raster-calculate",
     "name": "Raster Calculator",
-    "description": "Raster calculator - calculates spectral indices.",
+    "description": "Performs pixel-level arithmetic on raster datasets to compute indices such as NDVI, EVI, "
+    "and other spectral indicators, enabling vegetation and land surface analysis.",
     "preset": True,
     "thumbnail_b64": _load_base_64_thumbnail("raster-calculate"),
     "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/raster-calculate-app.cwl",
@@ -70,7 +71,8 @@ RASTER_CALCULATOR_FUNCTION_SPEC = {
 LAND_COVER_CHANGE_DETECTION_FUNCTION_SPEC = {
     "identifier": "lulc-change",
     "name": "Land Cover Change Detection",
-    "description": "Land Cover change detection.",
+    "description": "Analyzes time-series satellite imagery to detect changes in land cover, identifying shifts in "
+    "urban areas, forests, water bodies, and agriculture over specified periods.",
     "preset": True,
     "thumbnail_b64": _load_base_64_thumbnail("lulc-change"),
     "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/lulc-change-app.cwl",
@@ -113,7 +115,8 @@ LAND_COVER_CHANGE_DETECTION_FUNCTION_SPEC = {
 WATER_QUALITY_FUNCTION_SPEC = {
     "identifier": "water-quality",
     "name": "Water Quality",
-    "description": "Water Quality with calibration using DEFRA's in-situ data.",
+    "description": "Evaluates water quality by analyzing spectral data from satellite imagery, calibrated with DEFRA's "
+    "in-situ measurements, to assess parameters like chlorophyll concentration and turbidity.",
     "preset": True,
     "thumbnail_b64": _load_base_64_thumbnail("water-quality"),
     "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/water-quality-app.cwl",
