@@ -139,7 +139,11 @@ class ADESClient(ADESClientBase):
         finally:
             await client_session.close()
 
-    async def list_job_submissions(self) -> tuple[ErrorResponse | None, JobList | None]:
+    async def list_job_submissions(
+        self,
+        *,
+        raw_output: bool = False,
+    ) -> tuple[ErrorResponse | None, JobList | dict[str, Any] | None]:
         client_session, retry_client = self._get_retry_client()
         try:
             async with retry_client.get(
@@ -149,6 +153,9 @@ class ADESClient(ADESClientBase):
             ) as response:
                 if err := await self._handle_common_errors_if_necessary(response):
                     return err, None
+
+                if raw_output:
+                    return None, await response.json()
 
                 return None, JobList(**await response.json())
         finally:

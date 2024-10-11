@@ -44,6 +44,7 @@ extend-exclude = [
     "data/*",
     "logs/*",
     "mlruns/*",
+    "*.http",
 ]
 
 [tool.ruff.lint]
@@ -139,6 +140,7 @@ combine-as-imports = true
 "src/services/ades/fake_client.py" = [
     "ARG002", # see: https://pypi.org/project/flake8-unused-arguments - Unused method argument
     "PLR6301", # see: https://pypi.org/project/Pylint - Method `X` could be a function, class method, or static method
+    "E501", # see: https://pypi.org/project/pycodestyle - Line too long
 ]
 
 [tool.ruff.lint.pydocstyle]
