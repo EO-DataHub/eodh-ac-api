@@ -10,7 +10,7 @@ from starlette import status
 
 from src.core.settings import current_settings
 from src.services.ades.factory import ades_client_factory
-from src.services.ades.schemas import StatusCode
+from src.services.ades.schemas import JobList, StatusCode
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -264,7 +264,8 @@ async def test_ades_listing_job_executions(ades: ADESClient) -> None:
     assert err is None
 
     # Act
-    err, result = await ades.list_job_submissions()
+    result: JobList
+    err, result = await ades.list_job_submissions()  # type: ignore[assignment]
 
     # Assert
     assert err is None

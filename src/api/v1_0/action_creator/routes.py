@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import math
 import uuid  # noqa: TCH003
-from typing import Annotated
+from typing import Annotated, Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, WebSocket, WebSocketDisconnect, WebSocketException
 from fastapi.security import HTTPAuthorizationCredentials  # noqa: TCH002
@@ -51,12 +51,7 @@ async def get_available_functions(
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
     collection: Annotated[str | None, Query(max_length=64, description="STAC collection")] = None,
 ) -> FunctionsResponse:
-    collection_supported_flag, results = repo.get_available_functions(collection)
-    if not collection_supported_flag:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Collection does not exist or is not supported by Action Creator",
-        )
+    _, results = repo.get_available_functions(collection)
     return FunctionsResponse(functions=[ActionCreatorFunctionSpec(**f) for f in results], total=len(results))
 
 
@@ -248,13 +243,14 @@ async def submit_function_websocket(  # noqa: C901
 async def get_function_submissions(
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
     params: Annotated[ActionCreatorSubmissionsQueryParams, Query()],
-) -> PaginationResults[ActionCreatorJobSummary]:
+) -> dict[str, Any]:
     introspected_token = decode_token(credential.credentials)
     username = introspected_token["preferred_username"]
     ades = ades_client_factory(workspace=username, token=credential.credentials)
 
     # Get the jobs
-    err, ades_jobs = await ades.list_job_submissions()
+    ades_jobs: dict[str, Any]
+    err, ades_jobs = await ades.list_job_submissions(raw_output=True)  # type: ignore[assignment]
 
     if err is not None:
         raise HTTPException(status_code=err.code, detail=err.detail)
@@ -267,37 +263,39 @@ async def get_function_submissions(
 
     # To result schema
     results = [
-        ActionCreatorJobSummary(
-            submission_id=job.job_id,
-            function_identifier=job.process_id,
-            status=job.status.value,
-            submitted_at=job.created,
-            finished_at=job.finished,
-        )
-        for job in ades_jobs.jobs
+        {
+            "submission_id": job["jobID"],
+            "function_identifier": job["processID"],
+            "status": job["status"],
+            "submitted_at": job["created"],
+            "finished_at": job.get("finished"),
+            "successful": job["status"] == "successful",
+        }
+        for job in ades_jobs["jobs"]
     ]
 
     # Order by
+    # Use tuples to handle None items - tuples are sorted item by item
     results.sort(
-        key=lambda x: x.model_dump(mode="json")[params.order_by],
+        key=lambda x: (x[params.order_by] is None, x[params.order_by]),
         reverse=params.order_direction == "desc",
     )
 
     # Paginate
     offset = (params.page - 1) * params.per_page
-    total_pages = math.ceil(len(ades_jobs.jobs) / params.per_page)
+    total_pages = math.ceil(len(ades_jobs["jobs"]) / params.per_page)
     limited_jobs = results[offset : offset + params.per_page]
 
-    return PaginationResults(
-        results=limited_jobs,
-        total_items=len(ades_jobs.jobs),  # Use len() as ADES returns count for the unregistered processes too
-        total_pages=total_pages,
-        ordered_by=params.order_by,
-        order_direction=params.order_direction,
-        current_page=params.page,
-        results_on_current_page=len(limited_jobs),
-        results_per_page=params.per_page,
-    )
+    return {
+        "results": limited_jobs,
+        "total_items": len(ades_jobs["jobs"]),  # Use len() as ADES returns count for the unregistered processes too
+        "total_pages": total_pages,
+        "ordered_by": params.order_by,
+        "order_direction": params.order_direction,
+        "current_page": params.page,
+        "results_on_current_page": len(limited_jobs),
+        "results_per_page": params.per_page,
+    }
 
 
 @action_creator_router_v1_0.get(
