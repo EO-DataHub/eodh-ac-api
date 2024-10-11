@@ -2,6 +2,12 @@
 GET {{api_url}}/health/ping
 Accept: application/json
 
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
 ### Token
 POST {{api_url}}/auth/token
 Accept: application/json
@@ -11,22 +17,63 @@ Accept: application/json
   "password": "{{password}}"
 }
 
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
 ### Introspect Token
 POST {{api_url}}/auth/token/introspection
 Accept: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
 
 ### List Functions
 GET {{api_url}}/action-creator/functions
 Accept: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
 ### List Functions For Collection
 GET {{api_url}}/action-creator/functions?collection=sentinel-2-l2a
 Accept: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### List Functions For Non Existent Collection
+GET {{api_url}}/action-creator/functions?collection=i-dont-exist
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+> {%
+    client.test("Request status is 404", function() {
+        client.assert(response.status === 404, "Response status is not 404");
+    });
+%}
+
 ### List Function Submissions No Params
 GET {{api_url}}/action-creator/submissions
 Accept: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
