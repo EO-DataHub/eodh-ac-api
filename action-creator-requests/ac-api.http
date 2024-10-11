@@ -1,0 +1,32 @@
+### Ping
+GET {{api_url}}/health/ping
+Accept: application/json
+
+### Token
+POST {{api_url}}/auth/token
+Accept: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+### Introspect Token
+POST {{api_url}}/auth/token/introspection
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### List Functions
+GET {{api_url}}/action-creator/functions
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### List Functions For Collection
+GET {{api_url}}/action-creator/functions?collection=sentinel-2-l2a
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### List Function Submissions No Params
+GET {{api_url}}/action-creator/submissions
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
