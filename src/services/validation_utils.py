@@ -1,40 +1,39 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 import pyproj
-from geojson_pydantic.geometries import Polygon, parse_geometry_obj
+from geojson_pydantic.geometries import parse_geometry_obj
 from pydantic_core import PydanticCustomError
 from shapely.geometry import shape
 
 from src.consts.action_creator import FUNCTIONS_REGISTRY
 
 if TYPE_CHECKING:
+    from datetime import datetime
+
     import shapely.geometry
 
 EXPECTED_BBOX_ELEMENT_COUNT = 4
 MAX_AREA_SQ_KM = 1000
+SQ_MILES_DIVISOR = 2.59
 
 
 class AreaOfInterestTooBigError:
     @classmethod
     def make(cls, aoi: Any, max_size: float) -> PydanticCustomError:
+        max_size_imperial = max_size / SQ_MILES_DIVISOR
         return PydanticCustomError(
             "area_of_interest_too_big_error",
-            "Area exceeds {max_size} sq kilometers.",
-            {"aoi": aoi, "max_size": max_size},
-        )
-
-
-class InvalidBoundingBoxError:
-    @classmethod
-    def make(cls, bbox: tuple[float, ...]) -> PydanticCustomError:
-        return PydanticCustomError(
-            "invalid_bounding_box_error",
-            "BBOX object must be an array of 4 values: [xmin, ymin, xmax, ymax].",
-            {"bbox": bbox},
+            f"Area exceeds {max_size_imperial:,.2f} {{units_imperial}}.",
+            {
+                "aoi": aoi,
+                "max_size_metric": max_size,
+                "max_size_imperial": max_size / SQ_MILES_DIVISOR,
+                "units_metric": "square kilometers",
+                "units_imperial": "square miles",
+            },
         )
 
 
@@ -52,23 +51,13 @@ class CollectionNotSupportedError:
         )
 
 
-class MissingGeometryError:
+class MissingAreaOfInterestError:
     @classmethod
     def make(cls) -> PydanticCustomError:
         return PydanticCustomError(
-            "missing_geometry_error",
-            "At least one of AOI or BBOX must be provided.",
-            {"aoi": None, "bbox": None},
-        )
-
-
-class AOIBBoxMisconfigurationError:
-    @classmethod
-    def make(cls, aoi: Any, bbox: Any) -> PydanticCustomError:
-        return PydanticCustomError(
-            "aoi_bbox_misconfiguration_error",
-            "AOI and BBOX are mutually exclusive, provide only one of them.",
-            {"aoi": aoi, "bbox": bbox},
+            "missing_area_of_interest_error",
+            "Area of Interest is missing.",
+            {"aoi": None},
         )
 
 
@@ -103,7 +92,7 @@ def ensure_area_smaller_than(geom: dict[str, Any], area_size_limit: float = MAX_
     # Calculate the area in square kilometers
     area_sq_km = calculate_geodesic_area(polygon) / 1e6  # Convert from square meters to square kilometers
 
-    # Raise an error if the area exceeds MAX_AREA_SQ_KM square kilometers
+    # Raise an error if the area exceeds area_size_limit square kilometers
     if area_sq_km > area_size_limit:
         raise AreaOfInterestTooBigError.make(aoi=geom, max_size=area_size_limit)
 
@@ -114,11 +103,9 @@ def aoi_from_geojson_if_necessary(v: dict[str, Any]) -> dict[str, Any]:
     return v
 
 
-def aoi_from_bbox_if_necessary(v: dict[str, Any]) -> dict[str, Any]:
-    if v.get("aoi") is None and v.get("bbox") is not None:
-        if len(v["bbox"]) != EXPECTED_BBOX_ELEMENT_COUNT:
-            raise InvalidBoundingBoxError.make(bbox=v["bbox"])
-        v["aoi"] = Polygon.from_bounds(*v["bbox"]).model_dump(mode="json")
+def aoi_must_be_present(v: dict[str, Any] | None = None) -> dict[str, Any]:
+    if v is None:
+        raise MissingAreaOfInterestError.make()
     return v
 
 
@@ -132,25 +119,9 @@ def validate_stac_collection(specified_collection: str, function_identifier: str
         )
 
 
-def validate_aoi_or_bbox_provided(v: dict[str, Any]) -> None:
-    if v.get("aoi") is None and v.get("bbox") is None:
-        raise MissingGeometryError.make()
-
-
-def raise_if_both_aoi_and_bbox_provided(v: dict[str, Any]) -> None:
-    if v.get("aoi") is not None and v.get("bbox") is not None:
-        raise AOIBBoxMisconfigurationError.make(aoi=v.get("aoi"), bbox=v.get("bbox"))
-
-
-def validate_date_range(v: dict[str, Any]) -> None:
-    date_start = v.get("date_start")
-    date_end = v.get("date_end")
-
+def validate_date_range(date_start: datetime | None = None, date_end: datetime | None = None) -> None:
     if date_start is None or date_end is None:
         return
-
-    date_start = datetime.fromisoformat(date_start)
-    date_end = datetime.fromisoformat(date_end)
 
     if date_start > date_end:
         raise InvalidDateRangeError.make(date_start, date_end)

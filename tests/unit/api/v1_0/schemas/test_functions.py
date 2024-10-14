@@ -8,12 +8,6 @@ from geojson_pydantic import Polygon
 
 from src.api.v1_0.action_creator.schemas import RasterCalculatorFunctionInputs, RasterCalculatorIndex
 
-TEST_BBOX = [
-    14.763294437090849,  # xmin,
-    50.833598186651244,  # ymin,
-    15.052268923898112,  # xmax,
-    50.989077215056824,  # ymax,
-]
 TEST_HEATHROW_AOI = {
     "type": "Polygon",
     "coordinates": [
@@ -70,10 +64,9 @@ TEST_UK_AOI = {
 }
 
 
-def test_raster_calculate_preset_validation_neither_aoi_nor_bbox_provided() -> None:
+def test_raster_calculate_preset_validation_no_aoi_provided() -> None:
     data = {
         "aoi": None,
-        "bbox": None,
         "date_start": "2024-01-01T00:00:00Z",
         "date_end": "2024-01-01T00:00:00Z",
         "stac_collection": "sentinel-2-l2a",
@@ -81,7 +74,7 @@ def test_raster_calculate_preset_validation_neither_aoi_nor_bbox_provided() -> N
     }
 
     # Act & Assert
-    with pytest.raises(ValueError, match="At least one of AOI or BBOX must be provided"):
+    with pytest.raises(ValueError, match="Area of Interest is missing."):
         RasterCalculatorFunctionInputs(**data)
 
 
@@ -89,7 +82,6 @@ def test_raster_calculate_preset_validation_aoi_too_big() -> None:
     # Arrange
     data = {
         "aoi": TEST_UK_AOI,
-        "bbox": None,
         "date_start": "2024-01-01T00:00:00Z",
         "date_end": "2024-01-01T00:00:00Z",
         "stac_collection": "sentinel-2-l2a",
@@ -101,63 +93,9 @@ def test_raster_calculate_preset_validation_aoi_too_big() -> None:
         RasterCalculatorFunctionInputs(**data)
 
 
-def test_raster_calculate_preset_validation_raises_if_both_aoi_and_bbox_provided() -> None:
-    data = {
-        "aoi": TEST_HEATHROW_AOI,
-        "bbox": TEST_BBOX,
-        "date_start": "2024-01-01T00:00:00Z",
-        "date_end": "2024-01-01T00:00:00Z",
-        "stac_collection": "sentinel-2-l2a",
-        "index": "EVI",
-    }
-
-    # Act & Assert
-    with pytest.raises(ValueError, match="AOI and BBOX are mutually exclusive, provide only one of them."):
-        RasterCalculatorFunctionInputs(**data)
-
-
-def test_raster_calculate_preset_validation_uses_bbox_if_no_aoi() -> None:
-    # Arrange
-    data = {
-        "aoi": None,
-        "bbox": TEST_BBOX,
-        "date_start": "2024-01-01T00:00:00Z",
-        "date_end": "2024-01-01T00:00:00Z",
-        "stac_collection": "sentinel-2-l2a",
-        "index": "EVI",
-    }
-
-    # Act
-    result = RasterCalculatorFunctionInputs(**data)
-
-    # Assert
-    assert result.aoi is not None
-    assert result.aoi == Polygon.from_bounds(*TEST_BBOX)
-
-
-def test_raster_calculate_preset_validation_parse_geojson() -> None:
-    # Arrange
-    data = {
-        "aoi": json.dumps(TEST_HEATHROW_AOI),
-        "bbox": None,
-        "date_start": "2024-01-01T00:00:00Z",
-        "date_end": "2024-01-01T00:00:00Z",
-        "stac_collection": "sentinel-2-l2a",
-        "index": "EVI",
-    }
-
-    # Act
-    result = RasterCalculatorFunctionInputs(**data)
-
-    # Assert
-    assert result.aoi is not None
-    assert result.aoi == Polygon(**TEST_HEATHROW_AOI)
-
-
 def test_raster_calculate_preset_validation_raises_for_unsupported_collection() -> None:
     data = {
         "aoi": TEST_HEATHROW_AOI,
-        "bbox": None,
         "date_start": "2024-01-01T00:00:00Z",
         "date_end": "2024-01-01T00:00:00Z",
         "stac_collection": "test",
@@ -172,7 +110,6 @@ def test_raster_calculate_preset_validation_raises_for_unsupported_collection() 
 def test_raster_calculate_preset_validation_raises_for_invalid_date_range() -> None:
     data = {
         "aoi": TEST_HEATHROW_AOI,
-        "bbox": None,
         "date_start": "2024-01-01T00:00:00Z",
         "date_end": "2023-01-01T00:00:00Z",
         "stac_collection": "sentinel-2-l2a",
@@ -187,7 +124,6 @@ def test_raster_calculate_preset_validation_raises_for_invalid_date_range() -> N
 def test_raster_calculate_preset_validation_uses_ndvi_if_index_not_provided() -> None:
     data = {
         "aoi": TEST_HEATHROW_AOI,
-        "bbox": None,
         "date_start": "2024-01-01T00:00:00Z",
         "date_end": "2024-01-01T00:00:00Z",
         "stac_collection": "sentinel-2-l2a",
@@ -203,7 +139,6 @@ def test_raster_calculate_preset_validation_uses_ndvi_if_index_not_provided() ->
 def test_raster_calculate_preset_validation_happy_path() -> None:
     data = {
         "aoi": TEST_HEATHROW_AOI,
-        "bbox": None,
         "date_start": "2024-01-01T00:00:00Z",
         "date_end": "2024-01-01T00:00:00Z",
         "stac_collection": "sentinel-2-l2a",
@@ -215,7 +150,6 @@ def test_raster_calculate_preset_validation_happy_path() -> None:
 
     # Assert
     assert result.aoi == Polygon(**TEST_HEATHROW_AOI)
-    assert result.bbox is None
     assert result.date_start == datetime(2024, 1, 1, tzinfo=timezone.utc)
     assert result.date_end == datetime(2024, 1, 1, tzinfo=timezone.utc)
     assert result.stac_collection == "sentinel-2-l2a"
@@ -225,7 +159,6 @@ def test_raster_calculate_preset_validation_happy_path() -> None:
 def test_raster_calculation_inputs() -> None:
     data = {
         "aoi": TEST_HEATHROW_AOI,
-        "bbox": None,
         "date_start": "2024-01-01T00:00:00Z",
         "date_end": "2024-01-01T00:00:00Z",
         "stac_collection": "sentinel-2-l2a",
@@ -237,7 +170,6 @@ def test_raster_calculation_inputs() -> None:
 
     # Assert
     assert json.loads(result["aoi"]) == TEST_HEATHROW_AOI
-    assert "bbox" not in result
     assert result["date_start"] == "2024-01-01T00:00:00+00:00"
     assert result["date_end"] == "2024-01-01T00:00:00+00:00"
     assert result["stac_collection"] == "sentinel-2-l2a"
