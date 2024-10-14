@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from src.services.validation_utils import ensure_area_smaller_than
-from tests.unit.api.v1_0.schemas.test_functions import TEST_HEATHROW_AOI, TEST_UK_AOI
+from tests.unit.api.v1_0.action_creator.schemas.test_functions import TEST_HEATHROW_AOI, TEST_UK_AOI
 
 
 def test_ensure_area_smaller_than_func_rises_error() -> None:

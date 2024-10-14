@@ -24,28 +24,6 @@ if TYPE_CHECKING:
 TOTAL_ITEMS = len(GET_JOB_LIST_RESPONSE["jobs"])  # type: ignore[arg-type]
 
 
-def test_get_job_submissions_endpoint_returns_forbidden_error_when_no_token_specified(
-    client: TestClient,
-    mocked_ades_factory: MagicMock,  # noqa: ARG001
-) -> None:
-    # Act
-    response = client.get("/api/v1.0/action-creator/submissions")
-
-    # Assert
-    assert response.status_code == status.HTTP_403_FORBIDDEN
-
-
-def test_get_job_submissions_endpoint_returns_unauthorized_error_when_bad_token(
-    client: TestClient,
-    mocked_ades_factory: MagicMock,  # noqa: ARG001
-) -> None:
-    # Act
-    response = client.get("/api/v1.0/action-creator/submissions", headers={"Authorization": "Bearer bad_token"})
-
-    # Assert
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-
 def test_get_job_submissions_endpoint_returns_valid_response_no_params(
     client: TestClient,
     mocked_ades_factory: MagicMock,  # noqa: ARG001

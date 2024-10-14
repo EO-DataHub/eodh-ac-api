@@ -6,13 +6,14 @@ import typing
 import pytest
 from starlette.testclient import TestClient
 
-from app import app
+from app import app as fast_api_app
 from src import consts
 from src.core.settings import current_settings
 
 if typing.TYPE_CHECKING:
     from _pytest.config import Config
     from _pytest.python import Function
+    from fastapi import FastAPI
 
 MARKERS = ["unit", "integration", "e2e"]
 
@@ -27,11 +28,19 @@ def pytest_collection_modifyitems(config: Config, items: list[Function]) -> None
             item.add_marker(mark)
 
 
-client = TestClient(app)
+@pytest.fixture(name="app")
+def app_fixture() -> FastAPI:
+    return fast_api_app
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(name="client")
+def client_fixture(app: FastAPI) -> TestClient:
+    return TestClient(app)
+
+
+@pytest.fixture(scope="session")
 def auth_token() -> str:
+    client = TestClient(fast_api_app)
     settings = current_settings()
 
     response = client.post(
