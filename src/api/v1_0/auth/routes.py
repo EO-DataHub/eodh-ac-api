@@ -11,10 +11,8 @@ from jwt import PyJWKClient  # type: ignore[attr-defined]
 
 from src.api.v1_0.auth.schemas import IntrospectResponse, TokenRequest, TokenResponse
 from src.core.settings import Settings, current_settings
-from src.utils.logging import get_logger
 
 _HEADERS = {"Content-Type": "application/x-www-form-urlencoded"}
-_logger = get_logger(__name__)
 
 auth_router_v1_0 = APIRouter(
     prefix="/auth",
@@ -39,7 +37,6 @@ def decode_token(token: str, *, ws: bool = False) -> dict[str, Any]:
             options={"verify_exp": True},
         )
     except jwt.exceptions.PyJWTError as ex:
-        _logger.exception("Error decoding JWK")
         if ws:
             raise WebSocketException(
                 code=status.WS_1008_POLICY_VIOLATION,

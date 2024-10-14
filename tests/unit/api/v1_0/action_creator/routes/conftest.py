@@ -1,22 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Generator
+from typing import Any, Generator
 from unittest.mock import MagicMock, patch
 
 import pytest
-from starlette.testclient import TestClient
 
-from app import app as fast_api_app
 from src.services.ades.factory import fake_ades_client_factory
 from src.services.ades.fake_client import FakeADESClient
-
-if TYPE_CHECKING:
-    from fastapi import FastAPI
-
-
-@pytest.fixture(name="app")
-def app_fixture() -> FastAPI:
-    return fast_api_app
 
 
 @pytest.fixture
@@ -28,11 +18,6 @@ def mocked_ades_factory() -> Generator[MagicMock]:
     ) as ades_client_factory_mock:
         ades_client_factory_mock.return_value = FakeADESClient
         yield ades_client_factory_mock
-
-
-@pytest.fixture(name="client")
-def client_fixture(app: FastAPI) -> TestClient:
-    return TestClient(app)
 
 
 @pytest.fixture
