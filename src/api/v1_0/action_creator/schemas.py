@@ -31,12 +31,17 @@ class ErrorResponse(BaseModel):
     detail: str
 
 
-class FuncInputOutputType(str, Enum):
-    number = "number"
-    string = "string"
-    boolean = "boolean"
-    datetime = "datetime"
-    stac_collection = "stac_collection"
+class FuncInputOutputType(StrEnum):
+    number = auto()
+    string = auto()
+    boolean = auto()
+    datetime = auto()
+    point = auto()
+    linestring = auto()
+    polygon = auto()
+    stac_item = auto()
+    stac_collection = auto()
+    stac_catalog = auto()
 
 
 class FuncInputSpec(BaseModel):
