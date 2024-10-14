@@ -16,7 +16,7 @@ from src.api.v1_0.action_creator.schemas import (
     PaginationResults,
 )
 from src.services.ades.fake_client import GET_JOB_LIST_RESPONSE
-from src.services.ades.schemas import JobList, JobType, StatusCode, StatusInfo
+from src.services.ades.schemas import JobList, JobType, StatusCode
 
 if TYPE_CHECKING:
     from starlette.testclient import TestClient
@@ -70,13 +70,15 @@ def test_get_job_submissions_endpoint_returns_valid_response_no_params(
 
 @patch("src.api.v1_0.action_creator.routes.ades_client_factory")
 def test_get_job_submissions_returns_empty_result_set_when_ades_job_history_is_empty(
-    mocked_ades_factory: MagicMock,
+    ades_factory_mock: MagicMock,
     client: TestClient,
     auth_token: str,
 ) -> None:
     # Arrange
-    ades_mock = AsyncMock(return_value=(None, JobList(jobs=[], links=[], numberTotal=0)))
-    mocked_ades_factory.return_value = ades_mock
+    ades_mock = MagicMock()
+    list_jobs_mock = AsyncMock(return_value=(None, JobList(jobs=[], links=[], numberTotal=0).model_dump(mode="json")))
+    ades_mock.list_job_submissions = list_jobs_mock
+    ades_factory_mock.return_value = ades_mock
 
     # Act
     response = client.get("/api/v1.0/action-creator/submissions", headers={"Authorization": f"Bearer {auth_token}"})
@@ -95,31 +97,30 @@ def test_get_job_submissions_returns_empty_result_set_when_ades_job_history_is_e
 
 @patch("src.api.v1_0.action_creator.routes.ades_client_factory")
 def test_get_job_submissions_returns_correct_pagination_with_fewer_jobs_than_per_page(
-    mocked_ades_factory: MagicMock,
+    ades_factory_mock: MagicMock,
     client: TestClient,
     auth_token: str,
 ) -> None:
     # Arrange
     num_jobs = 10
     jobs = [
-        StatusInfo(
-            jobID=f"job-{i}",
-            processID=f"process-{i}",
-            status=StatusCode.successful,
-            created=datetime.now(tz=timezone.utc),
-            finished=datetime.now(tz=timezone.utc),
-            type=JobType.process,
-            links=[],
-        )
+        {
+            "jobID": f"job-{i}",
+            "processID": f"process-{i}",
+            "status": StatusCode.successful,
+            "created": datetime.now(tz=timezone.utc),
+            "finished": datetime.now(tz=timezone.utc),
+            "type": JobType.process,
+            "links": [],
+        }
         for i in range(num_jobs)
     ]
 
     fake_ades_client = MagicMock()
     fake_ades_client.list_job_submissions = AsyncMock(
-        return_value=(None, JobList(jobs=jobs, numberTotal=num_jobs, links=[]))
+        return_value=(None, {"jobs": jobs, "numberTotal": num_jobs, "links": []})
     )
-
-    mocked_ades_factory.return_value = fake_ades_client
+    ades_factory_mock.return_value = fake_ades_client
 
     # Act
     response = client.get("/api/v1.0/action-creator/submissions", headers={"Authorization": f"Bearer {auth_token}"})
