@@ -44,6 +44,8 @@ jobs:
           ADES__URL: ${{ secrets.ADES__URL }}
           ADES__OGC_PROCESSES_API_PATH: ${{ secrets.ADES__OGC_PROCESSES_API_PATH }}
           ADES__OGC_JOBS_API_PATH: ${{ secrets.ADES__OGC_JOBS_API_PATH }}
+          SENTINEL_HUB__CLIENT_ID: ${{ secrets.SENTINEL_HUB__CLIENT_ID }}
+          SENTINEL_HUB__CLIENT_SECRET: ${{ secrets.SENTINEL_HUB__CLIENT_SECRET }}
 
       - name: Get code coverage
         uses: orgoro/coverage@v3.2
