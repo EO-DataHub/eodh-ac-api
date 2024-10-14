@@ -3,20 +3,20 @@ from __future__ import annotations
 import abc
 from datetime import datetime  # noqa: TCH003
 from enum import Enum, StrEnum, auto
-from typing import Annotated, Any, ClassVar, Generic, Literal, Sequence, TypeVar
+from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Generic, Literal, Sequence, TypeVar
 
-from geojson_pydantic.geometries import Geometry, Polygon
+from geojson_pydantic.geometries import Polygon
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from src.services.validation_utils import (
-    aoi_from_bbox_if_necessary,
-    aoi_from_geojson_if_necessary,
+    aoi_must_be_present,
     ensure_area_smaller_than,
-    raise_if_both_aoi_and_bbox_provided,
-    validate_aoi_or_bbox_provided,
     validate_date_range,
     validate_stac_collection,
 )
+
+if TYPE_CHECKING:
+    from pydantic_core.core_schema import ValidationInfo
 
 T = TypeVar("T", bound=BaseModel)
 
@@ -88,10 +88,6 @@ class PresetFunctionIdentifier(StrEnum):
 
 
 class OGCProcessInputs(BaseModel, abc.ABC):
-    @classmethod
-    @abc.abstractmethod
-    def validate_model(cls, v: dict[str, Any]) -> dict[str, Any]: ...
-
     @abc.abstractmethod
     def as_ogc_process_inputs(self) -> dict[str, Any]: ...
 
@@ -99,47 +95,39 @@ class OGCProcessInputs(BaseModel, abc.ABC):
 class CommonPresetFunctionInputs(OGCProcessInputs, abc.ABC):
     function_identifier: ClassVar[str] = "common"
 
-    aoi: Geometry
-    bbox: tuple[float, float, float, float] | None = None
+    aoi: Polygon
     date_start: datetime | None = None
     date_end: datetime | None = None
     stac_collection: str
 
+    @field_validator("stac_collection", mode="after")
     @classmethod
-    def validate_model(cls, v: dict[str, Any]) -> dict[str, Any]:
-        # Neither AOI nor BBox provided
-        validate_aoi_or_bbox_provided(v)
-
-        # Both AOI and BBox provided
-        raise_if_both_aoi_and_bbox_provided(v)
-
-        # AOI from bbox
-        v = aoi_from_bbox_if_necessary(v)
-
-        # AOI from GeoJSON
-        v = aoi_from_geojson_if_necessary(v)
-
-        # Ensure AOI or BBox (for non polygon features) does not exceed area limit
-        geom_to_check = (
-            Polygon(**v["aoi"]) if v["aoi"]["type"] in {"Polygon", "MultiPolygon"} else Polygon.from_bounds(*v["bbox"])
-        )
-        ensure_area_smaller_than(geom_to_check.model_dump())
-
+    def validate_stac_collection(cls, v: str) -> str:
         # Validate STAC collection
         validate_stac_collection(
-            specified_collection=v["stac_collection"],
+            specified_collection=v,
             function_identifier=cls.function_identifier,
         )
-
-        # Validate proper date range
-        validate_date_range(v)
-
         return v
 
-    @model_validator(mode="before")
+    @field_validator("aoi", mode="before")
     @classmethod
-    def validate_before_init(cls, v: dict[str, Any]) -> dict[str, Any]:
-        return cls.validate_model(v)
+    def validate_aoi(cls, v: dict[str, Any] | None = None) -> dict[str, Any]:
+        # Ensure AOI provided
+        aoi_must_be_present(v)
+
+        # Ensure AOI does not exceed area limit
+        geom_to_check = Polygon(**v)
+        ensure_area_smaller_than(geom_to_check.model_dump())
+
+        return v  # type: ignore[return-value]
+
+    @field_validator("date_end", mode="after")
+    @classmethod
+    def validate_date_range(cls, date_end: datetime | None, info: ValidationInfo) -> datetime | None:
+        date_start = info.data.get("date_start")
+        validate_date_range(date_start=date_start, date_end=date_end)
+        return date_end
 
     def as_ogc_process_inputs(self) -> dict[str, Any]:
         vals = {
@@ -151,6 +139,7 @@ class CommonPresetFunctionInputs(OGCProcessInputs, abc.ABC):
         keys_to_pop = [k for k in vals if vals[k] is None]
         for k in keys_to_pop:
             vals.pop(k, None)
+
         return vals
 
 
@@ -232,9 +221,8 @@ class PresetFunctionExecutionRequest(BaseModel):
             )
             raise ValueError(msg)
 
-        inputs = v["inputs"]
         inputs_cls = FUNCTION_TO_INPUTS_LOOKUP[v["function_identifier"]]
-        inputs = inputs_cls.validate_model(inputs)
+        inputs = inputs_cls(**v["inputs"]).model_dump(mode="json")
         v["inputs"] = inputs
         return v
 
