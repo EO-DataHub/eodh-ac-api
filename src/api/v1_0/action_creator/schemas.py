@@ -95,7 +95,7 @@ class OGCProcessInputs(BaseModel, abc.ABC):
 class CommonPresetFunctionInputs(OGCProcessInputs, abc.ABC):
     function_identifier: ClassVar[str] = "common"
 
-    aoi: Polygon
+    aoi: Annotated[Polygon | None, Field(None, validate_default=True)]
     date_start: datetime | None = None
     date_end: datetime | None = None
     stac_collection: str
@@ -131,7 +131,7 @@ class CommonPresetFunctionInputs(OGCProcessInputs, abc.ABC):
 
     def as_ogc_process_inputs(self) -> dict[str, Any]:
         vals = {
-            "aoi": self.aoi.model_dump_json(),
+            "aoi": self.aoi.model_dump_json(),  # type: ignore[union-attr]
             "stac_collection": self.stac_collection,
             "date_start": self.date_start.isoformat() if self.date_start else None,
             "date_end": self.date_end.isoformat() if self.date_end else None,

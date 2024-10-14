@@ -49,7 +49,7 @@ def test_post_job_submissions_endpoint_returns_422_when_invalid_stac_collection_
     # Assert
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     err = response.json()
-    assert err["detail"][0]["loc"] == ["body", "preset_function"]
+    assert err["detail"][0]["loc"] == ["body", "preset_function", "stac_collection"]
     assert err["detail"][0]["type"] == "collection_not_supported_error"
     assert err["detail"][0]["msg"] == (
         "Collection 'dummy-collection' cannot be used with 'raster-calculate' function! "
@@ -76,8 +76,8 @@ def test_post_job_submissions_endpoint_returns_422_when_missing_geometry(
     # Assert
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     err = response.json()
-    assert err["detail"][0]["loc"] == ["body", "preset_function"]
-    assert err["detail"][0]["type"] == "missing_geometry_error"
+    assert err["detail"][0]["loc"] == ["body", "preset_function", "aoi"]
+    assert err["detail"][0]["type"] == "missing_area_of_interest_error"
     assert err["detail"][0]["msg"] == "Area of Interest is missing."
 
 
@@ -100,6 +100,6 @@ def test_post_job_submissions_endpoint_returns_422_when_invalid_date_range_was_p
     # Assert
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     err = response.json()
-    assert err["detail"][0]["loc"] == ["body", "preset_function"]
+    assert err["detail"][0]["loc"] == ["body", "preset_function", "date_end"]
     assert err["detail"][0]["type"] == "invalid_date_range_error"
     assert err["detail"][0]["msg"] == "End date cannot be before start date."
