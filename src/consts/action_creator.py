@@ -55,6 +55,12 @@ RASTER_CALCULATOR_FUNCTION_SPEC = {
                 "SAVI",
             ],
         },
+        "limit": {
+            "type": "number",
+            "required": False,
+            "default": 1,
+            "description": "The number of latest items to process.",
+        },
     },
     "outputs": {
         "collection": {
