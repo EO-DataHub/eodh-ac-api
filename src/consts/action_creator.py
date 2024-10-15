@@ -75,9 +75,9 @@ LAND_COVER_CHANGE_DETECTION_FUNCTION_SPEC = {
         "stac_collection": {
             "type": "string",
             "required": False,
-            "default": "global-land-cover",
+            "default": "esacci-globallc",
             "description": "The STAC collection to use.",
-            "options": ["land_cover", "corine-land-cover", "CLC-backbone", "water-bodies"],
+            "options": ["esacci-globallc", "clms-corinelc", "clms-water-bodies"],
         },
         "date_start": {
             "type": "datetime",
