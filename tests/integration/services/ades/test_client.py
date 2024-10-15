@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from typing import TYPE_CHECKING
 from uuid import uuid4
 
@@ -18,21 +19,28 @@ if TYPE_CHECKING:
     from src.services.ades.client import ADESClient
 
 
-WATER_BODIES_PROCESS_IDENTIFIER = "water_bodies"
-WATER_BODIES_CWL_HREF = "https://raw.githubusercontent.com/Terradue/ogc-eo-application-package-hands-on/refs/heads/master/water-bodies/app-package.cwl"
-
 RASTER_CALCULATOR_PROCESS_IDENTIFIER = "raster-calculate"
 RASTER_CALCULATOR_CWL_HREF = (
     "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/raster-calculate-app.cwl"
 )
-
-TEST_PROCESS_INPUTS = {
-    "stac_items": [
-        "https://earth-search.aws.element84.com/v0/collections/sentinel-s2-l2a-cogs/items/S2B_10TFK_20210713_0_L2A",
-        "https://earth-search.aws.element84.com/v0/collections/sentinel-s2-l2a-cogs/items/S2A_10TFK_20220524_0_L2A",
-    ],
-    "aoi": "-121.399,39.834,-120.74,40.472",
-    "epsg": "EPSG:4326",
+RASTER_CALCULATOR_INPUTS = {
+    "aoi": json.dumps({
+        "type": "Polygon",
+        "coordinates": [
+            [
+                [14.763294437090849, 50.833598186651244],
+                [15.052268923898112, 50.833598186651244],
+                [15.052268923898112, 50.989077215056824],
+                [14.763294437090849, 50.989077215056824],
+                [14.763294437090849, 50.833598186651244],
+            ]
+        ],
+    }),
+    "date_start": "2024-04-03T00:00:00",
+    "date_end": "2024-08-01T00:00:00",
+    "index": "NDVI",
+    "stac_collection": "sentinel-2-l2a",
+    "limit": 1,
 }
 NON_EXISTENT_PROCESS_ID = NON_EXISTENT_JOB_ID = "i-dont-exist"
 
@@ -58,31 +66,31 @@ async def get_cwl_from_href(cwl_href: str, save_dir: Path) -> Path:
 @pytest.mark.asyncio(scope="function")
 async def test_ades_registering_process_from_url(ades: ADESClient) -> None:
     # Arrange - ensure process not registered
-    err = await ades.unregister_process(WATER_BODIES_PROCESS_IDENTIFIER)
+    err = await ades.unregister_process(RASTER_CALCULATOR_PROCESS_IDENTIFIER)
     assert err is None or err.code == status.HTTP_404_NOT_FOUND
 
     # Act
-    err, result = await ades.register_process_from_cwl_href(WATER_BODIES_CWL_HREF)
+    err, result = await ades.register_process_from_cwl_href(RASTER_CALCULATOR_CWL_HREF)
 
     # Assert
     assert err is None
     assert result is not None
-    assert result.id == WATER_BODIES_PROCESS_IDENTIFIER
+    assert result.id == RASTER_CALCULATOR_PROCESS_IDENTIFIER
 
 
 @pytest.mark.asyncio(scope="function")
 async def test_ades_registering_process_from_url_with_download(ades: ADESClient) -> None:
     # Arrange - ensure process not registered
-    err = await ades.unregister_process(WATER_BODIES_PROCESS_IDENTIFIER)
+    err = await ades.unregister_process(RASTER_CALCULATOR_PROCESS_IDENTIFIER)
     assert err is None or err.code == status.HTTP_404_NOT_FOUND
 
     # Act
-    err, result = await ades.register_process_from_cwl_href_with_download(WATER_BODIES_CWL_HREF)
+    err, result = await ades.register_process_from_cwl_href_with_download(RASTER_CALCULATOR_CWL_HREF)
 
     # Assert
     assert err is None
     assert result is not None
-    assert result.id == WATER_BODIES_PROCESS_IDENTIFIER
+    assert result.id == RASTER_CALCULATOR_PROCESS_IDENTIFIER
 
 
 @pytest.mark.asyncio(scope="function")
@@ -106,11 +114,11 @@ async def test_ades_ensure_process_exists(ades: ADESClient) -> None:
 @pytest.mark.asyncio(scope="function")
 async def test_ades_registering_process_twice_results_in_conflict(ades: ADESClient) -> None:
     # Arrange - ensure process registered
-    err, _ = await ades.register_process_from_cwl_href(WATER_BODIES_CWL_HREF)
+    err, _ = await ades.register_process_from_cwl_href(RASTER_CALCULATOR_CWL_HREF)
     assert err is None or err.code == status.HTTP_409_CONFLICT
 
     # Act - register 2nd time
-    err, _ = await ades.register_process_from_cwl_href(WATER_BODIES_CWL_HREF)
+    err, _ = await ades.register_process_from_cwl_href(RASTER_CALCULATOR_CWL_HREF)
 
     # Assert
     assert err is not None
@@ -120,11 +128,11 @@ async def test_ades_registering_process_twice_results_in_conflict(ades: ADESClie
 @pytest.mark.asyncio(scope="function")
 async def test_ades_registering_process_from_file(ades: ADESClient, tmp_path: Path) -> None:
     # Arrange - ensure process not registered
-    err = await ades.unregister_process(WATER_BODIES_PROCESS_IDENTIFIER)
+    err = await ades.unregister_process(RASTER_CALCULATOR_PROCESS_IDENTIFIER)
     assert err is None or err.code == status.HTTP_404_NOT_FOUND
 
     # Get the CWL file content
-    tmp_file = await get_cwl_from_href(cwl_href=WATER_BODIES_CWL_HREF, save_dir=tmp_path)
+    tmp_file = await get_cwl_from_href(cwl_href=RASTER_CALCULATOR_CWL_HREF, save_dir=tmp_path)
 
     # Act
     err, result = await ades.register_process_from_local_cwl_file(tmp_file)
@@ -132,8 +140,8 @@ async def test_ades_registering_process_from_file(ades: ADESClient, tmp_path: Pa
     # Assert
     assert err is None
     assert result is not None
-    assert result.id == WATER_BODIES_PROCESS_IDENTIFIER
-    assert await ades.process_exists(WATER_BODIES_PROCESS_IDENTIFIER)
+    assert result.id == RASTER_CALCULATOR_PROCESS_IDENTIFIER
+    assert await ades.process_exists(RASTER_CALCULATOR_PROCESS_IDENTIFIER)
 
 
 @pytest.mark.asyncio(scope="function")
@@ -192,18 +200,18 @@ async def test_ades_listing_process(ades: ADESClient) -> None:
 @pytest.mark.asyncio(scope="function")
 async def test_ades_get_process_details(ades: ADESClient) -> None:
     # Arrange
-    err, _ = await ades.register_process_from_cwl_href(WATER_BODIES_CWL_HREF)
+    err, _ = await ades.register_process_from_cwl_href(RASTER_CALCULATOR_CWL_HREF)
     assert err is None or err.code == status.HTTP_409_CONFLICT
 
     # Act
-    err, result = await ades.get_process_details(WATER_BODIES_PROCESS_IDENTIFIER)
+    err, result = await ades.get_process_details(RASTER_CALCULATOR_PROCESS_IDENTIFIER)
 
     # Assert
     assert err is None
     assert result is not None
-    assert result.id == WATER_BODIES_PROCESS_IDENTIFIER
+    assert result.id == RASTER_CALCULATOR_PROCESS_IDENTIFIER
     assert result.inputs is not None
-    assert all(k in result.inputs for k in ("stac_items", "aoi", "epsg"))
+    assert all(k in result.inputs for k in ("stac_collection", "date_start", "date_end", "aoi"))
 
 
 @pytest.mark.asyncio(scope="function")
@@ -221,19 +229,19 @@ async def test_ades_get_non_existent_process_details_returns_404_not_found(ades:
 @pytest.mark.asyncio(scope="function")
 async def test_ades_executing_job(ades: ADESClient) -> None:
     # Arrange - ensure process registered
-    err, _ = await ades.register_process_from_cwl_href(WATER_BODIES_CWL_HREF)
+    err, _ = await ades.register_process_from_cwl_href(RASTER_CALCULATOR_CWL_HREF)
     assert err is None or err.code == status.HTTP_409_CONFLICT
 
-    # Act
+    # Act #1
     # Execute the process
     err, execution_result = await ades.execute_process(
-        process_identifier=WATER_BODIES_PROCESS_IDENTIFIER,
-        process_inputs=TEST_PROCESS_INPUTS,
+        process_identifier=RASTER_CALCULATOR_PROCESS_IDENTIFIER,
+        process_inputs=RASTER_CALCULATOR_INPUTS,
     )
     assert err is None
     assert execution_result is not None
     assert execution_result is not None
-    assert execution_result.process_id == WATER_BODIES_PROCESS_IDENTIFIER
+    assert execution_result.process_id == RASTER_CALCULATOR_PROCESS_IDENTIFIER
     assert execution_result.job_id
     assert execution_result.status == StatusCode.running
 
@@ -251,27 +259,24 @@ async def test_ades_executing_job(ades: ADESClient) -> None:
     assert status_result.status in {StatusCode.failed, StatusCode.successful}
     assert status_result.finished is not None
 
-
-@pytest.mark.asyncio(scope="function")
-async def test_ades_listing_job_executions(ades: ADESClient) -> None:
-    # Arrange
-    err, _ = await ades.register_process_from_cwl_href(WATER_BODIES_CWL_HREF)
-    assert err is None or err.code == status.HTTP_409_CONFLICT
-    err, _ = await ades.execute_process(
-        process_identifier=WATER_BODIES_PROCESS_IDENTIFIER,
-        process_inputs=TEST_PROCESS_INPUTS,
-    )
-    assert err is None
-
-    # Act
-    result: JobList
-    err, result = await ades.list_job_submissions()  # type: ignore[assignment]
+    # Act #2
+    # List job submissions
+    list_jobs_result: JobList
+    err, list_jobs_result = await ades.list_job_submissions()  # type: ignore[assignment]
 
     # Assert
     assert err is None
-    assert result is not None
-    assert result.jobs
-    assert result.number_total > 0
+    assert list_jobs_result is not None
+    assert list_jobs_result.jobs
+    assert list_jobs_result.number_total > 0
+
+    # Act #3
+    # List job results
+    err, job_results = await ades.get_job_results(execution_result.job_id)
+
+    # Assert
+    assert err is None
+    assert job_results
 
 
 @pytest.mark.asyncio(scope="function")
@@ -283,41 +288,6 @@ async def test_ades_get_non_existent_job_details_returns_404_not_found(ades: ADE
     assert err is not None
     assert result is None
     assert err.code == status.HTTP_404_NOT_FOUND
-
-
-@pytest.mark.asyncio(scope="function")
-async def test_ades_getting_job_results(ades: ADESClient, tmp_path: Path) -> None:
-    # Arrange
-    # Ensure process not registered
-    err = await ades.unregister_process(WATER_BODIES_PROCESS_IDENTIFIER)
-    assert err is None or err.code == status.HTTP_404_NOT_FOUND
-    tmp_file = await get_cwl_from_href(cwl_href=WATER_BODIES_CWL_HREF, save_dir=tmp_path)
-    err, _ = await ades.register_process_from_local_cwl_file(tmp_file)
-    assert err is None
-
-    # Execute the process
-    err, execution_result = await ades.execute_process(
-        process_identifier=WATER_BODIES_PROCESS_IDENTIFIER,
-        process_inputs=TEST_PROCESS_INPUTS,
-    )
-    assert err is None
-    assert execution_result is not None
-
-    # Poll for changes while process is running
-    while True:
-        err, response = await ades.get_job_details(execution_result.job_id)
-        assert err is None
-        assert response is not None
-        if response.status != StatusCode.running:
-            break
-        await asyncio.sleep(5)
-
-    # Act
-    err, job_results = await ades.get_job_results(execution_result.job_id)
-
-    # Assert
-    assert err is None
-    assert job_results
 
 
 @pytest.mark.asyncio(scope="function")
@@ -337,8 +307,8 @@ async def test_ades_cancelling_job_returns_501_not_implemented(ades: ADESClient)
     # Arrange
     # Execute the process
     err, execution_result = await ades.execute_process(
-        process_identifier=WATER_BODIES_PROCESS_IDENTIFIER,
-        process_inputs=TEST_PROCESS_INPUTS,
+        process_identifier=RASTER_CALCULATOR_PROCESS_IDENTIFIER,
+        process_inputs=RASTER_CALCULATOR_INPUTS,
     )
     assert err is None
     assert execution_result is not None
