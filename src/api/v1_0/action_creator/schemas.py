@@ -161,6 +161,13 @@ class RasterCalculatorFunctionInputs(CommonPresetFunctionInputs):
 class LandCoverChangeDetectionFunctionInputs(CommonPresetFunctionInputs):
     function_identifier: ClassVar[str] = PresetFunctionIdentifier.LAND_COVER_CHANGE_DETECTION
 
+    def as_ogc_process_inputs(self) -> dict[str, Any]:
+        outputs = super().as_ogc_process_inputs()
+        # Rename stac_collection input to source
+        stac_collection = outputs.pop("stac_collection")
+        outputs["source"] = stac_collection
+        return outputs
+
 
 class WaterQualityFunctionInputs(CommonPresetFunctionInputs):
     function_identifier: ClassVar[str] = PresetFunctionIdentifier.WATER_QUALITY
