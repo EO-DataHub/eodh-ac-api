@@ -1,28 +1,42 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
+import pytest
 from starlette import status
 
 from src.api.v1_0.action_creator.schemas import ActionCreatorJob
+from src.consts.action_creator import FUNCTIONS_REGISTRY
 
 if TYPE_CHECKING:
     from unittest.mock import MagicMock
 
+    from _pytest.fixtures import FixtureRequest
     from starlette.testclient import TestClient
 
 
+@pytest.mark.parametrize(
+    "request_body_fixture",
+    [
+        "raster_calculator_request_body",
+        "lulc_change_request_body",
+    ],
+)
 def test_post_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
     client: TestClient,
     mocked_ades_factory: MagicMock,  # noqa: ARG001
     auth_token: str,
-    raster_calculator_request_body: dict[str, Any],
+    request_body_fixture: str,
+    request: FixtureRequest,
 ) -> None:
+    # Arrange
+    request_body = request.getfixturevalue(request_body_fixture)
+
     # Act
     response = client.post(
         url="/api/v1.0/action-creator/submissions",
         headers={"Authorization": f"Bearer {auth_token}"},
-        json=raster_calculator_request_body,
+        json=request_body,
     )
 
     # Assert
@@ -30,20 +44,31 @@ def test_post_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
     assert ActionCreatorJob(**response.json())
 
 
+@pytest.mark.parametrize(
+    "request_body_fixture",
+    [
+        "raster_calculator_request_body",
+        "lulc_change_request_body",
+    ],
+)
 def test_post_job_submissions_endpoint_returns_422_when_invalid_stac_collection_was_provided(
     client: TestClient,
     mocked_ades_factory: MagicMock,  # noqa: ARG001
     auth_token: str,
-    raster_calculator_request_body: dict[str, Any],
+    request_body_fixture: str,
+    request: FixtureRequest,
 ) -> None:
     # Arrange
-    raster_calculator_request_body["preset_function"]["inputs"]["stac_collection"] = "dummy-collection"
+    request_body = request.getfixturevalue(request_body_fixture)
+    request_body["preset_function"]["inputs"]["stac_collection"] = "dummy-collection"
+    func = request_body["preset_function"]["function_identifier"]
+    supported_collections = FUNCTIONS_REGISTRY[func]["inputs"]["stac_collection"]["options"]
 
     # Act
     response = client.post(
         url="/api/v1.0/action-creator/submissions",
         headers={"Authorization": f"Bearer {auth_token}"},
-        json=raster_calculator_request_body,
+        json=request_body,
     )
 
     # Assert
@@ -52,25 +77,34 @@ def test_post_job_submissions_endpoint_returns_422_when_invalid_stac_collection_
     assert err["detail"][0]["loc"] == ["body", "preset_function", "stac_collection"]
     assert err["detail"][0]["type"] == "collection_not_supported_error"
     assert err["detail"][0]["msg"] == (
-        "Collection 'dummy-collection' cannot be used with 'raster-calculate' function! "
-        "Valid options are: ['sentinel-2-l2a']."
+        f"Collection 'dummy-collection' cannot be used with '{func}' function! "
+        f"Valid options are: {supported_collections}."
     )
 
 
+@pytest.mark.parametrize(
+    "request_body_fixture",
+    [
+        "raster_calculator_request_body",
+        "lulc_change_request_body",
+    ],
+)
 def test_post_job_submissions_endpoint_returns_422_when_missing_geometry(
     client: TestClient,
     mocked_ades_factory: MagicMock,  # noqa: ARG001
     auth_token: str,
-    raster_calculator_request_body: dict[str, Any],
+    request_body_fixture: str,
+    request: FixtureRequest,
 ) -> None:
     # Arrange
-    raster_calculator_request_body["preset_function"]["inputs"].pop("aoi")
+    request_body = request.getfixturevalue(request_body_fixture)
+    request_body["preset_function"]["inputs"].pop("aoi")
 
     # Act
     response = client.post(
         url="/api/v1.0/action-creator/submissions",
         headers={"Authorization": f"Bearer {auth_token}"},
-        json=raster_calculator_request_body,
+        json=request_body,
     )
 
     # Assert
@@ -81,20 +115,29 @@ def test_post_job_submissions_endpoint_returns_422_when_missing_geometry(
     assert err["detail"][0]["msg"] == "Area of Interest is missing."
 
 
+@pytest.mark.parametrize(
+    "request_body_fixture",
+    [
+        "raster_calculator_request_body",
+        "lulc_change_request_body",
+    ],
+)
 def test_post_job_submissions_endpoint_returns_422_when_invalid_date_range_was_provided(
     client: TestClient,
     mocked_ades_factory: MagicMock,  # noqa: ARG001
     auth_token: str,
-    raster_calculator_request_body: dict[str, Any],
+    request_body_fixture: str,
+    request: FixtureRequest,
 ) -> None:
     # Arrange
-    raster_calculator_request_body["preset_function"]["inputs"]["date_end"] = "2024-01-01T00:00:00"
+    request_body = request.getfixturevalue(request_body_fixture)
+    request_body["preset_function"]["inputs"]["date_end"] = "2024-01-01T00:00:00"
 
     # Act
     response = client.post(
         url="/api/v1.0/action-creator/submissions",
         headers={"Authorization": f"Bearer {auth_token}"},
-        json=raster_calculator_request_body,
+        json=request_body,
     )
 
     # Assert
