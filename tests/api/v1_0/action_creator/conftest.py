@@ -42,6 +42,7 @@ def raster_calculator_request_body() -> dict[str, Any]:
                 "date_end": "2024-08-01T00:00:00",
                 "index": "NDVI",
                 "stac_collection": "sentinel-2-l2a",
+                "limit": 10,
             },
         }
     }
@@ -68,6 +69,34 @@ def lulc_change_request_body() -> dict[str, Any]:
                 "date_start": "2024-04-03T00:00:00",
                 "date_end": "2024-08-01T00:00:00",
                 "stac_collection": "esacci-globallc",
+            },
+        }
+    }
+
+
+@pytest.fixture
+def water_quality_request_body() -> dict[str, Any]:
+    return {
+        "preset_function": {
+            "function_identifier": "water-quality",
+            "inputs": {
+                "aoi": {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [
+                            [14.763294437090849, 50.833598186651244],
+                            [15.052268923898112, 50.833598186651244],
+                            [15.052268923898112, 50.989077215056824],
+                            [14.763294437090849, 50.989077215056824],
+                            [14.763294437090849, 50.833598186651244],
+                        ]
+                    ],
+                },
+                "date_start": "2024-04-03T00:00:00",
+                "date_end": "2024-08-01T00:00:00",
+                "stac_collection": "sentinel-2-l2a",
+                "calibrate": True,
+                "index": "CYA",
             },
         }
     }

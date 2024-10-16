@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Generic, Literal, Se
 from geojson_pydantic.geometries import Polygon
 from pydantic import BaseModel, Field, field_validator, model_validator
 
+from src.consts.action_creator import FUNCTIONS_REGISTRY
 from src.services.validation_utils import (
     aoi_must_be_present,
     ensure_area_smaller_than,
@@ -103,11 +104,13 @@ class CommonPresetFunctionInputs(OGCProcessInputs, abc.ABC):
     aoi: Annotated[Polygon | None, Field(None, validate_default=True)]
     date_start: datetime | None = None
     date_end: datetime | None = None
-    stac_collection: str
+    stac_collection: Annotated[str | None, Field(None, validate_default=True)]
 
     @field_validator("stac_collection", mode="after")
     @classmethod
-    def validate_stac_collection(cls, v: str) -> str:
+    def validate_stac_collection(cls, v: str | None = None) -> str:
+        if v is None:
+            return FUNCTIONS_REGISTRY[cls.function_identifier]["inputs"]["stac_collection"]["default"]  # type: ignore[no-any-return]
         # Validate STAC collection
         validate_stac_collection(
             specified_collection=v,
