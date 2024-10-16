@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     [
         "raster_calculator_request_body",
         "lulc_change_request_body",
+        "water_quality_request_body",
     ],
 )
 def test_post_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
@@ -49,6 +50,7 @@ def test_post_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
     [
         "raster_calculator_request_body",
         "lulc_change_request_body",
+        "water_quality_request_body",
     ],
 )
 def test_post_job_submissions_endpoint_returns_422_when_invalid_stac_collection_was_provided(
@@ -87,6 +89,7 @@ def test_post_job_submissions_endpoint_returns_422_when_invalid_stac_collection_
     [
         "raster_calculator_request_body",
         "lulc_change_request_body",
+        "water_quality_request_body",
     ],
 )
 def test_post_job_submissions_endpoint_returns_422_when_missing_geometry(
@@ -120,6 +123,7 @@ def test_post_job_submissions_endpoint_returns_422_when_missing_geometry(
     [
         "raster_calculator_request_body",
         "lulc_change_request_body",
+        "water_quality_request_body",
     ],
 )
 def test_post_job_submissions_endpoint_returns_422_when_invalid_date_range_was_provided(
