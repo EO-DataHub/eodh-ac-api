@@ -8,7 +8,7 @@ from geojson_pydantic.geometries import parse_geometry_obj
 from pydantic_core import PydanticCustomError
 from shapely.geometry import shape
 
-from src.consts.action_creator import FUNCTIONS_REGISTRY
+from src.consts.action_creator import PRESETS_REGISTRY
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -110,7 +110,7 @@ def aoi_must_be_present(v: dict[str, Any] | None = None) -> dict[str, Any]:
 
 
 def validate_stac_collection(specified_collection: str, function_identifier: str) -> None:
-    function_spec = FUNCTIONS_REGISTRY[function_identifier]
+    function_spec = PRESETS_REGISTRY[function_identifier]
     if specified_collection not in (valid_collections := function_spec["inputs"]["stac_collection"]["options"]):
         raise CollectionNotSupportedError.make(
             collection=specified_collection,

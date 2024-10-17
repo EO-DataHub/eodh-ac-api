@@ -22,6 +22,8 @@ RASTER_CALCULATOR_FUNCTION_SPEC = {
     "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/raster-calculate-app.cwl",
     "inputs": {
         "stac_collection": {
+            "name": "stac_collection",
+            "full_name": "STAC collection",
             "type": "string",
             "required": False,
             "default": "sentinel-2-l2a",
@@ -29,21 +31,31 @@ RASTER_CALCULATOR_FUNCTION_SPEC = {
             "options": ["sentinel-2-l2a"],
         },
         "date_start": {
+            "name": "date_start",
+            "full_name": "Start date",
             "type": "datetime",
             "required": False,
             "description": "The start date and time to use for item filtering. Must be RFC3339 compliant.",
         },
         "date_end": {
+            "name": "date_end",
+            "full_name": "End date",
             "type": "datetime",
             "required": False,
             "description": "The end date and time to use for item filtering. Must be RFC3339 compliant.",
         },
         "aoi": {
+            "name": "aoi",
+            "full_name": "Area of Interest",
             "type": "polygon",
             "required": True,
             "description": "The Area of Interest as GeoJSON (polygon).",
         },
+    },
+    "parameters": {
         "index": {
+            "name": "index",
+            "full_name": "Spectral index",
             "type": "string",
             "description": "The spectral index to calculate.",
             "required": False,
@@ -56,6 +68,8 @@ RASTER_CALCULATOR_FUNCTION_SPEC = {
             ],
         },
         "limit": {
+            "name": "limit",
+            "full_name": "Result number limit",
             "type": "number",
             "required": False,
             "default": 1,
@@ -63,10 +77,12 @@ RASTER_CALCULATOR_FUNCTION_SPEC = {
         },
     },
     "outputs": {
-        "collection": {
+        "stac_collection": {
+            "name": "stac_collection",
+            "full_name": "STAC collection",
             "type": "stac_collection",
             "description": "The STAC collection with results.",
-        }
+        },
     },
 }
 LAND_COVER_CHANGE_DETECTION_FUNCTION_SPEC = {
@@ -79,33 +95,43 @@ LAND_COVER_CHANGE_DETECTION_FUNCTION_SPEC = {
     "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/lulc-change-app.cwl",
     "inputs": {
         "stac_collection": {
+            "name": "stac_collection",
+            "full_name": "STAC collection",
             "type": "string",
             "required": False,
-            "default": "esacci-globallc",
+            "default": "sentinel-2-l2a",
             "description": "The STAC collection to use.",
             "options": ["esacci-globallc", "clms-corinelc", "clms-water-bodies"],
         },
         "date_start": {
+            "name": "date_start",
+            "full_name": "Start date",
             "type": "datetime",
             "required": False,
             "description": "The start date and time to use for item filtering. Must be RFC3339 compliant.",
         },
         "date_end": {
+            "name": "date_end",
+            "full_name": "End date",
             "type": "datetime",
             "required": False,
             "description": "The end date and time to use for item filtering. Must be RFC3339 compliant.",
         },
         "aoi": {
+            "name": "aoi",
+            "full_name": "Area of Interest",
             "type": "polygon",
             "required": True,
             "description": "The Area of Interest as GeoJSON (polygon).",
         },
     },
     "outputs": {
-        "collection": {
+        "stac_collection": {
+            "name": "stac_collection",
+            "full_name": "STAC collection",
             "type": "stac_collection",
             "description": "The STAC collection with results.",
-        }
+        },
     },
 }
 WATER_QUALITY_FUNCTION_SPEC = {
@@ -118,6 +144,8 @@ WATER_QUALITY_FUNCTION_SPEC = {
     "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/water-quality-app.cwl",
     "inputs": {
         "stac_collection": {
+            "name": "stac_collection",
+            "full_name": "STAC collection",
             "type": "string",
             "required": False,
             "default": "sentinel-2-l2a",
@@ -125,21 +153,31 @@ WATER_QUALITY_FUNCTION_SPEC = {
             "options": ["sentinel-2-l2a"],
         },
         "date_start": {
+            "name": "date_start",
+            "full_name": "Start date",
             "type": "datetime",
             "required": False,
             "description": "The start date and time to use for item filtering. Must be RFC3339 compliant.",
         },
         "date_end": {
+            "name": "date_end",
+            "full_name": "End date",
             "type": "datetime",
             "required": False,
             "description": "The end date and time to use for item filtering. Must be RFC3339 compliant.",
         },
         "aoi": {
+            "name": "aoi",
+            "full_name": "Area of Interest",
             "type": "polygon",
             "required": True,
             "description": "The Area of Interest as GeoJSON (polygon).",
         },
+    },
+    "parameters": {
         "calibrate": {
+            "name": "calibrate",
+            "full_name": "In-situ data calibration",
             "type": "boolean",
             "required": False,
             "default": False,
@@ -147,6 +185,8 @@ WATER_QUALITY_FUNCTION_SPEC = {
             "using in-situ data from DEFRA.",
         },
         "index": {
+            "name": "index",
+            "full_name": "Quality index",
             "type": "string",
             "description": "The spectral index to calculate.",
             "required": False,
@@ -160,43 +200,53 @@ WATER_QUALITY_FUNCTION_SPEC = {
         },
     },
     "outputs": {
-        "collection": {
+        "stac_collection": {
+            "name": "stac_collection",
+            "full_name": "STAC collection",
             "type": "stac_collection",
             "description": "The STAC collection with results.",
-        }
+        },
     },
 }
 CLIP_FUNCTION_SPEC = {
     "identifier": "clip",
     "name": "Clip",
     "description": "Clip (crop) items generated by previous function using provided Area of Interest.",
-    "preset": False,
-    "thumbnail_b64": _load_base_64_thumbnail("clip"),
+    "standalone": False,
     "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/clip-app.cwl",
     "inputs": {
-        "collection": {
+        "stac_collection": {
+            "name": "stac_collection",
+            "full_name": "STAC collection",
             "type": "stac_collection",
             "required": True,
-            "description": "The STAC collection to use.",
+            "description": "The STAC collection with items from previous function block.",
         },
         "aoi": {
+            "name": "aoi",
+            "full_name": "Area of Interest",
             "type": "polygon",
             "required": True,
-            "description": "The Area of Interest as GeoJSON (polygon).",
+            "description": "The Area of Interest as GeoJSON (polygon) for item cropping.",
         },
     },
     "outputs": {
-        "collection": {
+        "stac_collection": {
+            "name": "stac_collection",
+            "full_name": "STAC collection",
             "type": "stac_collection",
             "description": "The STAC collection with results.",
-        }
+        },
     },
 }
 
-FUNCTIONS = [
+PRESETS = [
     RASTER_CALCULATOR_FUNCTION_SPEC,
     LAND_COVER_CHANGE_DETECTION_FUNCTION_SPEC,
     WATER_QUALITY_FUNCTION_SPEC,
+]
+FUNCTIONS = [
     CLIP_FUNCTION_SPEC,
 ]
+PRESETS_REGISTRY: dict[str, dict[str, Any]] = {f["identifier"]: f for f in PRESETS}  # type: ignore[misc]
 FUNCTIONS_REGISTRY: dict[str, dict[str, Any]] = {f["identifier"]: f for f in FUNCTIONS}  # type: ignore[misc]
