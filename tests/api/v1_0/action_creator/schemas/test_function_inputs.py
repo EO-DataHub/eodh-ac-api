@@ -15,7 +15,7 @@ from src.api.v1_0.action_creator.schemas import (
     WaterQualityFunctionInputs,
     WaterQualityIndex,
 )
-from src.consts.action_creator import FUNCTIONS_REGISTRY
+from src.consts.action_creator import PRESETS_REGISTRY
 from tests.api.v1_0.action_creator.schemas.test_functions import TEST_UK_AOI
 
 if TYPE_CHECKING:
@@ -50,7 +50,7 @@ def test_defaults_for_common_params(
     assert result.date_end is None
     assert result.date_end is None
     assert result.aoi == Polygon(**inputs["aoi"])
-    assert result.stac_collection == (FUNCTIONS_REGISTRY[identifier]["inputs"]["stac_collection"]["default"])
+    assert result.stac_collection == (PRESETS_REGISTRY[identifier]["inputs"]["stac_collection"]["default"])
 
 
 @pytest.mark.parametrize(
@@ -142,7 +142,7 @@ def test_raises_when_invalid_stac_collection(
 
 def test_default_index_for_raster_calculator(raster_calculator_request_body: dict[str, Any]) -> None:
     # Arrange
-    raster_calculator_request_body["preset_function"]["inputs"].pop("index")
+    raster_calculator_request_body["preset_function"]["parameters"].pop("index")
     inputs = raster_calculator_request_body["preset_function"]["inputs"]
 
     # Act
@@ -154,19 +154,19 @@ def test_default_index_for_raster_calculator(raster_calculator_request_body: dic
 
 def test_default_limit_for_raster_calculator(raster_calculator_request_body: dict[str, Any]) -> None:
     # Arrange
-    raster_calculator_request_body["preset_function"]["inputs"].pop("limit")
+    raster_calculator_request_body["preset_function"]["parameters"].pop("limit")
     inputs = raster_calculator_request_body["preset_function"]["inputs"]
 
     # Act
     result = RasterCalculatorFunctionInputs(**inputs)
 
     # Assert
-    assert result.limit == FUNCTIONS_REGISTRY["raster-calculate"]["inputs"]["limit"]["default"]
+    assert result.limit == PRESETS_REGISTRY["raster-calculate"]["parameters"]["limit"]["default"]
 
 
 def test_default_index_for_water_quality(water_quality_request_body: dict[str, Any]) -> None:
     # Arrange
-    water_quality_request_body["preset_function"]["inputs"].pop("index")
+    water_quality_request_body["preset_function"]["parameters"].pop("index")
     inputs = water_quality_request_body["preset_function"]["inputs"]
 
     # Act
@@ -178,7 +178,7 @@ def test_default_index_for_water_quality(water_quality_request_body: dict[str, A
 
 def test_default_calibration_flag_water_quality(water_quality_request_body: dict[str, Any]) -> None:
     # Arrange
-    water_quality_request_body["preset_function"]["inputs"].pop("calibrate")
+    water_quality_request_body["preset_function"]["parameters"].pop("calibrate")
     inputs = water_quality_request_body["preset_function"]["inputs"]
 
     # Act
@@ -191,7 +191,8 @@ def test_default_calibration_flag_water_quality(water_quality_request_body: dict
 def test_raster_calculator_as_ogc_process_inputs(raster_calculator_request_body: dict[str, Any]) -> None:
     # Arrange
     inputs = raster_calculator_request_body["preset_function"]["inputs"]
-    model = RasterCalculatorFunctionInputs(**inputs)
+    params = raster_calculator_request_body["preset_function"]["parameters"]
+    model = RasterCalculatorFunctionInputs(**inputs, **params)
 
     # Act
     result = model.as_ogc_process_inputs()
@@ -201,8 +202,8 @@ def test_raster_calculator_as_ogc_process_inputs(raster_calculator_request_body:
     assert json.loads(result["aoi"]) == inputs["aoi"]
     assert result["date_start"] == inputs["date_start"]
     assert result["date_end"] == inputs["date_end"]
-    assert result["index"] == inputs["index"]
-    assert result["limit"] == inputs["limit"]
+    assert result["index"] == params["index"]
+    assert result["limit"] == params["limit"]
 
 
 def test_lulc_change_as_ogc_process_inputs(lulc_change_request_body: dict[str, Any]) -> None:
@@ -223,7 +224,8 @@ def test_lulc_change_as_ogc_process_inputs(lulc_change_request_body: dict[str, A
 def test_water_quality_as_ogc_process_inputs(water_quality_request_body: dict[str, Any]) -> None:
     # Arrange
     inputs = water_quality_request_body["preset_function"]["inputs"]
-    model = WaterQualityFunctionInputs(**inputs)
+    params = water_quality_request_body["preset_function"]["parameters"]
+    model = WaterQualityFunctionInputs(**inputs, **params)
 
     # Act
     result = model.as_ogc_process_inputs()
@@ -233,5 +235,5 @@ def test_water_quality_as_ogc_process_inputs(water_quality_request_body: dict[st
     assert json.loads(result["aoi"]) == inputs["aoi"]
     assert result["date_start"] == inputs["date_start"]
     assert result["date_end"] == inputs["date_end"]
-    assert result["index"] == inputs["index"]
-    assert result["calibrate"] == inputs["calibrate"]
+    assert result["index"] == params["index"]
+    assert result["calibrate"] == params["calibrate"]

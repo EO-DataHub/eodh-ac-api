@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Generic, Literal, Se
 from geojson_pydantic.geometries import Polygon
 from pydantic import BaseModel, Field, field_validator, model_validator
 
-from src.consts.action_creator import FUNCTIONS_REGISTRY
+from src.consts.action_creator import PRESETS_REGISTRY
 from src.services.validation_utils import (
     aoi_must_be_present,
     ensure_area_smaller_than,
@@ -46,6 +46,8 @@ class FuncInputOutputType(StrEnum):
 
 
 class FuncInputSpec(BaseModel):
+    name: str
+    full_name: str
     type: FuncInputOutputType
     required: bool = True
     description: str
@@ -54,22 +56,43 @@ class FuncInputSpec(BaseModel):
 
 
 class FuncOutputSpec(BaseModel):
+    name: str
     type: FuncInputOutputType
     description: str | None = None
 
 
-class ActionCreatorFunctionSpec(BaseModel):
-    name: str
+class FunctionInputs(BaseModel):
+    aoi: Annotated[FuncInputSpec | None, Field(None)]
+    stac_collection: Annotated[FuncInputSpec | None, Field(None)]
+    date_start: Annotated[FuncInputSpec | None, Field(None)]
+    date_end: Annotated[FuncInputSpec | None, Field(None)]
+
+
+class ActionCreatorFunctionBaseSpec(BaseModel):
     identifier: str
-    preset: bool = False
+    name: str
     description: str | None = None
-    thumbnail_b64: str | None = None
-    inputs: dict[str, FuncInputSpec]
+    inputs: FunctionInputs
+    parameters: dict[str, FuncInputSpec] | None = None
     outputs: dict[str, FuncOutputSpec]
+
+
+class ActionCreatorFunctionSpec(ActionCreatorFunctionBaseSpec):
+    standalone: bool = True
+
+
+class ActionCreatorPresetFunctionSpec(ActionCreatorFunctionBaseSpec):
+    thumbnail_b64: str | None = None
+    preset: bool = True
 
 
 class FunctionsResponse(BaseModel):
     functions: list[ActionCreatorFunctionSpec]
+    total: int
+
+
+class PresetsResponse(BaseModel):
+    presets: list[ActionCreatorPresetFunctionSpec]
     total: int
 
 
@@ -110,7 +133,7 @@ class CommonPresetFunctionInputs(OGCProcessInputs, abc.ABC):
     @classmethod
     def validate_stac_collection(cls, v: str | None = None) -> str:
         if v is None:
-            return FUNCTIONS_REGISTRY[cls.function_identifier]["inputs"]["stac_collection"]["default"]  # type: ignore[no-any-return]
+            return PRESETS_REGISTRY[cls.function_identifier]["inputs"]["stac_collection"]["default"]  # type: ignore[no-any-return]
         # Validate STAC collection
         validate_stac_collection(
             specified_collection=v,
@@ -223,10 +246,10 @@ class PresetFunctionExecutionRequest(BaseModel):
                 },
                 "date_start": "2024-04-03T00:00:00",
                 "date_end": "2024-08-01T00:00:00",
-                "index": "NDVI",
             }
         ],
     )
+    parameters: dict[str, Any] | None = Field(None, examples=[{"index": "NDVI", "limit": 1}])
 
     @model_validator(mode="before")
     @classmethod
@@ -239,8 +262,7 @@ class PresetFunctionExecutionRequest(BaseModel):
             raise ValueError(msg)
 
         inputs_cls = FUNCTION_TO_INPUTS_LOOKUP[v["function_identifier"]]
-        inputs = inputs_cls(**v["inputs"]).model_dump(mode="json")
-        v["inputs"] = inputs
+        inputs_cls(**v["inputs"], **v.get("parameters", {}) or {})
         return v
 
 
