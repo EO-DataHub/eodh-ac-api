@@ -11,7 +11,7 @@ from aiohttp import ClientSession
 from aiohttp_retry import ExponentialRetry, RetryClient
 from starlette import status
 
-from src.consts.presets import PRESETS_REGISTRY
+from src.consts.functions import FUNCTIONS_REGISTRY
 from src.core.settings import current_settings
 from src.services.ades.base_client import ADESClientBase, ErrorResponse
 from src.services.ades.schemas import JobList, Process, ProcessList, ProcessSummary, StatusInfo
@@ -261,7 +261,7 @@ class ADESClient(ADESClientBase):
         return None, process_identifier in {p.id for p in user_processes.processes}  # type: ignore[union-attr]
 
     async def ensure_process_exists(self, process_identifier: str) -> ErrorResponse | None:
-        if process_identifier not in PRESETS_REGISTRY:
+        if process_identifier not in FUNCTIONS_REGISTRY:
             return ErrorResponse(
                 code=status.HTTP_404_NOT_FOUND,
                 detail=f"Process '{process_identifier}' does not exist in Action Creator Function Registry. "
@@ -274,7 +274,7 @@ class ADESClient(ADESClientBase):
         if exists:
             return None
 
-        cwl_href = PRESETS_REGISTRY[process_identifier]["cwl_href"]
+        cwl_href = FUNCTIONS_REGISTRY[process_identifier]["cwl_href"]
         err, _ = await self.register_process_from_cwl_href_with_download(cwl_href=cwl_href)
 
         return err
@@ -362,7 +362,7 @@ class ADESClient(ADESClientBase):
             await client_session.close()
 
     async def reregister_process(self, process_identifier: str) -> tuple[ErrorResponse | None, ProcessSummary | None]:
-        if process_identifier not in PRESETS_REGISTRY:
+        if process_identifier not in FUNCTIONS_REGISTRY:
             return ErrorResponse(
                 code=status.HTTP_404_NOT_FOUND,
                 detail=f"Process '{process_identifier}' does not exist in Action Creator Function Registry. "
@@ -370,7 +370,7 @@ class ADESClient(ADESClientBase):
             ), None
         if await self.process_exists(process_identifier):
             await self.unregister_process(process_identifier)
-        cwl_href = PRESETS_REGISTRY[process_identifier]["cwl_href"]
+        cwl_href = FUNCTIONS_REGISTRY[process_identifier]["cwl_href"]
         return await self.register_process_from_cwl_href(cwl_href)
 
     @staticmethod
