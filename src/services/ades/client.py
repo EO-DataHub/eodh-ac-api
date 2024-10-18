@@ -11,7 +11,7 @@ from aiohttp import ClientSession
 from aiohttp_retry import ExponentialRetry, RetryClient
 from starlette import status
 
-from src.consts.action_creator import FUNCTIONS_REGISTRY
+from src.consts.functions import FUNCTIONS_REGISTRY
 from src.core.settings import current_settings
 from src.services.ades.base_client import ADESClientBase, ErrorResponse
 from src.services.ades.schemas import JobList, Process, ProcessList, ProcessSummary, StatusInfo

@@ -8,7 +8,7 @@ from geojson_pydantic.geometries import parse_geometry_obj
 from pydantic_core import PydanticCustomError
 from shapely.geometry import shape
 
-from src.consts.action_creator import PRESETS_REGISTRY
+from src.consts.presets import PRESETS_REGISTRY
 
 if TYPE_CHECKING:
     from datetime import datetime
