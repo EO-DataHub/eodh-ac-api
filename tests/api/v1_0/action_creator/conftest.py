@@ -40,11 +40,9 @@ def raster_calculator_request_body() -> dict[str, Any]:
                 },
                 "date_start": "2024-04-03T00:00:00",
                 "date_end": "2024-08-01T00:00:00",
-                "stac_collection": "sentinel-2-l2a",
-            },
-            "parameters": {
-                "limit": 10,
                 "index": "NDVI",
+                "stac_collection": "sentinel-2-l2a",
+                "limit": 10,
             },
         }
     }
@@ -97,8 +95,6 @@ def water_quality_request_body() -> dict[str, Any]:
                 "date_start": "2024-04-03T00:00:00",
                 "date_end": "2024-08-01T00:00:00",
                 "stac_collection": "sentinel-2-l2a",
-            },
-            "parameters": {
                 "calibrate": True,
                 "index": "CYA",
             },
