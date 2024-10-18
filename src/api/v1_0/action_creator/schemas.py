@@ -81,7 +81,7 @@ class ActionCreatorFunctionSpec(ActionCreatorFunctionBaseSpec):
     standalone: bool = True
 
 
-class ActionCreatorPresetFunctionSpec(ActionCreatorFunctionSpec):
+class ActionCreatorPresetFunctionSpec(ActionCreatorFunctionBaseSpec):
     thumbnail_b64: str | None = None
     preset: bool = True
 
