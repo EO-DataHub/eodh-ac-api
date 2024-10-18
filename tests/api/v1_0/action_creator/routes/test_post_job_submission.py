@@ -6,7 +6,7 @@ import pytest
 from starlette import status
 
 from src.api.v1_0.action_creator.schemas import ActionCreatorJob
-from src.consts.action_creator import PRESETS_REGISTRY
+from src.consts.presets import PRESETS_REGISTRY
 
 if TYPE_CHECKING:
     from unittest.mock import MagicMock

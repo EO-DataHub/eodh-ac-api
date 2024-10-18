@@ -15,7 +15,7 @@ from src.api.v1_0.action_creator.schemas import (
     WaterQualityFunctionInputs,
     WaterQualityIndex,
 )
-from src.consts.action_creator import PRESETS_REGISTRY
+from src.consts.presets import PRESETS_REGISTRY
 from tests.api.v1_0.action_creator.schemas.test_functions import TEST_UK_AOI
 
 if TYPE_CHECKING:
