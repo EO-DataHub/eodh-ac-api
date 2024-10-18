@@ -6,7 +6,7 @@ import pytest
 from starlette import status
 
 from src.api.v1_0.action_creator.schemas import ActionCreatorJob
-from src.consts.action_creator import PRESETS_REGISTRY
+from src.consts.action_creator import FUNCTIONS_REGISTRY
 
 if TYPE_CHECKING:
     from unittest.mock import MagicMock
@@ -64,7 +64,7 @@ def test_post_job_submissions_endpoint_returns_422_when_invalid_stac_collection_
     request_body = request.getfixturevalue(request_body_fixture)
     request_body["preset_function"]["inputs"]["stac_collection"] = "dummy-collection"
     func = request_body["preset_function"]["function_identifier"]
-    supported_collections = PRESETS_REGISTRY[func]["inputs"]["stac_collection"]["options"]
+    supported_collections = FUNCTIONS_REGISTRY[func]["inputs"]["stac_collection"]["options"]
 
     # Act
     response = client.post(

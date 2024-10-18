@@ -12,6 +12,7 @@ from starlette import status
 
 from src.api.v1_0.action_creator.schemas import (
     FUNCTION_TO_INPUTS_LOOKUP,
+    ActionCreatorFunctionSpec,
     ActionCreatorJob,
     ActionCreatorJobSummary,
     ActionCreatorSubmissionRequest,
@@ -19,7 +20,6 @@ from src.api.v1_0.action_creator.schemas import (
     ErrorResponse,
     FunctionsResponse,
     PaginationResults,
-    PresetsResponse,
 )
 from src.api.v1_0.auth.routes import decode_token, validate_access_token, validate_token_from_websocket
 from src.services.ades.factory import ades_client_factory
@@ -36,31 +36,9 @@ action_creator_router_v1_0 = APIRouter(
 
 
 @action_creator_router_v1_0.get(
-    "/presets",
-    response_model=PresetsResponse,
-    response_model_exclude_unset=True,
-    response_model_exclude_none=True,
-    responses={
-        status.HTTP_404_NOT_FOUND: {
-            "description": "Not found",
-            "model": ErrorResponse,
-        }
-    },
-)
-async def get_available_presets(
-    repo: Annotated[ActionCreatorRepository, Depends(get_function_repo)],
-    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
-    collection: Annotated[str | None, Query(max_length=64, description="STAC collection")] = None,
-) -> dict[str, Any]:
-    _, results = repo.get_available_presets(collection)
-    return {"presets": results, "total": len(results)}
-
-
-@action_creator_router_v1_0.get(
     "/functions",
     response_model=FunctionsResponse,
-    response_model_exclude_unset=True,
-    response_model_exclude_none=True,
+    response_model_exclude_unset=False,
     responses={
         status.HTTP_404_NOT_FOUND: {
             "description": "Not found",
@@ -68,13 +46,13 @@ async def get_available_presets(
         }
     },
 )
-async def get_available_standalone_functions(
+async def get_available_functions(
     repo: Annotated[ActionCreatorRepository, Depends(get_function_repo)],
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
     collection: Annotated[str | None, Query(max_length=64, description="STAC collection")] = None,
-) -> dict[str, Any]:
+) -> FunctionsResponse:
     _, results = repo.get_available_functions(collection)
-    return {"functions": results, "total": len(results)}
+    return FunctionsResponse(functions=[ActionCreatorFunctionSpec(**f) for f in results], total=len(results))
 
 
 @action_creator_router_v1_0.post(
@@ -97,10 +75,7 @@ async def submit_function(
     ades = ades_client_factory(workspace=introspected_token["preferred_username"], token=credential.credentials)
 
     inputs_cls = FUNCTION_TO_INPUTS_LOOKUP[creation_spec.preset_function.function_identifier]
-    inputs = inputs_cls(
-        **creation_spec.preset_function.inputs,
-        **(creation_spec.preset_function.parameters or {}),
-    ).as_ogc_process_inputs()
+    inputs = inputs_cls(**creation_spec.preset_function.inputs).as_ogc_process_inputs()
 
     err = await ades.ensure_process_exists(creation_spec.preset_function.function_identifier)
 
