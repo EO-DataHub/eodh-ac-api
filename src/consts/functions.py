@@ -228,4 +228,4 @@ FUNCTIONS = [
     NDMI_FUNCTION_SPEC,
     CLIP_FUNCTION_SPEC,
 ]
-FUNCTIONS_REGISTRY: dict[str, dict[str, Any]] = {f["identifier"]: f for f in FUNCTIONS}  # type: ignore[misc]
+PRESETS_REGISTRY: dict[str, dict[str, Any]] = {f["identifier"]: f for f in FUNCTIONS}  # type: ignore[misc]
