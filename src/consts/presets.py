@@ -18,6 +18,7 @@ RASTER_CALCULATOR_FUNCTION_SPEC = {
     "description": "Performs pixel-level calculations on raster datasets to compute indices such as NDVI, EVI, "
     "and other spectral indicators, enabling vegetation and land surface analysis.",
     "preset": True,
+    "standalone": True,
     "thumbnail_b64": _load_base_64_thumbnail("raster-calculate"),
     "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/raster-calculate-app.cwl",
     "inputs": {
@@ -91,6 +92,7 @@ LAND_COVER_CHANGE_DETECTION_FUNCTION_SPEC = {
     "description": "Analyses time-series satellite imagery to detect changes in land cover, identifying shifts in "
     "urban areas, forests, water bodies, and agriculture over specified periods.",
     "preset": True,
+    "standalone": True,
     "thumbnail_b64": _load_base_64_thumbnail("lulc-change"),
     "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/lulc-change-app.cwl",
     "inputs": {
@@ -140,6 +142,7 @@ WATER_QUALITY_FUNCTION_SPEC = {
     "description": "Evaluates water quality by analysing spectral data from satellite imagery, calibrated with DEFRA's "
     "in-situ measurements, to assess parameters like chlorophyll concentration and turbidity.",
     "preset": True,
+    "standalone": True,
     "thumbnail_b64": _load_base_64_thumbnail("water-quality"),
     "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/water-quality-app.cwl",
     "inputs": {
