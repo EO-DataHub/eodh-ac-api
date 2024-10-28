@@ -142,6 +142,8 @@ combine-as-imports = true
     "PLR6301", # see: https://pypi.org/project/Pylint - Method `X` could be a function, class method, or static method
     "E501", # see: https://pypi.org/project/pycodestyle - Line too long
 ]
+"**/{schemas}/*" = ["TCH001", "TCH002", "TCH003"]  # Ignore "Move to TYPE_CHECKING block" issues in FastAPI schema files
+"**/routes.py" = ["TCH001", "TCH002", "TCH003"]  # Ignore "Move to TYPE_CHECKING block" issues in FastAPI route files
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
