@@ -9,7 +9,7 @@ from geojson_pydantic import Polygon
 from pydantic import BaseModel, Field
 from pyproj.database import query_crs_info
 
-from src.api.v1_1.action_creator.schemas.functions import (
+from src.api.v1_2.action_creator.schemas.functions import (
     ConstraintOperator,
     FuncInputOutputType,
     FunctionCategory,

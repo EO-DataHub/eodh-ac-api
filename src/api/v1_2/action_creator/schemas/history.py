@@ -6,7 +6,7 @@ from typing import Annotated, Any, Generic, Literal, Sequence, TypeVar
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
-from src.api.v1_1.action_creator.schemas.workflows import WorkflowSpec
+from src.api.v1_2.action_creator.schemas.workflows import WorkflowSpec
 
 T = TypeVar("T", bound=BaseModel)
 DEFAULT_PAGE_IDX = 1

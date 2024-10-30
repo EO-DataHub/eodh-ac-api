@@ -4,12 +4,12 @@ import functools
 
 from pydantic import BaseModel, Field
 
-from src.api.v1_1.action_creator.schemas.workflow_steps import (
+from src.api.v1_2.action_creator.schemas.workflow_steps import (
     DirectoryOutputs,
     DirectoryStepOutputSpec,
     InputOutputValue,
 )
-from src.api.v1_1.action_creator.schemas.workflows import MainWorkflowInputs
+from src.api.v1_2.action_creator.schemas.workflows import MainWorkflowInputs
 from src.consts.directories import ASSETS_DIR
 from src.consts.geometries import HEATHROW_AOI, UK_AOI
 

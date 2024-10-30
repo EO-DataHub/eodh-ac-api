@@ -7,10 +7,10 @@ from fastapi.security import HTTPAuthorizationCredentials
 from starlette import status
 
 from src.api.v1_0.auth.routes import decode_token, validate_access_token
-from src.api.v1_1.action_creator.schemas.errors import ErrorResponse
-from src.api.v1_1.action_creator.schemas.functions import FunctionsResponse
-from src.api.v1_1.action_creator.schemas.history import ActionCreatorJob
-from src.api.v1_1.action_creator.schemas.presets import (
+from src.api.v1_2.action_creator.schemas.errors import ErrorResponse
+from src.api.v1_2.action_creator.schemas.functions import FunctionsResponse
+from src.api.v1_2.action_creator.schemas.history import ActionCreatorJob
+from src.api.v1_2.action_creator.schemas.presets import (
     ERR_AOI_TOO_BIG_NDVI_WORKFLOW_SPEC,
     ERR_INVALID_DATASET_NDVI_WORKFLOW_SPEC,
     ERR_INVALID_DATE_RANGE_NDVI_WORKFLOW_SPEC,
@@ -21,11 +21,11 @@ from src.api.v1_1.action_creator.schemas.presets import (
     SIMPLEST_NDVI_WORKFLOW_SPEC,
     PresetList,
 )
-from src.api.v1_1.action_creator.schemas.workflow_steps import (
+from src.api.v1_2.action_creator.schemas.workflow_steps import (
     FUNCTIONS,
     WorkflowValidationResult,
 )
-from src.api.v1_1.action_creator.schemas.workflows import WorkflowSpec
+from src.api.v1_2.action_creator.schemas.workflows import WorkflowSpec
 from src.utils.logging import get_logger
 
 _logger = get_logger(__name__)
@@ -75,13 +75,13 @@ TWorkflowSpec = Annotated[
     ),
 ]
 
-action_creator_router_v1_1 = APIRouter(
+action_creator_router_v1_2 = APIRouter(
     prefix="/action-creator",
     tags=["Action Creator"],
 )
 
 
-@action_creator_router_v1_1.get(
+@action_creator_router_v1_2.get(
     "/functions",
     response_model=FunctionsResponse,
     response_model_exclude_unset=True,
@@ -102,7 +102,7 @@ async def get_available_functions(
     return FunctionsResponse(functions=funcs, total=len(funcs))
 
 
-@action_creator_router_v1_1.get(
+@action_creator_router_v1_2.get(
     "/presets",
     response_model=PresetList,
     response_model_exclude_unset=False,
@@ -117,7 +117,7 @@ async def get_available_presets() -> PresetList:
     return PresetList(presets=PRESETS, total=len(PRESETS))
 
 
-@action_creator_router_v1_1.post(
+@action_creator_router_v1_2.post(
     "/workflow-validation",
     response_model=WorkflowValidationResult,
     status_code=status.HTTP_200_OK,
@@ -132,7 +132,7 @@ async def validate_workflow_specification(workflow_spec: TWorkflowSpec) -> Workf
     return WorkflowValidationResult(valid=True)
 
 
-@action_creator_router_v1_1.post(
+@action_creator_router_v1_2.post(
     "/workflow-submissions",
     response_model=ActionCreatorJob,
     status_code=status.HTTP_202_ACCEPTED,

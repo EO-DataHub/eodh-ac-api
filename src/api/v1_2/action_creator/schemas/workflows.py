@@ -8,7 +8,7 @@ from geojson_pydantic import Polygon
 from pydantic import BaseModel, Field, field_validator, model_validator
 from pydantic_core.core_schema import ValidationInfo
 
-from src.api.v1_1.action_creator.schemas.workflow_steps import DirectoryOutputs, TWorkflowStep
+from src.api.v1_2.action_creator.schemas.workflow_steps import DirectoryOutputs, TWorkflowStep
 from src.services.validation_utils import aoi_must_be_present, ensure_area_smaller_than, validate_date_range
 
 

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from src.api.v1_1.action_creator.schemas.presets import LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC
-from src.api.v1_1.action_creator.schemas.workflows import WorkflowSpec
+from src.api.v1_2.action_creator.schemas.presets import LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC
+from src.api.v1_2.action_creator.schemas.workflows import WorkflowSpec
 
 
 def test_lulc_change_preset_parsing() -> None:
