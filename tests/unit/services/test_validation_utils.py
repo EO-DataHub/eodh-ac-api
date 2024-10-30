@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from src.consts.geometries import HEATHROW_AOI, UK_AOI
+from src.consts.aoi import HEATHROW_AOI, UK_AOI
 from src.services.validation_utils import ensure_area_smaller_than
 
 

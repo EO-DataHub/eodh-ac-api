@@ -9,6 +9,7 @@ from pydantic_core import PydanticCustomError
 from shapely.geometry import shape
 
 from src.consts.action_creator import FUNCTIONS_REGISTRY
+from src.consts.functions import FUNCTIONS_REGISTRY as NEW_FUNCTIONS_REGISTRY
 
 if TYPE_CHECKING:
     from datetime import datetime
@@ -112,6 +113,16 @@ def aoi_must_be_present(v: dict[str, Any] | None = None) -> dict[str, Any]:
 def validate_stac_collection(specified_collection: str, function_identifier: str) -> None:
     function_spec = FUNCTIONS_REGISTRY[function_identifier]
     if specified_collection not in (valid_collections := function_spec["inputs"]["stac_collection"]["options"]):
+        raise CollectionNotSupportedError.make(
+            collection=specified_collection,
+            valid_collections=valid_collections,
+            function_identifier=function_identifier,
+        )
+
+
+def validate_stac_collection_v1_1(specified_collection: str, function_identifier: str) -> None:
+    function_spec = NEW_FUNCTIONS_REGISTRY[function_identifier]
+    if specified_collection not in (valid_collections := function_spec["compatible_input_datasets"]):
         raise CollectionNotSupportedError.make(
             collection=specified_collection,
             valid_collections=valid_collections,

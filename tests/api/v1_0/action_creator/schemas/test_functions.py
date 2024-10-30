@@ -7,7 +7,7 @@ import pytest
 from geojson_pydantic import Polygon
 
 from src.api.v1_0.action_creator.schemas import RasterCalculatorFunctionInputs, RasterCalculatorIndex
-from src.consts.geometries import HEATHROW_AOI, UK_AOI
+from src.consts.aoi import HEATHROW_AOI, UK_AOI
 
 
 def test_raster_calculate_preset_validation_no_aoi_provided() -> None:
@@ -103,6 +103,7 @@ def test_raster_calculate_preset_validation_happy_path() -> None:
 
 
 def test_raster_calculation_inputs() -> None:
+    # Arrange
     data = {
         "aoi": HEATHROW_AOI,
         "date_start": "2024-01-01T00:00:00Z",

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import re
 from pathlib import Path
@@ -9,10 +10,12 @@ from urllib.parse import urlparse
 
 from aiohttp import ClientSession
 from aiohttp_retry import ExponentialRetry, RetryClient
+from dotenv import load_dotenv
 from starlette import status
 
+from src import consts
 from src.consts.action_creator import FUNCTIONS_REGISTRY
-from src.core.settings import current_settings
+from src.consts.functions import WORKFLOW_REGISTRY
 from src.services.ades.base_client import ADESClientBase, ErrorResponse
 from src.services.ades.schemas import JobList, Process, ProcessList, ProcessSummary, StatusInfo
 from src.utils.logging import get_logger
@@ -27,7 +30,7 @@ _logger = get_logger(__name__)
 
 
 def replace_placeholders_in_cwl_file(file_path: Path) -> None:
-    _ = current_settings()
+    load_dotenv(consts.directories.ROOT_DIR / ".env")
 
     content = file_path.read_text()
     pattern = re.compile(r"<<([A-Za-z\-_ ]+)>>")
@@ -279,6 +282,25 @@ class ADESClient(ADESClientBase):
 
         return err
 
+    async def ensure_process_exists_v1_1(self, process_identifier: str) -> ErrorResponse | None:
+        if process_identifier not in WORKFLOW_REGISTRY:
+            return ErrorResponse(
+                code=status.HTTP_404_NOT_FOUND,
+                detail=f"Process '{process_identifier}' does not exist in Action Creator Function Registry. "
+                f"Have you made a typo?",
+            )
+
+        err, exists = await self.process_exists(process_identifier)
+        if err:
+            return err
+        if exists:
+            return None
+
+        cwl_href = WORKFLOW_REGISTRY[process_identifier]["cwl_href"]
+        err, _ = await self.register_process_from_cwl_href_with_download(cwl_href=cwl_href)
+
+        return err
+
     async def list_processes(self) -> tuple[ErrorResponse | None, ProcessList | None]:
         client_session, retry_client = self._get_retry_client()
         try:
@@ -322,6 +344,8 @@ class ADESClient(ADESClientBase):
 
             if "workspace" not in process_inputs["inputs"]:
                 process_inputs["inputs"]["workspace"] = self.workspace
+
+            _logger.info("Executing process: %s with inputs: %s", process_identifier, json.dumps(process_inputs))
 
             async with retry_client.post(
                 url=f"{self.processes_endpoint_url}/{process_identifier}/execution",
@@ -370,7 +394,21 @@ class ADESClient(ADESClientBase):
             ), None
         if await self.process_exists(process_identifier):
             await self.unregister_process(process_identifier)
-        cwl_href = FUNCTIONS_REGISTRY[process_identifier]["cwl_href"]
+        cwl_href = WORKFLOW_REGISTRY[process_identifier]["cwl_href"]
+        return await self.register_process_from_cwl_href_with_download(cwl_href)
+
+    async def reregister_process_v1_1(
+        self, process_identifier: str
+    ) -> tuple[ErrorResponse | None, ProcessSummary | None]:
+        if process_identifier not in WORKFLOW_REGISTRY:
+            return ErrorResponse(
+                code=status.HTTP_404_NOT_FOUND,
+                detail=f"Process '{process_identifier}' does not exist in Action Creator Function Registry. "
+                f"Have you made a typo?",
+            ), None
+        if await self.process_exists(process_identifier):
+            await self.unregister_process(process_identifier)
+        cwl_href = WORKFLOW_REGISTRY[process_identifier]["cwl_href"]
         return await self.register_process_from_cwl_href(cwl_href)
 
     @staticmethod

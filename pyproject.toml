@@ -210,6 +210,7 @@ module = [
     "fastapi_hypermodel.*",
     "geojson_pydantic.*",
     "jwt.*",
+    "dotenv.*",
     "mkdocs_gen_files.*",
     "pandas.*",
     "pydantic.*",
