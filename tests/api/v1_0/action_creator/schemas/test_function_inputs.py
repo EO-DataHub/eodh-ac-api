@@ -16,7 +16,7 @@ from src.api.v1_0.action_creator.schemas import (
     WaterQualityIndex,
 )
 from src.consts.action_creator import FUNCTIONS_REGISTRY
-from tests.api.v1_0.action_creator.schemas.test_functions import TEST_UK_AOI
+from src.consts.aoi import UK_AOI
 
 if TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
@@ -90,7 +90,7 @@ def test_raises_when_aoi_too_big(
 ) -> None:
     # Arrange
     inputs = request.getfixturevalue(input_model_fixture)["preset_function"]["inputs"]
-    inputs["aoi"] = TEST_UK_AOI
+    inputs["aoi"] = UK_AOI
 
     # Act & Assert
     with pytest.raises(ValidationError, match="Area exceeds"):

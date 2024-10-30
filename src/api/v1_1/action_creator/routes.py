@@ -10,9 +10,8 @@ from fastapi.security import HTTPAuthorizationCredentials  # noqa: TCH002
 from pydantic import ValidationError
 from starlette import status
 
-from src.api.v1_0.action_creator.schemas import (
-    FUNCTION_TO_INPUTS_LOOKUP,
-    ActionCreatorFunctionSpec,
+from src.api.v1_0.auth.routes import decode_token, validate_access_token, validate_token_from_websocket
+from src.api.v1_1.action_creator.schemas import (
     ActionCreatorJob,
     ActionCreatorJobSummary,
     ActionCreatorSubmissionRequest,
@@ -20,141 +19,51 @@ from src.api.v1_0.action_creator.schemas import (
     ErrorResponse,
     FunctionsResponse,
     PaginationResults,
+    PresetsResponse,
 )
-from src.api.v1_0.auth.routes import decode_token, validate_access_token, validate_token_from_websocket
+from src.consts.functions import FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING, FUNCTIONS
+from src.consts.presets import LAND_COVER_CHANGE_DETECTION_PRESET_SPEC, NDVI_CLIP_PRESET, NDVI_PRESET, PRESETS
 from src.services.ades.factory import ades_client_factory
 from src.services.ades.schemas import StatusCode
-from src.services.db.action_creator_repo import ActionCreatorRepository, get_function_repo  # noqa: TCH001
 from src.utils.logging import get_logger
 
 _logger = get_logger(__name__)
 WAIT_TIME_AFTER_PROCESS_REGISTRATION = 15  # seconds
-TCreationSpec = Annotated[
+
+TWorkflowCreationSpec = Annotated[
     ActionCreatorSubmissionRequest,
     Body(
         openapi_examples={
-            "ndvi": {
-                "summary": "NDVI",
-                "description": "Calculate NDVI",
-                "value": {
-                    "preset_function": {
-                        "function_identifier": "raster-calculate",
-                        "inputs": {
-                            "aoi": {
-                                "coordinates": [
-                                    [
-                                        [14.763294437090849, 50.833598186651244],
-                                        [15.052268923898112, 50.833598186651244],
-                                        [15.052268923898112, 50.989077215056824],
-                                        [14.763294437090849, 50.989077215056824],
-                                        [14.763294437090849, 50.833598186651244],
-                                    ]
-                                ],
-                                "type": "Polygon",
-                            },
-                            "date_start": "2024-04-03T00:00:00",
-                            "date_end": "2024-08-01T00:00:00",
-                            "index": "NDVI",
-                            "stac_collection": "sentinel-2-l2a",
-                        },
-                    }
-                },
+            "land-cover-change-preset": {
+                "summary": "Land Cover Change Detection",
+                "description": "Land Cover Change Detection using ESA LCCCI Global Land Cover Map.",
+                "value": {"workflow": LAND_COVER_CHANGE_DETECTION_PRESET_SPEC["workflow"]},
             },
-            "land-cover-change-detection-esa-global-lc": {
-                "summary": "Land Cover Change Detection - ESA Global Land Cover",
-                "description": "Calculate Land Cover class changes across time-series of STAC items from selected "
-                "collection",
-                "value": {
-                    "preset_function": {
-                        "function_identifier": "lulc-change",
-                        "inputs": {
-                            "aoi": {
-                                "coordinates": [
-                                    [
-                                        [14.763294437090849, 50.833598186651244],
-                                        [15.052268923898112, 50.833598186651244],
-                                        [15.052268923898112, 50.989077215056824],
-                                        [14.763294437090849, 50.989077215056824],
-                                        [14.763294437090849, 50.833598186651244],
-                                    ]
-                                ],
-                                "type": "Polygon",
-                            },
-                            "date_start": "2006-01-01T00:00:00",
-                            "date_end": "2024-04-03T00:00:00",
-                            "stac_collection": "esacci-globallc",
-                        },
-                    }
-                },
+            "simplest-ndvi": {
+                "summary": "Simplest workflow - NDVI",
+                "description": "Just an NDVI function",
+                "value": NDVI_PRESET,
             },
-            "land-cover-change-detection-corine": {
-                "summary": "Land Cover Change Detection - CORINE",
-                "description": "Calculate Land Cover class changes across time-series of STAC items from selected "
-                "collection",
-                "value": {
-                    "preset_function": {
-                        "function_identifier": "lulc-change",
-                        "inputs": {
-                            "aoi": {
-                                "coordinates": [
-                                    [
-                                        [14.763294437090849, 50.833598186651244],
-                                        [15.052268923898112, 50.833598186651244],
-                                        [15.052268923898112, 50.989077215056824],
-                                        [14.763294437090849, 50.989077215056824],
-                                        [14.763294437090849, 50.833598186651244],
-                                    ]
-                                ],
-                                "type": "Polygon",
-                            },
-                            "date_start": "2006-01-01T00:00:00",
-                            "date_end": "2024-04-03T00:00:00",
-                            "stac_collection": "clms-corinelc",
-                        },
-                    }
-                },
-            },
-            "land-cover-change-detection-water-bodies": {
-                "summary": "Land Cover Change Detection - Water Bodies",
-                "description": "Calculate Land Cover class changes across time-series of STAC items from selected "
-                "collection",
-                "value": {
-                    "preset_function": {
-                        "function_identifier": "lulc-change",
-                        "inputs": {
-                            "aoi": {
-                                "coordinates": [
-                                    [
-                                        [14.763294437090849, 50.833598186651244],
-                                        [15.052268923898112, 50.833598186651244],
-                                        [15.052268923898112, 50.989077215056824],
-                                        [14.763294437090849, 50.989077215056824],
-                                        [14.763294437090849, 50.833598186651244],
-                                    ]
-                                ],
-                                "type": "Polygon",
-                            },
-                            "date_start": "2006-01-01T00:00:00",
-                            "date_end": "2024-04-03T00:00:00",
-                            "stac_collection": "clms-water-bodies",
-                        },
-                    }
-                },
+            "ndvi+clip": {
+                "summary": "NDVI with Clipping",
+                "description": "NDVI function with additional Clipping of the results",
+                "value": NDVI_CLIP_PRESET,
             },
         }
     ),
 ]
 
-action_creator_router_v1_0 = APIRouter(
+action_creator_router_v1_1 = APIRouter(
     prefix="/action-creator",
     tags=["Action Creator"],
 )
 
 
-@action_creator_router_v1_0.get(
+@action_creator_router_v1_1.get(
     "/functions",
     response_model=FunctionsResponse,
     response_model_exclude_unset=False,
+    response_model_exclude_none=True,
     responses={
         status.HTTP_404_NOT_FOUND: {
             "description": "Not found",
@@ -163,15 +72,35 @@ action_creator_router_v1_0 = APIRouter(
     },
 )
 async def get_available_functions(
-    repo: Annotated[ActionCreatorRepository, Depends(get_function_repo)],
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
     collection: Annotated[str | None, Query(max_length=64, description="STAC collection")] = None,
 ) -> FunctionsResponse:
-    _, results = repo.get_available_functions(collection)
-    return FunctionsResponse(functions=[ActionCreatorFunctionSpec(**f) for f in results], total=len(results))
+    funcs = [f for f in FUNCTIONS if f["visible"]]
+    if collection:
+        funcs = [f for f in funcs if collection in f["compatible_with_input_dataset"]]  # type: ignore[operator]
+    return FunctionsResponse(functions=funcs, total=len(funcs))
 
 
-@action_creator_router_v1_0.post(
+@action_creator_router_v1_1.get(
+    "/presets",
+    response_model=PresetsResponse,
+    response_model_exclude_unset=False,
+    response_model_exclude_none=True,
+    responses={
+        status.HTTP_404_NOT_FOUND: {
+            "description": "Not found",
+            "model": ErrorResponse,
+        }
+    },
+)
+async def get_available_presets(
+    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
+) -> PresetsResponse:
+    presets = [p for p in PRESETS if p["visible"]]
+    return PresetsResponse(presets=presets, total=len(presets))
+
+
+@action_creator_router_v1_1.post(
     "/submissions",
     response_model=ActionCreatorJob,
     status_code=status.HTTP_202_ACCEPTED,
@@ -182,18 +111,22 @@ async def get_available_functions(
         }
     },
 )
-async def submit_function(
-    creation_spec: TCreationSpec,
+async def submit_workflow(
+    workflow_spec: TWorkflowCreationSpec,
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
 ) -> ActionCreatorJob:
     introspected_token = decode_token(credential.credentials)
 
     ades = ades_client_factory(workspace=introspected_token["preferred_username"], token=credential.credentials)
 
-    inputs_cls = FUNCTION_TO_INPUTS_LOOKUP[creation_spec.preset_function.function_identifier]
-    inputs = inputs_cls(**creation_spec.preset_function.inputs).as_ogc_process_inputs()
+    workflow_step_spec = next(iter(workflow_spec.workflow.values()))
+    wf_identifier = FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING[workflow_step_spec.identifier]
+    ogc_inputs = workflow_step_spec.inputs.as_ogc_process_inputs()
 
-    err, _ = await ades.reregister_process(creation_spec.preset_function.function_identifier)
+    if "clip" in workflow_spec.workflow:
+        ogc_inputs["clip"] = "True"
+
+    err, _ = await ades.reregister_process_v1_1(wf_identifier)
 
     if err is not None:
         raise HTTPException(
@@ -206,8 +139,8 @@ async def submit_function(
     await asyncio.sleep(WAIT_TIME_AFTER_PROCESS_REGISTRATION)
 
     err, response = await ades.execute_process(
-        process_identifier=creation_spec.preset_function.function_identifier,
-        process_inputs=inputs,
+        process_identifier=wf_identifier,
+        process_inputs=ogc_inputs,
     )
 
     if err is not None:  # Will happen if there are race conditions and the process was deleted or ADES is unresponsive
@@ -224,13 +157,13 @@ async def submit_function(
 
     return ActionCreatorJob(
         submission_id=response.job_id,
-        spec=creation_spec,
+        spec=workflow_spec,
         status=response.status.value,
         submitted_at=response.created,
     )
 
 
-@action_creator_router_v1_0.websocket("/ws/submissions")
+@action_creator_router_v1_1.websocket("/ws/submissions")
 async def submit_function_websocket(  # noqa: C901
     websocket: WebSocket,
 ) -> None:
@@ -242,7 +175,7 @@ async def submit_function_websocket(  # noqa: C901
 
         # Receive the submission request from the client
         try:
-            creation_spec = ActionCreatorSubmissionRequest(**await websocket.receive_json())
+            workflow_spec = ActionCreatorSubmissionRequest(**await websocket.receive_json())
         except ValidationError as e:
             # Manually construct a validation error response
             error_response = {
@@ -251,19 +184,16 @@ async def submit_function_websocket(  # noqa: C901
             await websocket.send_json({"status_code": status.HTTP_422_UNPROCESSABLE_ENTITY, "result": error_response})
             raise WebSocketException(code=status.WS_1003_UNSUPPORTED_DATA, reason="Data validation error") from e
 
-        if creation_spec.preset_function.function_identifier not in FUNCTION_TO_INPUTS_LOOKUP:
-            raise WebSocketException(
-                code=status.WS_1003_UNSUPPORTED_DATA,
-                reason=f"Function '{creation_spec.preset_function.function_identifier}' not found. "
-                "Please use `/functions` endpoint to get list of supported functions.",
-            )
+        workflow_step_spec = next(iter(workflow_spec.workflow.values()))
+        wf_identifier = FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING[workflow_step_spec.identifier]
+        ogc_inputs = workflow_step_spec.inputs.as_ogc_process_inputs()
 
-        inputs_cls = FUNCTION_TO_INPUTS_LOOKUP[creation_spec.preset_function.function_identifier]
-        inputs = inputs_cls(**creation_spec.preset_function.inputs).as_ogc_process_inputs()
+        if "clip" in workflow_spec.workflow:
+            ogc_inputs["clip"] = "True"
 
         ades = ades_client_factory(workspace=token, token=introspected_token["preferred_username"])
 
-        err = await ades.ensure_process_exists(creation_spec.preset_function.function_identifier)
+        err, _ = await ades.reregister_process_v1_1(wf_identifier)
 
         if err is not None:
             await websocket.send_json({
@@ -275,9 +205,13 @@ async def submit_function_websocket(  # noqa: C901
                 reason=err.detail,
             )
 
+        # HACK: We have to wait for some time after process registration since ADES takes some time to register
+        # everything. If we were to run the process immediately after registration we simply would get an error
+        await asyncio.sleep(WAIT_TIME_AFTER_PROCESS_REGISTRATION)
+
         err, execution_result = await ades.execute_process(
-            process_identifier=creation_spec.preset_function.function_identifier,
-            process_inputs=inputs,
+            process_identifier=wf_identifier,
+            process_inputs=ogc_inputs,
         )
 
         if (
@@ -306,7 +240,7 @@ async def submit_function_websocket(  # noqa: C901
             "status_code": status.HTTP_202_ACCEPTED,
             "result": ActionCreatorJob(
                 submission_id=execution_result.job_id,
-                spec=creation_spec,
+                spec=workflow_spec,
                 status=execution_result.status.value,
                 submitted_at=execution_result.created,
             ).model_dump(mode="json"),
@@ -353,14 +287,14 @@ async def submit_function_websocket(  # noqa: C901
         await websocket.close()
 
 
-@action_creator_router_v1_0.get(
+@action_creator_router_v1_1.get(
     "/submissions",
     response_model=PaginationResults[ActionCreatorJobSummary],
     response_model_exclude_unset=False,
     response_model_exclude_none=False,
     status_code=status.HTTP_200_OK,
 )
-async def get_function_submissions(
+async def get_job_history(
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
     params: Annotated[ActionCreatorSubmissionsQueryParams, Query()],
 ) -> dict[str, Any]:
@@ -418,14 +352,14 @@ async def get_function_submissions(
     }
 
 
-@action_creator_router_v1_0.get(
+@action_creator_router_v1_1.get(
     "/submissions/{submission_id}",
     response_model=ActionCreatorJobSummary,
     response_model_exclude_unset=False,
     status_code=status.HTTP_200_OK,
     responses={status.HTTP_404_NOT_FOUND: {"description": "Not Found", "model": ErrorResponse}},
 )
-async def get_function_submission_status(
+async def get_job_status(
     submission_id: uuid.UUID,
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
 ) -> ActionCreatorJobSummary:
@@ -450,17 +384,20 @@ async def get_function_submission_status(
     )
 
 
-@action_creator_router_v1_0.delete(
+@action_creator_router_v1_1.delete(
     "/submissions/{submission_id}",
     status_code=204,
     response_model=None,
     responses={status.HTTP_404_NOT_FOUND: {"description": "Not Found", "model": ErrorResponse}},
 )
-async def cancel_function_execution(
-    submission_id: uuid.UUID,  # noqa: ARG001
-    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
+async def cancel_or_delete_job(
+    submission_id: uuid.UUID,
+    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
 ) -> None:
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Function execution cancellation is currently not implemented",
-    )
+    introspected_token = decode_token(credential.credentials)
+    username = introspected_token["preferred_username"]
+    ades = ades_client_factory(workspace=username, token=credential.credentials)
+    err = await ades.cancel_job(job_id=submission_id)
+
+    if err:
+        raise HTTPException(status_code=err.code, detail=err.detail)
