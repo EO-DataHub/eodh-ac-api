@@ -28,7 +28,6 @@ from src.services.db.action_creator_repo import ActionCreatorRepository, get_fun
 from src.utils.logging import get_logger
 
 _logger = get_logger(__name__)
-WAIT_TIME_AFTER_PROCESS_REGISTRATION = 15  # seconds
 TCreationSpec = Annotated[
     ActionCreatorSubmissionRequest,
     Body(
@@ -56,6 +55,7 @@ TCreationSpec = Annotated[
                             "date_end": "2024-08-01T00:00:00",
                             "index": "NDVI",
                             "stac_collection": "sentinel-2-l2a",
+                            "limit": 25,
                         },
                     }
                 },
@@ -200,10 +200,6 @@ async def submit_function(
             status_code=err.code,
             detail=err.detail,
         )
-
-    # HACK: We have to wait for some time after process registration since ADES takes some time to register everything
-    # If we were to run the process immediately after registration we simply would get an error
-    await asyncio.sleep(WAIT_TIME_AFTER_PROCESS_REGISTRATION)
 
     err, response = await ades.execute_process(
         process_identifier=creation_spec.preset_function.function_identifier,

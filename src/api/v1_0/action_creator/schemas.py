@@ -154,12 +154,13 @@ class CommonPresetFunctionInputs(OGCProcessInputs, abc.ABC):
 class RasterCalculatorFunctionInputs(CommonPresetFunctionInputs):
     function_identifier: ClassVar[str] = PresetFunctionIdentifier.RASTER_CALCULATOR
     index: RasterCalculatorIndex = RasterCalculatorIndex.NDVI
-    limit: Annotated[int, Field(1, validate_default=True, ge=1, le=50)]
+    limit: Annotated[int, Field(25, validate_default=True, ge=1, le=50)]
 
     def as_ogc_process_inputs(self) -> dict[str, Any]:
         outputs = super().as_ogc_process_inputs()
         outputs["index"] = self.index.value
         outputs["limit"] = self.limit
+        outputs["clip"] = "True"
         return outputs
 
 

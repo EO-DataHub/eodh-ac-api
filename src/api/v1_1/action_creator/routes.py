@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import asyncio
 import math
-import uuid  # noqa: TCH003
+import uuid
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, WebSocket, WebSocketDisconnect, WebSocketException
-from fastapi.security import HTTPAuthorizationCredentials  # noqa: TCH002
+from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import ValidationError
 from starlette import status
 
@@ -28,7 +28,6 @@ from src.services.ades.schemas import StatusCode
 from src.utils.logging import get_logger
 
 _logger = get_logger(__name__)
-WAIT_TIME_AFTER_PROCESS_REGISTRATION = 15  # seconds
 
 TWorkflowCreationSpec = Annotated[
     ActionCreatorSubmissionRequest,
@@ -134,10 +133,6 @@ async def submit_workflow(
             detail=err.detail,
         )
 
-    # HACK: We have to wait for some time after process registration since ADES takes some time to register everything
-    # If we were to run the process immediately after registration we simply would get an error
-    await asyncio.sleep(WAIT_TIME_AFTER_PROCESS_REGISTRATION)
-
     err, response = await ades.execute_process(
         process_identifier=wf_identifier,
         process_inputs=ogc_inputs,
@@ -204,10 +199,6 @@ async def submit_function_websocket(  # noqa: C901
                 code=status.WS_1011_INTERNAL_ERROR,
                 reason=err.detail,
             )
-
-        # HACK: We have to wait for some time after process registration since ADES takes some time to register
-        # everything. If we were to run the process immediately after registration we simply would get an error
-        await asyncio.sleep(WAIT_TIME_AFTER_PROCESS_REGISTRATION)
 
         err, execution_result = await ades.execute_process(
             process_identifier=wf_identifier,
