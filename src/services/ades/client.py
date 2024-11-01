@@ -409,7 +409,7 @@ class ADESClient(ADESClientBase):
         if await self.process_exists(process_identifier):
             await self.unregister_process(process_identifier)
         cwl_href = WORKFLOW_REGISTRY[process_identifier]["cwl_href"]
-        return await self.register_process_from_cwl_href(cwl_href)
+        return await self.register_process_from_cwl_href_with_download(cwl_href)
 
     @staticmethod
     async def _handle_common_errors_if_necessary(response: ClientResponse) -> ErrorResponse | None:

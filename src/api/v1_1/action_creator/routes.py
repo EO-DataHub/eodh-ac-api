@@ -121,9 +121,9 @@ async def submit_workflow(
     workflow_step_spec = next(iter(workflow_spec.workflow.values()))
     wf_identifier = FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING[workflow_step_spec.identifier]
     ogc_inputs = workflow_step_spec.inputs.as_ogc_process_inputs()
-
-    if "clip" in workflow_spec.workflow:
-        ogc_inputs["clip"] = "True"
+    ogc_inputs["clip"] = (
+        "True" if any(step.identifier == "clip" for step in workflow_spec.workflow.values()) else "False"
+    )
 
     err, _ = await ades.reregister_process_v1_1(wf_identifier)
 
@@ -183,7 +183,7 @@ async def submit_function_websocket(  # noqa: C901
         wf_identifier = FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING[workflow_step_spec.identifier]
         ogc_inputs = workflow_step_spec.inputs.as_ogc_process_inputs()
 
-        if "clip" in workflow_spec.workflow:
+        if any(step.identifier == "clip" for step in workflow_spec.workflow.values()):
             ogc_inputs["clip"] = "True"
 
         ades = ades_client_factory(workspace=token, token=introspected_token["preferred_username"])

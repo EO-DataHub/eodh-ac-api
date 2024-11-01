@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import functools
 
-from src.consts.aoi import HEATHROW_AOI
+from src.consts.aoi import HEATHROW_AOI, INDIAN_OCEAN_AOI
 from src.consts.directories import ASSETS_DIR
 
 
@@ -45,10 +45,10 @@ NDVI_PRESET = {
         "ndvi": {
             "identifier": "ndvi",
             "inputs": {
-                "stac_collection": "esacci-globallc",
-                "date_start": "1992-01-01T00:00:00",
-                "date_end": "2015-12-31T23:59:59",
-                "aoi": HEATHROW_AOI,
+                "stac_collection": "sentinel-2-l2a",
+                "date_start": "2024-01-01T00:00:00",
+                "date_end": "2024-12-31T23:59:59",
+                "aoi": INDIAN_OCEAN_AOI,
             },
         }
     }
@@ -59,16 +59,16 @@ NDVI_CLIP_PRESET = {
         "ndvi": {
             "identifier": "ndvi",
             "inputs": {
-                "stac_collection": "esacci-globallc",
-                "date_start": "1992-01-01T00:00:00",
-                "date_end": "2015-12-31T23:59:59",
-                "aoi": HEATHROW_AOI,
+                "stac_collection": "sentinel-2-l2a",
+                "date_start": "2024-01-01T00:00:00",
+                "date_end": "2024-12-31T23:59:59",
+                "aoi": INDIAN_OCEAN_AOI,
             },
         },
         "clip": {
             "identifier": "clip",
             "inputs": {
-                "aoi": HEATHROW_AOI,
+                "aoi": INDIAN_OCEAN_AOI,
             },
         },
     }
