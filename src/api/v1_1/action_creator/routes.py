@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import asyncio
 import math
-import uuid  # noqa: TCH003
+import uuid
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, WebSocket, WebSocketDisconnect, WebSocketException
-from fastapi.security import HTTPAuthorizationCredentials  # noqa: TCH002
+from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import ValidationError
 from starlette import status
 
@@ -28,7 +28,6 @@ from src.services.ades.schemas import StatusCode
 from src.utils.logging import get_logger
 
 _logger = get_logger(__name__)
-WAIT_TIME_AFTER_PROCESS_REGISTRATION = 15  # seconds
 
 TWorkflowCreationSpec = Annotated[
     ActionCreatorSubmissionRequest,
@@ -122,9 +121,9 @@ async def submit_workflow(
     workflow_step_spec = next(iter(workflow_spec.workflow.values()))
     wf_identifier = FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING[workflow_step_spec.identifier]
     ogc_inputs = workflow_step_spec.inputs.as_ogc_process_inputs()
-
-    if "clip" in workflow_spec.workflow:
-        ogc_inputs["clip"] = "True"
+    ogc_inputs["clip"] = (
+        "True" if any(step.identifier == "clip" for step in workflow_spec.workflow.values()) else "False"
+    )
 
     err, _ = await ades.reregister_process_v1_1(wf_identifier)
 
@@ -133,10 +132,6 @@ async def submit_workflow(
             status_code=err.code,
             detail=err.detail,
         )
-
-    # HACK: We have to wait for some time after process registration since ADES takes some time to register everything
-    # If we were to run the process immediately after registration we simply would get an error
-    await asyncio.sleep(WAIT_TIME_AFTER_PROCESS_REGISTRATION)
 
     err, response = await ades.execute_process(
         process_identifier=wf_identifier,
@@ -188,7 +183,7 @@ async def submit_function_websocket(  # noqa: C901
         wf_identifier = FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING[workflow_step_spec.identifier]
         ogc_inputs = workflow_step_spec.inputs.as_ogc_process_inputs()
 
-        if "clip" in workflow_spec.workflow:
+        if any(step.identifier == "clip" for step in workflow_spec.workflow.values()):
             ogc_inputs["clip"] = "True"
 
         ades = ades_client_factory(workspace=token, token=introspected_token["preferred_username"])
@@ -204,10 +199,6 @@ async def submit_function_websocket(  # noqa: C901
                 code=status.WS_1011_INTERNAL_ERROR,
                 reason=err.detail,
             )
-
-        # HACK: We have to wait for some time after process registration since ADES takes some time to register
-        # everything. If we were to run the process immediately after registration we simply would get an error
-        await asyncio.sleep(WAIT_TIME_AFTER_PROCESS_REGISTRATION)
 
         err, execution_result = await ades.execute_process(
             process_identifier=wf_identifier,
@@ -378,7 +369,7 @@ async def get_job_status(
     return ActionCreatorJobSummary(
         submission_id=job.job_id,
         function_identifier=job.process_id,
-        status=job.status.value,
+        status=job.status if job.status != StatusCode.dismissed else "cancelled",
         submitted_at=job.created,
         finished_at=job.finished,
     )
@@ -397,7 +388,6 @@ async def cancel_or_delete_job(
     introspected_token = decode_token(credential.credentials)
     username = introspected_token["preferred_username"]
     ades = ades_client_factory(workspace=username, token=credential.credentials)
-    err = await ades.cancel_job(job_id=submission_id)
-
+    err, _ = await ades.cancel_job(submission_id)
     if err:
         raise HTTPException(status_code=err.code, detail=err.detail)

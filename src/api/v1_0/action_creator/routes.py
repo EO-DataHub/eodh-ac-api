@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import asyncio
 import math
-import uuid  # noqa: TCH003
+import uuid
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, WebSocket, WebSocketDisconnect, WebSocketException
-from fastapi.security import HTTPAuthorizationCredentials  # noqa: TCH002
+from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import ValidationError
 from starlette import status
 
@@ -24,11 +24,10 @@ from src.api.v1_0.action_creator.schemas import (
 from src.api.v1_0.auth.routes import decode_token, validate_access_token, validate_token_from_websocket
 from src.services.ades.factory import ades_client_factory
 from src.services.ades.schemas import StatusCode
-from src.services.db.action_creator_repo import ActionCreatorRepository, get_function_repo  # noqa: TCH001
+from src.services.db.action_creator_repo import ActionCreatorRepository, get_function_repo
 from src.utils.logging import get_logger
 
 _logger = get_logger(__name__)
-WAIT_TIME_AFTER_PROCESS_REGISTRATION = 15  # seconds
 TCreationSpec = Annotated[
     ActionCreatorSubmissionRequest,
     Body(
@@ -56,6 +55,7 @@ TCreationSpec = Annotated[
                             "date_end": "2024-08-01T00:00:00",
                             "index": "NDVI",
                             "stac_collection": "sentinel-2-l2a",
+                            "limit": 25,
                         },
                     }
                 },
@@ -200,10 +200,6 @@ async def submit_function(
             status_code=err.code,
             detail=err.detail,
         )
-
-    # HACK: We have to wait for some time after process registration since ADES takes some time to register everything
-    # If we were to run the process immediately after registration we simply would get an error
-    await asyncio.sleep(WAIT_TIME_AFTER_PROCESS_REGISTRATION)
 
     err, response = await ades.execute_process(
         process_identifier=creation_spec.preset_function.function_identifier,
@@ -444,7 +440,7 @@ async def get_function_submission_status(
     return ActionCreatorJobSummary(
         submission_id=job.job_id,
         function_identifier=job.process_id,
-        status=job.status.value,
+        status=job.status if job.status != "dismissed" else "cancelled",
         submitted_at=job.created,
         finished_at=job.finished,
     )
@@ -457,10 +453,12 @@ async def get_function_submission_status(
     responses={status.HTTP_404_NOT_FOUND: {"description": "Not Found", "model": ErrorResponse}},
 )
 async def cancel_function_execution(
-    submission_id: uuid.UUID,  # noqa: ARG001
-    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
+    submission_id: uuid.UUID,
+    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
 ) -> None:
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Function execution cancellation is currently not implemented",
-    )
+    introspected_token = decode_token(credential.credentials)
+    username = introspected_token["preferred_username"]
+    ades = ades_client_factory(workspace=username, token=credential.credentials)
+    err, _ = await ades.cancel_job(submission_id)
+    if err:
+        raise HTTPException(status_code=err.code, detail=err.detail)

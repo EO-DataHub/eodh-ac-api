@@ -2,10 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from starlette import status
-
 from src.services.ades.base_client import ADESClientBase, ErrorResponse
-from src.services.ades.schemas import JobList, Process, ProcessList, ProcessSummary, StatusInfo
+from src.services.ades.schemas import JobList, Process, ProcessList, ProcessSummary, StatusCode, StatusInfo
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -1086,8 +1084,10 @@ class FakeADESClient(ADESClientBase):
     ) -> tuple[ErrorResponse | None, JobList | dict[str, Any] | None]:
         return None, GET_JOB_LIST_RESPONSE if raw_output else JobList(**GET_JOB_LIST_RESPONSE)
 
-    async def cancel_job(self, job_id: str | UUID) -> ErrorResponse | None:
-        return ErrorResponse(code=status.HTTP_501_NOT_IMPLEMENTED, detail="Not implemented")
+    async def cancel_job(self, job_id: str | UUID) -> tuple[ErrorResponse | None, StatusInfo | None]:
+        job = StatusInfo(**GET_JOB_FINISHED_STATUS_RESPONSE)
+        job.status = StatusCode.dismissed
+        return None, job
 
     async def register_process_from_cwl_href(self, cwl_href: str) -> tuple[ErrorResponse | None, ProcessSummary | None]:
         return None, ProcessSummary(**REGISTER_PROCESS_RESPONSE)

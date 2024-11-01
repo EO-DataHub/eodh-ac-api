@@ -164,7 +164,7 @@ class ADESClient(ADESClientBase):
         finally:
             await client_session.close()
 
-    async def cancel_job(self, job_id: str | UUID) -> ErrorResponse | None:
+    async def cancel_job(self, job_id: str | UUID) -> tuple[ErrorResponse | None, StatusInfo | None]:
         client_session, retry_client = self._get_retry_client()
         try:
             async with retry_client.delete(
@@ -173,18 +173,18 @@ class ADESClient(ADESClientBase):
             ) as response:
                 # ADES returns 403 when cancelling non-existent job
                 if response.status == status.HTTP_403_FORBIDDEN:
-                    return ErrorResponse(code=status.HTTP_404_NOT_FOUND, detail=f"Job '{job_id}' does not exist.")
+                    return ErrorResponse(code=status.HTTP_404_NOT_FOUND, detail=f"Job '{job_id}' does not exist."), None
 
                 if response.status == status.HTTP_501_NOT_IMPLEMENTED:
                     return ErrorResponse(
                         code=status.HTTP_501_NOT_IMPLEMENTED,
                         detail="Job cancellation is not implemented.",
-                    )
+                    ), None
 
                 if err := await self._handle_common_errors_if_necessary(response):
-                    return err
+                    return err, None
 
-                return None
+                return None, StatusInfo(**json.loads(await response.text()))
         finally:
             await client_session.close()
 
@@ -409,7 +409,7 @@ class ADESClient(ADESClientBase):
         if await self.process_exists(process_identifier):
             await self.unregister_process(process_identifier)
         cwl_href = WORKFLOW_REGISTRY[process_identifier]["cwl_href"]
-        return await self.register_process_from_cwl_href(cwl_href)
+        return await self.register_process_from_cwl_href_with_download(cwl_href)
 
     @staticmethod
     async def _handle_common_errors_if_necessary(response: ClientResponse) -> ErrorResponse | None:

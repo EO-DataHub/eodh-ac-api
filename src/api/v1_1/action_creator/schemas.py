@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 from datetime import datetime  # noqa: TCH003
-from enum import Enum, StrEnum, auto
+from enum import StrEnum, auto
 from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Generic, Literal, Sequence, TypeVar, Union
 
 from geojson_pydantic.geometries import Polygon
@@ -91,8 +91,7 @@ class OGCProcessInputs(BaseModel, abc.ABC):
 
 
 class CommonFunctionInputs(OGCProcessInputs, abc.ABC):
-    _identifier: ClassVar[str] = "common"
-
+    identifier: str
     aoi: Annotated[Polygon | None, Field(None, validate_default=True)]
     date_start: datetime | None = None
     date_end: datetime | None = None
@@ -100,13 +99,13 @@ class CommonFunctionInputs(OGCProcessInputs, abc.ABC):
 
     @field_validator("stac_collection", mode="after")
     @classmethod
-    def validate_stac_collection(cls, v: str | None = None) -> str:
+    def validate_stac_collection(cls, v: str | None, info: ValidationInfo) -> str:
         if v is None:
-            return FUNCTIONS_REGISTRY[cls._identifier]["inputs"]["stac_collection"]["default"]  # type: ignore[no-any-return]
+            return FUNCTIONS_REGISTRY[info.data["identifier"]]["inputs"]["stac_collection"]["default"]  # type: ignore[no-any-return]
         # Validate STAC collection
         validate_stac_collection_v1_1(
             specified_collection=v,
-            function_identifier=cls._identifier,
+            function_identifier=info.data["identifier"],
         )
         return v
 
@@ -149,11 +148,12 @@ class RasterCalculatorFunctionInputs(CommonFunctionInputs):
     def as_ogc_process_inputs(self) -> dict[str, Any]:
         outputs = super().as_ogc_process_inputs()
         outputs["limit"] = self.limit
+        outputs["index"] = self.identifier
         return outputs
 
 
 class LandCoverChangeDetectionFunctionInputs(CommonFunctionInputs):
-    _identifier: ClassVar[str] = "land-cover-change-detection"
+    identifier: Literal["land-cover-change-detection"] = "land-cover-change-detection"
 
     def as_ogc_process_inputs(self) -> dict[str, Any]:
         outputs = super().as_ogc_process_inputs()
@@ -179,7 +179,7 @@ class ClipFunctionInputs(BaseModel):
         return v  # type: ignore[return-value]
 
 
-class ActionCreatorJobStatus(str, Enum):
+class ActionCreatorJobStatus(StrEnum):
     submitted = "submitted"
     running = "running"
     cancel_request = "cancel-request"
@@ -194,32 +194,43 @@ class ClipWorkflowStep(BaseModel):
     inputs: ClipFunctionInputs
 
 
-class NDVIWorkflowStep(BaseModel):
-    _identifier: ClassVar[Literal["ndvi"]] = "ndvi"
+class NDVIFunctionInputs(RasterCalculatorFunctionInputs):
     identifier: Literal["ndvi"] = "ndvi"
-    inputs: RasterCalculatorFunctionInputs
+
+
+class NDVIWorkflowStep(BaseModel):
+    identifier: Literal["ndvi"] = "ndvi"
+    inputs: NDVIFunctionInputs
+
+
+class EVIFunctionInputs(RasterCalculatorFunctionInputs):
+    identifier: Literal["evi"] = "evi"
 
 
 class EVIWorkflowStep(BaseModel):
-    _identifier: ClassVar[Literal["evi"]] = "evi"
     identifier: Literal["evi"] = "evi"
     inputs: RasterCalculatorFunctionInputs
 
 
+class SAVIFunctionInputs(RasterCalculatorFunctionInputs):
+    identifier: Literal["savi"] = "savi"
+
+
 class SAVIWorkflowStep(BaseModel):
-    _identifier: ClassVar[Literal["savi"]] = "savi"
     identifier: Literal["savi"] = "savi"
     inputs: RasterCalculatorFunctionInputs
 
 
+class NDWIFunctionInputs(RasterCalculatorFunctionInputs):
+    identifier: Literal["ndwi"] = "ndwi"
+
+
 class NDWIWorkflowStep(BaseModel):
-    _identifier: ClassVar[Literal["ndwi"]] = "ndwi"
     identifier: Literal["ndwi"] = "ndwi"
     inputs: RasterCalculatorFunctionInputs
 
 
 class LandCoverChangeDetectionWorkflowStep(BaseModel):
-    _identifier: ClassVar[Literal["land-cover-change-detection"]] = "land-cover-change-detection"
     identifier: Literal["land-cover-change-detection"] = "land-cover-change-detection"
     inputs: LandCoverChangeDetectionFunctionInputs
 

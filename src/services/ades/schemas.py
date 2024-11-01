@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from typing import Annotated, Any, Dict, List, Optional, Union
 
 from pydantic import (
@@ -31,12 +31,12 @@ class ConfClasses(BaseModel):
     conforms_to: list[str] = Field(..., alias="conformsTo")
 
 
-class Response(Enum):
+class Response(StrEnum):
     raw = "raw"
     document = "document"
 
 
-class JobType(Enum):
+class JobType(StrEnum):
     process = "process"
 
 
@@ -48,7 +48,7 @@ class Link(BaseModel):
     title: str | None = None
 
 
-class MaxOccurs(Enum):
+class MaxOccurs(StrEnum):
     unbounded = "unbounded"
 
 
@@ -65,7 +65,7 @@ class Subscriber(BaseModel):
     failed_uri: AnyUrl | None = Field(None, alias="failedUri")
 
 
-class StatusCode(Enum):
+class StatusCode(StrEnum):
     accepted = "accepted"
     running = "running"
     successful = "successful"
@@ -73,18 +73,18 @@ class StatusCode(Enum):
     dismissed = "dismissed"
 
 
-class JobControlOptions(Enum):
+class JobControlOptions(StrEnum):
     sync_execute = "sync-execute"
     async_execute = "async-execute"
     dismiss = "dismiss"
 
 
-class TransmissionMode(Enum):
+class TransmissionMode(StrEnum):
     value = "value"
     reference = "reference"
 
 
-class DataType(Enum):
+class DataType(StrEnum):
     array = "array"
     boolean = "boolean"
     integer = "integer"
@@ -118,7 +118,7 @@ class BinaryInputValue(RootModel[str]):
     root: str
 
 
-class Crs(Enum):
+class Crs(StrEnum):
     crs84 = "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
     crs84h = "http://www.opengis.net/def/crs/OGC/0/CRS84h"
 

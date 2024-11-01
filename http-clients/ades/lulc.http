@@ -1,0 +1,86 @@
+### Get Land Cover Change Detection File
+GET {{lulc_change_cwl_href}}
+
+>> lulc-change-app.cwl
+
+### Unregister Process
+DELETE {{ades_url}}/{{workspace}}/ogc-api/processes/lulc-change
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### Register Process
+POST {{ades_url}}/{{workspace}}/ogc-api/processes
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+Content-Type: application/cwl+yaml
+
+< lulc-change-app.cwl
+
+### Get Process details
+GET {{ades_url}}/{{workspace}}/ogc-api/processes/lulc-change
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### Execute Process
+POST {{ades_url}}/{{workspace}}/ogc-api/processes/lulc-change/execution
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+Content-Type: application/json
+Prefer: respond-async
+
+{
+    "inputs": {
+        "aoi": "{\"type\":\"Polygon\",\"coordinates\":[[[14.763294437090849,50.833598186651244],[15.052268923898112,50.833598186651244],[15.052268923898112,50.989077215056824],[14.763294437090849,50.989077215056824],[14.763294437090849,50.833598186651244]]]}",
+        "date_start": "20010-01-01",
+        "date_end": "2024-04-03",
+        "source": "esacci-globallc",
+        "workspace": "{{workspace}}"
+    }
+}
+
+> {%
+
+    client.global.set("execute_process_response", response.body);
+
+%}
+
+### Get Job status
+GET https://test.eodatahub.org.uk/ades/{{workspace}}/ogc-api/jobs/{{execute_process_response.jobID}}
+Authorization: Bearer {{$auth.token("auth-id")}}
+Content-Type: application/json
+
+> {%
+
+    client.global.set("job_status", response.body);
+
+%}
+
+### Get results
+GET https://test.eodatahub.org.uk/ades/{{workspace}}/ogc-api/jobs/{{execute_process_response.jobID}}/results
+Authorization: Bearer {{$auth.token("auth-id")}}
+Content-Type: application/json
+
+### Get Job Logs
+GET {{job_status.links[2].href}}
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### Get Job Stage Out Logs
+GET {{job_status.links[3].href}}
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### Get Failed Job Logs
+GET {{job_status.links[1].href}}
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### Get Failed Job Stage Out Logs
+GET {{job_status.links[2].href}}
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+### Cancel Job
+DELETE {{ades_url}}/{{workspace}}/ogc-api/jobs/{{execute_process_response.jobID}}
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}

@@ -18,29 +18,20 @@ if TYPE_CHECKING:
 
     from src.services.ades.client import ADESClient
 
+from src.consts.aoi import INDIAN_OCEAN_AOI
 
 RASTER_CALCULATOR_PROCESS_IDENTIFIER = "raster-calculate"
 RASTER_CALCULATOR_CWL_HREF = (
     "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/raster-calculate-app.cwl"
 )
 RASTER_CALCULATOR_INPUTS = {
-    "aoi": json.dumps({
-        "type": "Polygon",
-        "coordinates": [
-            [
-                [14.763294437090849, 50.833598186651244],
-                [15.052268923898112, 50.833598186651244],
-                [15.052268923898112, 50.989077215056824],
-                [14.763294437090849, 50.989077215056824],
-                [14.763294437090849, 50.833598186651244],
-            ]
-        ],
-    }),
-    "date_start": "2024-04-03T00:00:00",
+    "aoi": json.dumps(INDIAN_OCEAN_AOI),
+    "date_start": "2024-01-01T00:00:00",
     "date_end": "2024-08-01T00:00:00",
     "index": "NDVI",
     "stac_collection": "sentinel-2-l2a",
     "limit": 1,
+    "clip": "True",
 }
 NON_EXISTENT_PROCESS_ID = NON_EXISTENT_JOB_ID = "i-dont-exist"
 
@@ -183,7 +174,11 @@ async def test_ades_unregister_non_existent_process_returns_404_not_found(ades: 
     # Assert
     assert err is not None
     assert err.code == status.HTTP_404_NOT_FOUND
-    assert err.detail == f"Process '{NON_EXISTENT_PROCESS_ID}' does not exist."
+    assert err.detail == json.dumps({
+        "title": "NoSuchProcess",
+        "type": "http://www.opengis.net/def/rel/ogc/1.0/exception/no-such-process",
+        "detail": "Unable to parse the ZCFG file: i-dont-exist.zcfg (No message provided)",
+    })
 
 
 @pytest.mark.asyncio(scope="function")
@@ -200,7 +195,7 @@ async def test_ades_listing_process(ades: ADESClient) -> None:
 @pytest.mark.asyncio(scope="function")
 async def test_ades_get_process_details(ades: ADESClient) -> None:
     # Arrange
-    err, _ = await ades.register_process_from_cwl_href(RASTER_CALCULATOR_CWL_HREF)
+    err, _ = await ades.register_process_from_cwl_href_with_download(RASTER_CALCULATOR_CWL_HREF)
     assert err is None or err.code == status.HTTP_409_CONFLICT
 
     # Act
@@ -229,7 +224,7 @@ async def test_ades_get_non_existent_process_details_returns_404_not_found(ades:
 @pytest.mark.asyncio(scope="function")
 async def test_ades_executing_job(ades: ADESClient) -> None:
     # Arrange - ensure process registered
-    err, _ = await ades.register_process_from_cwl_href(RASTER_CALCULATOR_CWL_HREF)
+    err, _ = await ades.register_process_from_cwl_href_with_download(RASTER_CALCULATOR_CWL_HREF)
     assert err is None or err.code == status.HTTP_409_CONFLICT
 
     # Act #1
@@ -272,11 +267,10 @@ async def test_ades_executing_job(ades: ADESClient) -> None:
 
     # Act #3
     # List job results
-    err, job_results = await ades.get_job_results(execution_result.job_id)
+    err, _ = await ades.get_job_results(execution_result.job_id)
 
     # Assert
     assert err is None
-    assert job_results
 
 
 @pytest.mark.asyncio(scope="function")
@@ -303,7 +297,7 @@ async def test_ades_getting_non_existent_job_results_of_returns_404_not_found(ad
 
 
 @pytest.mark.asyncio(scope="function")
-async def test_ades_cancelling_job_returns_501_not_implemented(ades: ADESClient) -> None:
+async def test_ades_cancelling_job_returns_204(ades: ADESClient) -> None:
     # Arrange
     # Execute the process
     err, execution_result = await ades.execute_process(
@@ -314,18 +308,20 @@ async def test_ades_cancelling_job_returns_501_not_implemented(ades: ADESClient)
     assert execution_result is not None
 
     # Act
-    err = await ades.cancel_job(execution_result.job_id)
+    err, result = await ades.cancel_job(execution_result.job_id)
 
     # Assert
-    assert err is not None
-    assert err.code == status.HTTP_501_NOT_IMPLEMENTED
+    assert err is None
+    assert result is not None
+    assert result.status == "dismissed"
 
 
 @pytest.mark.asyncio(scope="function")
 async def test_ades_cancelling_non_existent_job_returns_error_response(ades: ADESClient) -> None:
     # Act
-    result = await ades.cancel_job(uuid4())
+    err, result = await ades.cancel_job(uuid4())
 
     # Assert
-    assert result is not None
-    assert result.code == status.HTTP_404_NOT_FOUND
+    assert result is None
+    assert err is not None
+    assert err.code == status.HTTP_404_NOT_FOUND

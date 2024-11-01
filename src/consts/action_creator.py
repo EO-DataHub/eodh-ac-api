@@ -12,6 +12,8 @@ def _load_base_64_thumbnail(function_identifier: str) -> str | None:
     return fp.read_text() if fp.exists() else None
 
 
+LULC_THUMBNAIL = _load_base_64_thumbnail("lulc-change")
+WATER_QUALITY_THUMBNAIL = _load_base_64_thumbnail("water-quality")
 RASTER_CALCULATOR_FUNCTION_SPEC = {
     "identifier": "raster-calculate",
     "name": "Raster Calculator",
@@ -58,7 +60,7 @@ RASTER_CALCULATOR_FUNCTION_SPEC = {
         "limit": {
             "type": "number",
             "required": False,
-            "default": 1,
+            "default": 25,
             "description": "The number of latest items to process.",
         },
     },
