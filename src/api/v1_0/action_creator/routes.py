@@ -440,7 +440,7 @@ async def get_function_submission_status(
     return ActionCreatorJobSummary(
         submission_id=job.job_id,
         function_identifier=job.process_id,
-        status=job.status.value,
+        status=job.status if job.status != "dismissed" else "cancelled",
         submitted_at=job.created,
         finished_at=job.finished,
     )
@@ -453,10 +453,12 @@ async def get_function_submission_status(
     responses={status.HTTP_404_NOT_FOUND: {"description": "Not Found", "model": ErrorResponse}},
 )
 async def cancel_function_execution(
-    submission_id: uuid.UUID,  # noqa: ARG001
-    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
+    submission_id: uuid.UUID,
+    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
 ) -> None:
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Function execution cancellation is currently not implemented",
-    )
+    introspected_token = decode_token(credential.credentials)
+    username = introspected_token["preferred_username"]
+    ades = ades_client_factory(workspace=username, token=credential.credentials)
+    err, _ = await ades.cancel_job(submission_id)
+    if err:
+        raise HTTPException(status_code=err.code, detail=err.detail)

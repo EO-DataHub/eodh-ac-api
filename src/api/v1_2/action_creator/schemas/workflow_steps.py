@@ -70,8 +70,6 @@ class DirectoryOutputs(BaseModel):
 
 
 class WorkflowStep(BaseModel, abc.ABC):
-    visible: bool = False
-
     @classmethod
     @abc.abstractmethod
     def as_function_spec(cls) -> dict[str, Any]: ...

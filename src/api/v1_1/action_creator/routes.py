@@ -369,7 +369,7 @@ async def get_job_status(
     return ActionCreatorJobSummary(
         submission_id=job.job_id,
         function_identifier=job.process_id,
-        status=job.status.value,
+        status=job.status if job.status != StatusCode.dismissed else "cancelled",
         submitted_at=job.created,
         finished_at=job.finished,
     )
@@ -388,7 +388,6 @@ async def cancel_or_delete_job(
     introspected_token = decode_token(credential.credentials)
     username = introspected_token["preferred_username"]
     ades = ades_client_factory(workspace=username, token=credential.credentials)
-    err = await ades.cancel_job(job_id=submission_id)
-
+    err, _ = await ades.cancel_job(submission_id)
     if err:
         raise HTTPException(status_code=err.code, detail=err.detail)

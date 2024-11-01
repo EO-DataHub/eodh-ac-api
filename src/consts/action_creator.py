@@ -60,7 +60,7 @@ RASTER_CALCULATOR_FUNCTION_SPEC = {
         "limit": {
             "type": "number",
             "required": False,
-            "default": 1,
+            "default": 25,
             "description": "The number of latest items to process.",
         },
     },

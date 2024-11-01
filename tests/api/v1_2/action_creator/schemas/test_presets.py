@@ -2,16 +2,14 @@ from __future__ import annotations
 
 from src.api.v1_2.action_creator.schemas.presets import LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC
 from src.api.v1_2.action_creator.schemas.workflows import WorkflowSpec
+from src.consts.geometries import HEATHROW_AOI
 
 
 def test_lulc_change_preset_parsing() -> None:
     # Arrange
     expected = {
         "inputs": {
-            "area": {
-                "type": "Polygon",
-                "coordinates": [[[-180.0, 90.0], [180.0, 90.0], [180.0, -90.0], [-180.0, -90.0], [-180.0, 90.0]]],
-            },
+            "area": HEATHROW_AOI,
             "dataset": "esa-lccci-glcm",
             "date_start": "1994-01-01T00:00:00",
             "date_end": "2015-12-31T00:00:00",
@@ -21,12 +19,7 @@ def test_lulc_change_preset_parsing() -> None:
             "query": {
                 "identifier": "esa-glc-ds-query",
                 "inputs": {
-                    "area": {
-                        "type": "Polygon",
-                        "coordinates": [
-                            [[-180.0, 90.0], [180.0, 90.0], [180.0, -90.0], [-180.0, -90.0], [-180.0, 90.0]]
-                        ],
-                    },
+                    "area": HEATHROW_AOI,
                     "stac_collection": "esa-lccci-glcm",
                     "date_start": "1994-01-01T00:00:00",
                     "date_end": "2015-12-31T00:00:00",
@@ -38,12 +31,7 @@ def test_lulc_change_preset_parsing() -> None:
                 "identifier": "clip",
                 "inputs": {
                     "data_dir": {"name": "results", "type": "directory"},
-                    "aoi": {
-                        "type": "Polygon",
-                        "coordinates": [
-                            [[-180.0, 90.0], [180.0, 90.0], [180.0, -90.0], [-180.0, -90.0], [-180.0, 90.0]]
-                        ],
-                    },
+                    "aoi": HEATHROW_AOI,
                 },
                 "outputs": {"results": {"name": "results", "type": "directory"}},
             },

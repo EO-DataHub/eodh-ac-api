@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 from datetime import datetime  # noqa: TCH003
-from enum import Enum, StrEnum, auto
+from enum import StrEnum, auto
 from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Generic, Literal, Sequence, TypeVar, Union
 
 from geojson_pydantic.geometries import Polygon
@@ -179,7 +179,7 @@ class ClipFunctionInputs(BaseModel):
         return v  # type: ignore[return-value]
 
 
-class ActionCreatorJobStatus(str, Enum):
+class ActionCreatorJobStatus(StrEnum):
     submitted = "submitted"
     running = "running"
     cancel_request = "cancel-request"
