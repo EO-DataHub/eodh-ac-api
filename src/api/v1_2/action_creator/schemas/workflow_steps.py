@@ -6,7 +6,8 @@ from enum import StrEnum, auto
 from typing import Annotated, Any, Literal, Union
 
 from geojson_pydantic import Polygon
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+from pydantic_core.core_schema import ValidationInfo
 from pyproj.database import query_crs_info
 
 from src.api.v1_2.action_creator.schemas.functions import (
@@ -17,6 +18,7 @@ from src.api.v1_2.action_creator.schemas.functions import (
     FunctionInputOption,
     FunctionOutputType,
 )
+from src.services.validation_utils import ensure_area_smaller_than, validate_date_range
 
 
 def get_crs_list() -> list[str]:
@@ -75,13 +77,33 @@ class WorkflowStep(BaseModel, abc.ABC):
     def as_function_spec(cls) -> dict[str, Any]: ...
 
 
-class Sentinel1QueryStepInputs(BaseModel):
+class QueryStepInputsBase(BaseModel):
+    stac_collection: str
+    area: Polygon
+    date_start: datetime | None
+    date_end: datetime | None
+
+    @field_validator("area", mode="after")
+    @classmethod
+    def validate_area(cls, v: Polygon) -> Polygon:
+        ensure_area_smaller_than(v.model_dump(mode="json"))
+        return v
+
+    @field_validator("date_end", mode="after")
+    @classmethod
+    def validate_date_range(cls, v: datetime | None, info: ValidationInfo) -> datetime | None:
+        start_date = info.data.get("date_start")
+        validate_date_range(start_date, v)
+        return v
+
+
+class Sentinel1QueryStepInputs(QueryStepInputsBase):
     stac_collection: Literal["sentinel-1-grd"] = "sentinel-1-grd"
     area: Polygon
     date_start: Annotated[datetime | None, Field(None, ge="2014-10-10")]
     date_end: datetime | None
-    orbit_direction: list[OrbitDirection]
-    polarization: list[Polarization]
+    orbit_direction: list[OrbitDirection] = Field(default_factory=list)
+    polarization: list[Polarization] = Field(default_factory=list)
     limit: int | None = 10
 
 
@@ -159,14 +181,23 @@ class Sentinel1DatasetQueryStep(WorkflowStep):
         }
 
 
-class Sentinel2QueryStepInputs(BaseModel):
-    stac_collection: Literal["sentinel-2-l1c", "sentinel-2-l2a"] = "sentinel-2-l2a"
+class Sentinel2QueryStepInputs(QueryStepInputsBase):
+    stac_collection: Literal["sentinel-2-l1c", "sentinel-2-l2a", "sentinel-2-l2a-ard"] = "sentinel-2-l2a-ard"
     area: Polygon
     date_start: Annotated[datetime | None, Field(None, ge="2015-06-27")]
     date_end: datetime | None
     cloud_cover_min: Annotated[int, Field(default=0, ge=0, le=100)]
-    cloud_cover_max: Annotated[int, Field(default=0, ge=0, le=100)]
+    cloud_cover_max: Annotated[int, Field(default=100, ge=0, le=100)]
     limit: int | None = 10
+
+    @field_validator("cloud_cover_max", mode="after")
+    @classmethod
+    def validate_cc_range(cls, cloud_cover_max: int, info: ValidationInfo) -> int:
+        cloud_cover_min = info.data.get("cloud_cover_min")
+        if cloud_cover_min > cloud_cover_max:
+            msg = "Min cloud cover cannot be greater than max cloud cover"
+            raise ValueError(msg)
+        return cloud_cover_max
 
 
 class Sentinel2DatasetQueryStep(WorkflowStep):
@@ -183,7 +214,7 @@ class Sentinel2DatasetQueryStep(WorkflowStep):
             "tags": ["Sentinel-2", "Satellite"],
             "description": "Query Sentinel-2 datasets.",
             "visible": True,
-            "compatible_input_datasets": ["sentinel-2-l1c", "sentinel-2-l2a"],
+            "compatible_input_datasets": ["sentinel-2-l1c", "sentinel-2-l2a", "sentinel-2-l2a-ard"],
             "inputs": {
                 "stac_collection": {
                     "name": "stac_collection",
@@ -193,8 +224,9 @@ class Sentinel2DatasetQueryStep(WorkflowStep):
                     "options": [
                         FunctionInputOption(label="Sentinel-2 L1C", value="sentinel-2-l1c"),
                         FunctionInputOption(label="Sentinel-2 L2A", value="sentinel-2-l2a"),
+                        FunctionInputOption(label="Sentinel-2 L2A ARD", value="sentinel-2-l2a-ard"),
                     ],
-                    "default": "sentinel-2-l2a",
+                    "default": "sentinel-2-l2a-ard",
                 },
                 "area": {
                     "name": "area",
@@ -255,7 +287,7 @@ class Sentinel2DatasetQueryStep(WorkflowStep):
         }
 
 
-class GlobalLandCoverQueryStepInputs(BaseModel):
+class GlobalLandCoverQueryStepInputs(QueryStepInputsBase):
     stac_collection: Literal["esa-lccci-glcm"] = "esa-lccci-glcm"
     area: Polygon
     date_start: Annotated[datetime | None, Field(None, ge="1992-01-01T00:00:00", le="2015-12-31T23:59:59")]
@@ -331,7 +363,7 @@ class GlobalLandCoverDatasetQueryStep(WorkflowStep):
         }
 
 
-class CorineLandCoverQueryStepInputs(BaseModel):
+class CorineLandCoverQueryStepInputs(QueryStepInputsBase):
     stac_collection: Literal["clms-corine-lc"] = "clms-corine-lc"
     area: Polygon
     date_start: Annotated[datetime | None, Field(None, ge="1990-01-01T00:00:00", le="2018-12-31T23:59:59")]
@@ -407,7 +439,7 @@ class CorineLandCoverDatasetQueryStep(WorkflowStep):
         }
 
 
-class WaterBodiesQueryStepInputs(BaseModel):
+class WaterBodiesQueryStepInputs(QueryStepInputsBase):
     stac_collection: Literal["clms-water-bodies"] = "clms-water-bodies"
     area: Polygon
     date_start: Annotated[datetime | None, Field(None, ge="2020-01-01T00:00:00")]
@@ -758,6 +790,12 @@ class ClipInputs(BaseModel):
     data_dir: DataDirInput
     aoi: Polygon
 
+    @field_validator("aoi", mode="after")
+    @classmethod
+    def validate_aoi(cls, v: Polygon) -> Polygon:
+        ensure_area_smaller_than(v.model_dump(mode="json"))
+        return v
+
 
 class ClipStep(WorkflowStep):
     identifier: Literal["clip"] = "clip"
@@ -828,6 +866,7 @@ class ReprojectStep(WorkflowStep):
                 "sentinel-1-grd",
                 "sentinel-2-l1c",
                 "sentinel-2-l2a",
+                "sentinel-2-l2a-ard",
                 "esa-lccci-glcm",
                 "clms-corine-lc",
                 "clms-water-bodies",
