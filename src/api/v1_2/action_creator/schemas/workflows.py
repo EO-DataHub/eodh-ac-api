@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from copy import deepcopy
 from datetime import datetime
-from typing import Annotated, Any
+from typing import Annotated, Any, Self
 
 from geojson_pydantic import Polygon
 from pydantic import BaseModel, Field, field_validator, model_validator
 from pydantic_core.core_schema import ValidationInfo
 
-from src.api.v1_2.action_creator.schemas.workflow_steps import DirectoryOutputs, TWorkflowStep
+from src.api.v1_2.action_creator.schemas.workflow_steps import FUNCTIONS_REGISTRY, DirectoryOutputs, TWorkflowStep
 from src.services.validation_utils import aoi_must_be_present, ensure_area_smaller_than, validate_date_range
 
 
@@ -92,6 +92,23 @@ def resolve_references_and_atom_values(data: dict[str, Any]) -> dict[str, Any]:
     return resolved_functions
 
 
+def check_for_cycles(data: dict[str, Any]) -> None: ...
+def check_step_order(data: dict[str, Any]) -> None: ...
+def check_step_outputs_mapped_to_wf_outputs(data: dict[str, Any]) -> None: ...
+
+
+def check_step_collection_support(ws: WorkflowSpec) -> None:
+    ds = ws.inputs.dataset
+    invalid_steps = []
+    for step in ws.functions.values():
+        func_spec = FUNCTIONS_REGISTRY[step.identifier]
+        if ds not in func_spec["compatible_input_datasets"]:
+            invalid_steps.append(step)
+    if invalid_steps:
+        msg = (f"Functions: {invalid_steps} cannot be used with data coming from '{ds}' dataset.",)
+        raise ValueError(msg)
+
+
 class WorkflowSpec(BaseModel):
     inputs: MainWorkflowInputs
     outputs: DirectoryOutputs
@@ -99,8 +116,16 @@ class WorkflowSpec(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def validate_workflow(cls, v: dict[str, Any]) -> dict[str, Any]:
+    def validate_workflow_before(cls, v: dict[str, Any]) -> dict[str, Any]:
+        check_for_cycles(v)
+        check_step_order(v)
+        check_step_outputs_mapped_to_wf_outputs(v)
         return resolve_references_and_atom_values(v)
+
+    @model_validator(mode="after")
+    def validate_workflow_after(self) -> Self:
+        check_step_collection_support(self)
+        return self
 
 
 class WorkflowSubmissionRequest(BaseModel):

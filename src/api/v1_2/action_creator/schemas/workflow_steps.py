@@ -994,3 +994,4 @@ WORKFLOW_STEPS = [
 
 TWorkflowStep = Annotated[Union[*WORKFLOW_STEPS], Field(discriminator="identifier")]  # type: ignore[valid-type]
 FUNCTIONS = [s.as_function_spec() for s in WORKFLOW_STEPS]
+FUNCTIONS_REGISTRY = {f["identifier"]: f for f in FUNCTIONS}
