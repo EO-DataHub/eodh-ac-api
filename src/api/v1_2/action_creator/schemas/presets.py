@@ -396,6 +396,13 @@ ERR_INVALID_REF_PATH_WORKFLOW_SPEC = {
     },
 }
 
+EXAMPLE_WORKFLOWS = {
+    "land-cover": LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC,
+    "water-quality": WATER_QUALITY_WORKFLOW_SPEC,
+    "simplest-ndvi": SIMPLEST_NDVI_WORKFLOW_SPEC,
+    "ndvi-crop-reproject": NDVI_WORKFLOW_SPEC,
+}
+
 
 class WorkflowPresetStep(BaseModel):
     identifier: str
