@@ -38,6 +38,12 @@ NDVI_FUNCTION_SPEC = {
             "description": "The Area of Interest as GeoJSON (polygon).",
         },
     },
+    "outputs": {
+        "collection": {
+            "type": "stac_collection",
+            "description": "STAC collection with results.",
+        },
+    },
 }
 EVI_FUNCTION_SPEC = {
     "identifier": "evi",
@@ -73,6 +79,12 @@ EVI_FUNCTION_SPEC = {
             "type": "polygon",
             "required": True,
             "description": "The Area of Interest as GeoJSON (polygon).",
+        },
+    },
+    "outputs": {
+        "collection": {
+            "type": "stac_collection",
+            "description": "STAC collection with results.",
         },
     },
 }
@@ -112,6 +124,12 @@ SAVI_FUNCTION_SPEC = {
             "description": "The Area of Interest as GeoJSON (polygon).",
         },
     },
+    "outputs": {
+        "collection": {
+            "type": "stac_collection",
+            "description": "STAC collection with results.",
+        },
+    },
 }
 CLIP_FUNCTION_SPEC = {
     "identifier": "clip",
@@ -122,10 +140,21 @@ CLIP_FUNCTION_SPEC = {
     "visible": True,
     "standalone": False,
     "inputs": {
+        "collection": {
+            "type": "stac_collection",
+            "description": "STAC collection to use.",
+            "required": True,
+        },
         "aoi": {
             "type": "polygon",
             "required": True,
             "description": "The Area of Interest as GeoJSON (polygon).",
+        },
+    },
+    "outputs": {
+        "collection": {
+            "type": "stac_collection",
+            "description": "STAC collection with results.",
         },
     },
 }
@@ -171,6 +200,12 @@ LAND_COVER_CHANGE_DETECTION_FUNCTION_SPEC = {
             "type": "polygon",
             "required": True,
             "description": "The Area of Interest as GeoJSON (polygon).",
+        },
+    },
+    "outputs": {
+        "collection": {
+            "type": "stac_collection",
+            "description": "STAC collection with results.",
         },
     },
 }

@@ -33,6 +33,7 @@ LAND_COVER_CHANGE_DETECTION_PRESET_SPEC = {
         "clip": {
             "identifier": "clip",
             "inputs": {
+                "collection": "land-cover-change-detection.outputs.collection",
                 "aoi": HEATHROW_AOI,
             },
         },
@@ -68,6 +69,7 @@ NDVI_CLIP_PRESET = {
         "clip": {
             "identifier": "clip",
             "inputs": {
+                "collection": "ndvi.outputs.collection",
                 "aoi": INDIAN_OCEAN_AOI,
             },
         },
