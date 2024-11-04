@@ -20,7 +20,7 @@ Content-Type: application/json
       }
     ],
     "filter-lang": "cql-json"
-  }
+}
 
 
 ### Get user catalogs
