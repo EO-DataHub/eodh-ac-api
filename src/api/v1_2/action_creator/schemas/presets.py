@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import functools
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -23,7 +24,7 @@ def _load_base_64_thumbnail(function_identifier: str) -> str | None:
 LULC_THUMBNAIL = _load_base_64_thumbnail("lulc-change")
 WATER_QUALITY_THUMBNAIL = _load_base_64_thumbnail("water-quality")
 
-LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC = {
+LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC: dict[str, Any] = {
     "inputs": {
         "area": HEATHROW_AOI,
         "dataset": "esa-lccci-glcm",
@@ -69,7 +70,7 @@ LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC = {
             "inputs": {
                 "data_dir": {
                     "$type": "ref",
-                    "value": ["functions", "clip", "outputs", "results"],
+                    "value": ["functions", "summarize_class_stats", "outputs", "results"],
                 },
                 "epsg": {"$type": "atom", "value": "EPSG:3857"},
             },
@@ -82,7 +83,7 @@ LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC = {
         },
     },
 }
-LULC_CHANGE_PRESET = {
+LULC_CHANGE_PRESET: dict[str, Any] = {
     "identifier": "lulc-change",
     "name": "Land Cover Change Detection",
     "description": "Analyses time-series satellite imagery to detect changes in land cover, identifying shifts in "
@@ -90,7 +91,7 @@ LULC_CHANGE_PRESET = {
     "thumbnail_b64": _load_base_64_thumbnail("lulc-change"),
     "workflow": LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC,
 }
-WATER_QUALITY_WORKFLOW_SPEC = {
+WATER_QUALITY_WORKFLOW_SPEC: dict[str, Any] = {
     "inputs": {
         "area": HEATHROW_AOI,
         "dataset": "sentinel-2-l2a",
@@ -159,7 +160,7 @@ WATER_QUALITY_WORKFLOW_SPEC = {
         },
     },
 }
-WATER_QUALITY_PRESET = {
+WATER_QUALITY_PRESET: dict[str, Any] = {
     "identifier": "water-quality",
     "name": "Water Quality",
     "description": "Evaluates water quality by analysing spectral data from satellite imagery, calibrated with DEFRA's "
@@ -171,7 +172,7 @@ WATER_QUALITY_PRESET = {
 PRESETS = [LULC_CHANGE_PRESET, WATER_QUALITY_PRESET]
 PRESET_LOOKUP = {p["identifier"]: p for p in PRESETS}
 
-SIMPLEST_NDVI_WORKFLOW_SPEC = {
+SIMPLEST_NDVI_WORKFLOW_SPEC: dict[str, Any] = {
     "inputs": {
         "area": HEATHROW_AOI,
         "dataset": "sentinel-2-l2a",
@@ -203,7 +204,7 @@ SIMPLEST_NDVI_WORKFLOW_SPEC = {
         },
     },
 }
-NDVI_WORKFLOW_SPEC = {
+NDVI_WORKFLOW_SPEC: dict[str, Any] = {
     "inputs": {
         "area": HEATHROW_AOI,
         "dataset": "sentinel-2-l2a",
@@ -259,7 +260,7 @@ NDVI_WORKFLOW_SPEC = {
         },
     },
 }
-ERR_AOI_TOO_BIG_NDVI_WORKFLOW_SPEC = {
+ERR_AOI_TOO_BIG_NDVI_WORKFLOW_SPEC: dict[str, Any] = {
     "inputs": {
         "area": UK_AOI,
         "dataset": "sentinel-2-l2a",
@@ -293,7 +294,7 @@ ERR_AOI_TOO_BIG_NDVI_WORKFLOW_SPEC = {
         },
     },
 }
-ERR_INVALID_DATE_RANGE_NDVI_WORKFLOW_SPEC = {
+ERR_INVALID_DATE_RANGE_NDVI_WORKFLOW_SPEC: dict[str, Any] = {
     "inputs": {
         "area": HEATHROW_AOI,
         "dataset": "sentinel-2-l2a",
@@ -327,7 +328,7 @@ ERR_INVALID_DATE_RANGE_NDVI_WORKFLOW_SPEC = {
         },
     },
 }
-ERR_INVALID_DATASET_NDVI_WORKFLOW_SPEC = {
+ERR_INVALID_DATASET_NDVI_WORKFLOW_SPEC: dict[str, Any] = {
     "inputs": {
         "area": HEATHROW_AOI,
         "dataset": "sentinel-1-grd",
@@ -361,7 +362,7 @@ ERR_INVALID_DATASET_NDVI_WORKFLOW_SPEC = {
         },
     },
 }
-ERR_INVALID_REF_PATH_WORKFLOW_SPEC = {
+ERR_INVALID_REF_PATH_WORKFLOW_SPEC: dict[str, Any] = {
     "inputs": {
         "area": HEATHROW_AOI,
         "dataset": "sentinel-2-l2a",
@@ -396,7 +397,7 @@ ERR_INVALID_REF_PATH_WORKFLOW_SPEC = {
     },
 }
 
-EXAMPLE_WORKFLOWS = {
+EXAMPLE_WORKFLOWS: dict[str, Any] = {
     "land-cover": LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC,
     "water-quality": WATER_QUALITY_WORKFLOW_SPEC,
     "simplest-ndvi": SIMPLEST_NDVI_WORKFLOW_SPEC,

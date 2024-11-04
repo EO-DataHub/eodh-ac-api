@@ -4,12 +4,16 @@ from copy import deepcopy
 from datetime import datetime
 from typing import Annotated, Any, Self
 
+import networkx as nx
 from geojson_pydantic import Polygon
+from matplotlib import pyplot as plt
 from pydantic import BaseModel, Field, field_validator, model_validator
 from pydantic_core.core_schema import ValidationInfo
 
 from src.api.v1_2.action_creator.schemas.workflow_steps import FUNCTIONS_REGISTRY, DirectoryOutputs, TWorkflowStep
 from src.services.validation_utils import aoi_must_be_present, ensure_area_smaller_than, validate_date_range
+
+MAX_WF_STEPS = 10
 
 
 class MainWorkflowInputs(BaseModel):
@@ -80,6 +84,7 @@ def resolve_references_and_atom_values(data: dict[str, Any]) -> dict[str, Any]:
     extended_dict = ExtendedDict(data)
     for f_id, f_spec in data["functions"].items():
         resolved_inputs: dict[str, Any] = {}
+        resolved_outputs: dict[str, Any] = {}
         for input_id, input_val in f_spec["inputs"].items():
             if isinstance(input_val, dict) and input_val.get("$type") == "ref":
                 resolved_inputs[input_id] = extended_dict.multi_level_get(input_val["value"])
@@ -87,9 +92,48 @@ def resolve_references_and_atom_values(data: dict[str, Any]) -> dict[str, Any]:
                 resolved_inputs[input_id] = input_val["value"]
             else:
                 resolved_inputs[input_id] = input_val
+        for input_id, input_val in f_spec["outputs"].items():
+            if isinstance(input_val, dict) and input_val.get("$type") == "ref":
+                resolved_inputs[input_id] = extended_dict.multi_level_get(input_val["value"])
+            elif isinstance(input_val, dict) and input_val.get("$type") == "atom":
+                resolved_inputs[input_id] = input_val["value"]
+            else:
+                resolved_inputs[input_id] = input_val
         resolved_functions["functions"][f_id]["inputs"] = resolved_inputs
-        resolved_functions["functions"][f_id]["outputs"] = data["functions"][f_id]["outputs"]
+        resolved_functions["functions"][f_id]["outputs"] = resolved_outputs
     return resolved_functions
+
+
+def check_for_max_steps(data: dict[str, Any], max_steps: int = MAX_WF_STEPS) -> None:
+    if len(data["functions"]) > max_steps:
+        msg = f"Maximum number of steps exceeded. Currently we only support {max_steps} maximum of steps."
+        raise ValueError(msg)
+
+
+def wf_as_networkx_graph(data: dict[str, Any]) -> nx.DiGraph:
+    g = nx.DiGraph()
+    g.add_nodes_from((f"inputs.{k}", {"value": v}) for k, v in data["inputs"].items())
+    g.add_nodes_from((f"functions.{k}", v) for k, v in data["functions"].items())
+    g.add_nodes_from((f"outputs.{k}", {"value": v}) for k, v in data["outputs"].items())
+
+    edges: list[tuple[str, str]] = []
+    for f_id, f_spec in data["functions"].items():
+        for prop in ["inputs", "outputs"]:
+            for input_output_val in f_spec[prop].values():
+                if isinstance(input_output_val, dict) and input_output_val.get("$type") == "ref":
+                    edges.append((".".join(input_output_val["value"][:2]), f"functions.{f_id}"))  # noqa: PERF401
+    g.add_edges_from(edges)
+
+    return g
+
+
+def visualize_workflow_graph(g: nx.DiGraph) -> plt.Figure:
+    fig, ax = plt.subplots(figsize=(15, 9))
+    ax.axis("off")
+    plot_options = {"node_size": 100, "with_labels": True}
+    pos = nx.spring_layout(g, seed=42)
+    nx.draw_networkx(g, pos=pos, ax=ax, **plot_options)
+    return fig
 
 
 def check_for_cycles(data: dict[str, Any]) -> None: ...
@@ -117,6 +161,7 @@ class WorkflowSpec(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def validate_workflow_before(cls, v: dict[str, Any]) -> dict[str, Any]:
+        check_for_max_steps(v)
         check_for_cycles(v)
         check_step_order(v)
         check_step_outputs_mapped_to_wf_outputs(v)

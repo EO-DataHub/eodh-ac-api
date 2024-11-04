@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import operator
 from typing import Any
 
 import pytest
+from matplotlib import pyplot as plt
 from pydantic import ValidationError
 
 from src.api.v1_2.action_creator.schemas.presets import (
@@ -10,7 +12,7 @@ from src.api.v1_2.action_creator.schemas.presets import (
     LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC,
     NDVI_WORKFLOW_SPEC,
 )
-from src.api.v1_2.action_creator.schemas.workflows import WorkflowSpec
+from src.api.v1_2.action_creator.schemas.workflows import WorkflowSpec, visualize_workflow_graph, wf_as_networkx_graph
 from src.consts.geometries import UK_AOI
 
 
@@ -62,6 +64,21 @@ def test_should_raise_ex_if_invalid_date_range(workflow_spec: dict[str, Any]) ->
         WorkflowSpec(**workflow_spec)
 
 
+def test_should_raise_ex_if_too_many_steps() -> None:
+    # Arrange
+    wf = NDVI_WORKFLOW_SPEC.copy()
+    for i in range(10):
+        wf["functions"][f"ndvi-{i}"] = wf["functions"]["ndvi"]
+
+    # Act & Assert
+    with pytest.raises(ValidationError, match="Maximum number of steps exceeded"):
+        WorkflowSpec(**wf)
+
+
+def test_should_raise_ex_if_last_steps_have_no_outputs_mapping() -> None:
+    raise NotImplementedError
+
+
 def test_should_raise_ex_if_invalid_step_order() -> None:
     raise NotImplementedError
 
@@ -81,7 +98,16 @@ def test_should_raise_ex_if_cycle_detected() -> None:
 @pytest.mark.parametrize(
     "wf_spec",
     list(EXAMPLE_WORKFLOWS.items()),
-    ids=lambda x: x[0],
+    ids=operator.itemgetter(0),
 )
 def test_example_workflows(wf_spec: tuple[str, dict[str, Any]]) -> None:
     WorkflowSpec(**wf_spec[1])
+
+
+@pytest.mark.parametrize("workflow_spec", [LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC])
+def test_wf_as_networkx_graph(workflow_spec: dict[str, Any]) -> None:
+    g = wf_as_networkx_graph(workflow_spec)
+    fig = visualize_workflow_graph(g)
+    fig.savefig("workflow.png")
+
+    plt.close(fig)
