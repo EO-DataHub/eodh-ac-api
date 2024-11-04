@@ -3,7 +3,7 @@ from __future__ import annotations
 import abc
 from datetime import datetime  # noqa: TCH003
 from enum import StrEnum, auto
-from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Generic, Literal, Sequence, TypeVar, Union
+from typing import TYPE_CHECKING, Annotated, Any, Generic, Literal, Sequence, TypeVar, Union
 
 from geojson_pydantic.geometries import Polygon
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -65,6 +65,7 @@ class ActionCreatorFunctionSpec(BaseModel):
     visible: bool = False
     standalone: bool = False
     inputs: dict[str, FuncInputSpec]
+    outputs: dict[str, FuncOutputSpec]
 
 
 class ActionCreatorPresetSpec(BaseModel):
@@ -164,6 +165,7 @@ class LandCoverChangeDetectionFunctionInputs(CommonFunctionInputs):
 
 
 class ClipFunctionInputs(BaseModel):
+    collection: str
     aoi: Annotated[Polygon | None, Field(None, validate_default=True)]
 
     @field_validator("aoi", mode="before")
@@ -189,7 +191,6 @@ class ActionCreatorJobStatus(StrEnum):
 
 
 class ClipWorkflowStep(BaseModel):
-    _identifier: ClassVar[Literal["clip"]] = "clip"
     identifier: Literal["clip"] = "clip"
     inputs: ClipFunctionInputs
 
