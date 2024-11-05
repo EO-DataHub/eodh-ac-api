@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 import abc
+import functools
 from datetime import datetime
 from enum import StrEnum, auto
 from typing import Annotated, Any, Literal, Union
 
+import pandas as pd
 from geojson_pydantic import Polygon
 from pydantic import BaseModel, Field, field_validator
 from pydantic_core.core_schema import ValidationInfo
 from pyproj.database import query_crs_info
 
+from src import consts
 from src.api.v1_2.action_creator.schemas.functions import (
     ConstraintOperator,
     FuncInputOutputType,
@@ -995,3 +998,39 @@ WORKFLOW_STEPS = [
 TWorkflowStep = Annotated[Union[*WORKFLOW_STEPS], Field(discriminator="identifier")]  # type: ignore[valid-type]
 FUNCTIONS = [s.as_function_spec() for s in WORKFLOW_STEPS]
 FUNCTIONS_REGISTRY = {f["identifier"]: f for f in FUNCTIONS}
+
+
+class StepCompatibility(StrEnum):
+    yes = auto()
+    no = auto()
+    maybe = auto()
+
+
+def is_query_step(s: str) -> bool:
+    return "ds-query" in s
+
+
+def is_raster_ops_step(s: str) -> bool:
+    return s in [f["identifier"] for f in FUNCTIONS if f["category"] == "raster_ops"]
+
+
+@functools.cache
+def load_step_compatibility_matrix() -> pd.DataFrame:
+    return pd.read_csv(consts.directories.ASSETS_DIR / "wf-step-compatibility-matrix.csv", index_col=0, header=0)
+
+
+def check_step_compatibility(s1: str, s2: str) -> StepCompatibility:
+    """Checks whether Workflow Steps ``s1`` and ``s2`` are compatible with each other.
+
+    i.e. if output of ``s1`` can be used as an input for ``s2``.
+
+    Arguments:
+        s1: The identifier of first function step.
+        s2: The identifier of second function step.
+
+    Returns:
+        Compatibility flag.
+        If result is ``maybe`` then additional checks with previous steps in the WF are required.
+    """
+    # Load compatibility matrix and get results from it
+    return load_step_compatibility_matrix().loc[s1, s2]
