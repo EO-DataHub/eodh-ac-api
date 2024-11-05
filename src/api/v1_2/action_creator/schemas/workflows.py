@@ -2,15 +2,22 @@ from __future__ import annotations
 
 from copy import deepcopy
 from datetime import datetime
-from typing import Annotated, Any, Self
+from typing import Annotated, Any
 
 import networkx as nx
 from geojson_pydantic import Polygon
 from matplotlib import pyplot as plt
+from networkx.classes import DiGraph, Graph
 from pydantic import BaseModel, Field, field_validator, model_validator
 from pydantic_core.core_schema import ValidationInfo
 
-from src.api.v1_2.action_creator.schemas.workflow_steps import FUNCTIONS_REGISTRY, DirectoryOutputs, TWorkflowStep
+from src.api.v1_2.action_creator.schemas.workflow_steps import (
+    FUNCTIONS_REGISTRY,
+    DirectoryOutputs,
+    StepCompatibility,
+    TWorkflowStep,
+    check_step_compatibility,
+)
 from src.services.validation_utils import aoi_must_be_present, ensure_area_smaller_than, validate_date_range
 
 MAX_WF_STEPS = 10
@@ -85,20 +92,14 @@ def resolve_references_and_atom_values(data: dict[str, Any]) -> dict[str, Any]:
     for f_id, f_spec in data["functions"].items():
         resolved_inputs: dict[str, Any] = {}
         resolved_outputs: dict[str, Any] = {}
-        for input_id, input_val in f_spec["inputs"].items():
-            if isinstance(input_val, dict) and input_val.get("$type") == "ref":
-                resolved_inputs[input_id] = extended_dict.multi_level_get(input_val["value"])
-            elif isinstance(input_val, dict) and input_val.get("$type") == "atom":
-                resolved_inputs[input_id] = input_val["value"]
-            else:
-                resolved_inputs[input_id] = input_val
-        for input_id, input_val in f_spec["outputs"].items():
-            if isinstance(input_val, dict) and input_val.get("$type") == "ref":
-                resolved_inputs[input_id] = extended_dict.multi_level_get(input_val["value"])
-            elif isinstance(input_val, dict) and input_val.get("$type") == "atom":
-                resolved_inputs[input_id] = input_val["value"]
-            else:
-                resolved_inputs[input_id] = input_val
+        for kind, collection in zip(["inputs", "outputs"], [resolved_inputs, resolved_outputs]):
+            for id_, val in f_spec[kind].items():
+                if isinstance(val, dict) and val.get("$type") == "ref":
+                    collection[id_] = extended_dict.multi_level_get(val["value"])
+                elif isinstance(val, dict) and val.get("$type") == "atom":
+                    collection[id_] = val["value"]
+                else:
+                    collection[id_] = val
         resolved_functions["functions"][f_id]["inputs"] = resolved_inputs
         resolved_functions["functions"][f_id]["outputs"] = resolved_outputs
     return resolved_functions
@@ -106,46 +107,102 @@ def resolve_references_and_atom_values(data: dict[str, Any]) -> dict[str, Any]:
 
 def check_for_max_steps(data: dict[str, Any], max_steps: int = MAX_WF_STEPS) -> None:
     if len(data["functions"]) > max_steps:
-        msg = f"Maximum number of steps exceeded. Currently we only support {max_steps} maximum of steps."
+        msg = f"Maximum number of steps exceeded. Currently we only support maximum of {max_steps} steps."
         raise ValueError(msg)
 
 
-def wf_as_networkx_graph(data: dict[str, Any]) -> nx.DiGraph:
-    g = nx.DiGraph()
+def wf_as_networkx_graph(data: dict[str, Any], *, directed: bool = False) -> nx.Graph | nx.DiGraph:
+    g = nx.DiGraph() if directed else nx.Graph()
     g.add_nodes_from((f"inputs.{k}", {"value": v}) for k, v in data["inputs"].items())
     g.add_nodes_from((f"functions.{k}", v) for k, v in data["functions"].items())
     g.add_nodes_from((f"outputs.{k}", {"value": v}) for k, v in data["outputs"].items())
 
     edges: list[tuple[str, str]] = []
     for f_id, f_spec in data["functions"].items():
-        for prop in ["inputs", "outputs"]:
-            for input_output_val in f_spec[prop].values():
-                if isinstance(input_output_val, dict) and input_output_val.get("$type") == "ref":
-                    edges.append((".".join(input_output_val["value"][:2]), f"functions.{f_id}"))  # noqa: PERF401
+        for input_val in f_spec["inputs"].values():
+            if isinstance(input_val, dict) and input_val.get("$type") == "ref":
+                edges.append((".".join(input_val["value"][:2]), f"functions.{f_id}"))  # noqa: PERF401
+        for output_val in f_spec["outputs"].values():
+            if isinstance(output_val, dict) and output_val.get("$type") == "ref":
+                edges.append((f"functions.{f_id}", ".".join(output_val["value"][:2])))  # noqa: PERF401
     g.add_edges_from(edges)
 
     return g
 
 
-def visualize_workflow_graph(g: nx.DiGraph) -> plt.Figure:
-    fig, ax = plt.subplots(figsize=(15, 9))
+def visualize_workflow_graph(
+    g: nx.Graph,
+    figsize: tuple[float, float] = (15, 9),
+    node_size: int = 2000,
+    **kwargs: Any,
+) -> plt.Figure:
+    fig, ax = plt.subplots(figsize=figsize)
     ax.axis("off")
-    plot_options = {"node_size": 100, "with_labels": True}
-    pos = nx.spring_layout(g, seed=42)
-    nx.draw_networkx(g, pos=pos, ax=ax, **plot_options)
+    plot_options = {"node_size": node_size, "with_labels": True}
+    pos = nx.nx_agraph.graphviz_layout(g, prog="dot")
+    nx.draw_networkx(g, pos=pos, ax=ax, **plot_options, **kwargs)
     return fig
 
 
-def check_for_cycles(data: dict[str, Any]) -> None: ...
-def check_step_order(data: dict[str, Any]) -> None: ...
-def check_step_outputs_mapped_to_wf_outputs(data: dict[str, Any]) -> None: ...
+def check_for_cycles(g: nx.DiGraph) -> None:
+    cycles = sorted(nx.simple_cycles(g))
+    if cycles:
+        formatted_cycles = [" -> ".join(c) + f" -> {c[0]}" for c in cycles]
+        msg = f"Workflow specification cannot contain cycles or self loops, but following cycles were found: {formatted_cycles}"
+        raise ValueError(msg)
 
 
-def check_step_collection_support(ws: WorkflowSpec) -> None:
-    ds = ws.inputs.dataset
+def check_for_disjoined_subgraphs(g: nx.Graph) -> None:
+    if (n := nx.number_connected_components(g)) > 1:
+        suffix = "s" if n > 1 else ""
+        msg = (
+            "The workflow specification must be a single, fully connected directed acyclic graph. "
+            f"Found {n} subgraph{suffix}."
+        )
+        raise ValueError(msg)
+
+
+def check_for_dangling_function(g: DiGraph) -> None:
+    dangling_functions = [x for x in g.nodes() if g.out_degree(x) == 0 and g.in_degree(x) == 1 and "functions." in x]
+    if len(dangling_functions) > 0:
+        msg = (
+            f"Workflow functions: {dangling_functions} have outputs without any mapping to workflow outputs. "
+            "Those functions are wasted computations. Please ensure that their outputs map to workflow outputs."
+        )
+        raise ValueError(msg)
+
+
+def check_step_outputs_mapped_to_wf_outputs(g: nx.DiGraph) -> None:
+    dangling_outputs = [x for x in g.nodes() if g.out_degree(x) == 0 and g.in_degree(x) == 0 and "outputs." in x]
+    if len(dangling_outputs) > 0:
+        msg = (
+            f"Workflow outputs: {dangling_outputs} are not mapped to function outputs. "
+            "Please map which function outputs map to those workflow outputs."
+        )
+        raise ValueError(msg)
+
+
+def check_step_order(g: nx.DiGraph) -> None:
+    # TODO extend this to incorporate all possible vertex paris
+    for src_id, target_id in g.edges():
+        if "inputs" in src_id or "outputs" in src_id:
+            continue
+        if "inputs" in target_id or "outputs" in target_id:
+            continue
+        src, target = g.nodes[src_id], g.nodes[target_id]
+        if check_step_compatibility(src["identifier"], target["identifier"]) == StepCompatibility.no:
+            msg = (
+                f"Step '{target['identifier']}' with identifier '{target_id}' cannot be used "
+                f"with outputs from preceding steps"
+            )
+            raise ValueError(msg)
+
+
+def check_step_collection_support(data: dict[str, Any]) -> None:
+    ds = data["inputs"]["dataset"]
     invalid_steps = []
-    for step in ws.functions.values():
-        func_spec = FUNCTIONS_REGISTRY[step.identifier]
+    for step in data["functions"].values():
+        func_spec = FUNCTIONS_REGISTRY[step["identifier"]]
         if ds not in func_spec["compatible_input_datasets"]:
             invalid_steps.append(step)
     if invalid_steps:
@@ -160,17 +217,18 @@ class WorkflowSpec(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def validate_workflow_before(cls, v: dict[str, Any]) -> dict[str, Any]:
+    def validate_workflow_before_instantiation(cls, v: dict[str, Any]) -> dict[str, Any]:
         check_for_max_steps(v)
-        check_for_cycles(v)
-        check_step_order(v)
-        check_step_outputs_mapped_to_wf_outputs(v)
-        return resolve_references_and_atom_values(v)
-
-    @model_validator(mode="after")
-    def validate_workflow_after(self) -> Self:
-        check_step_collection_support(self)
-        return self
+        check_step_collection_support(v)
+        resolved = resolve_references_and_atom_values(v)
+        dg: DiGraph = wf_as_networkx_graph(v, directed=True)
+        g: Graph = wf_as_networkx_graph(v)
+        check_for_cycles(dg)
+        check_step_outputs_mapped_to_wf_outputs(dg)
+        check_for_disjoined_subgraphs(g)
+        check_for_dangling_function(dg)
+        check_step_order(dg)
+        return resolved
 
 
 class WorkflowSubmissionRequest(BaseModel):

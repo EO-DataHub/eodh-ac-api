@@ -200,7 +200,9 @@ SIMPLEST_NDVI_WORKFLOW_SPEC: dict[str, Any] = {
                     "value": ["functions", "query", "outputs", "results"],
                 },
             },
-            "outputs": {"results": {"name": "results", "type": "directory"}},
+            "outputs": {
+                "results": {"$type": "ref", "value": ["outputs", "results"]},
+            },
         },
     },
 }
