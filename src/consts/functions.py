@@ -140,11 +140,6 @@ CLIP_FUNCTION_SPEC = {
     "visible": True,
     "standalone": False,
     "inputs": {
-        "collection": {
-            "type": "stac_collection",
-            "description": "STAC collection to use.",
-            "required": True,
-        },
         "aoi": {
             "type": "polygon",
             "required": True,
