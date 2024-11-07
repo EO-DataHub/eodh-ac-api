@@ -43,7 +43,7 @@ class InputOutputValue(BaseModel):
     value: Any | None = None
 
 
-class StepOutputSpec(BaseModel):
+class TaskOutputSpec(BaseModel):
     name: str
     type: FunctionOutputType
 
@@ -60,22 +60,22 @@ class Polarization(StrEnum):
     hh_hv = "HH+HV"
 
 
-class DirectoryStepOutputSpec(BaseModel):
+class DirectoryTaskOutputSpec(BaseModel):
     type: Literal["directory"] = "directory"
     name: Literal["results"] = "results"
 
 
 class DirectoryOutputs(BaseModel):
-    results: DirectoryStepOutputSpec
+    results: DirectoryTaskOutputSpec
 
 
-class WorkflowStep(BaseModel, abc.ABC):
+class WorkflowTask(BaseModel, abc.ABC):
     @classmethod
     @abc.abstractmethod
     def as_function_spec(cls) -> dict[str, Any]: ...
 
 
-class QueryStepInputsBase(BaseModel):
+class QueryTaskInputsBase(BaseModel):
     stac_collection: str
     area: Polygon
     date_start: datetime | None
@@ -95,7 +95,7 @@ class QueryStepInputsBase(BaseModel):
         return v
 
 
-class Sentinel1QueryStepInputs(QueryStepInputsBase):
+class Sentinel1QueryTaskInputs(QueryTaskInputsBase):
     stac_collection: Literal["sentinel-1-grd"] = "sentinel-1-grd"
     area: Polygon
     date_start: Annotated[datetime | None, Field(None, ge="2014-10-10")]
@@ -105,9 +105,9 @@ class Sentinel1QueryStepInputs(QueryStepInputsBase):
     limit: int | None = 10
 
 
-class Sentinel1DatasetQueryStep(WorkflowStep):
+class Sentinel1DatasetQueryTask(WorkflowTask):
     identifier: Literal["s1-ds-query"] = "s1-ds-query"
-    inputs: Sentinel1QueryStepInputs
+    inputs: Sentinel1QueryTaskInputs
     outputs: DirectoryOutputs
 
     @classmethod
@@ -179,7 +179,7 @@ class Sentinel1DatasetQueryStep(WorkflowStep):
         }
 
 
-class Sentinel2QueryStepInputs(QueryStepInputsBase):
+class Sentinel2QueryTaskInputs(QueryTaskInputsBase):
     stac_collection: Literal["sentinel-2-l1c", "sentinel-2-l2a", "sentinel-2-l2a-ard"] = "sentinel-2-l2a-ard"
     area: Polygon
     date_start: Annotated[datetime | None, Field(None, ge="2015-06-27")]
@@ -198,9 +198,9 @@ class Sentinel2QueryStepInputs(QueryStepInputsBase):
         return cloud_cover_max
 
 
-class Sentinel2DatasetQueryStep(WorkflowStep):
+class Sentinel2DatasetQueryTask(WorkflowTask):
     identifier: Literal["s2-ds-query"] = "s2-ds-query"
-    inputs: Sentinel2QueryStepInputs
+    inputs: Sentinel2QueryTaskInputs
     outputs: DirectoryOutputs
 
     @classmethod
@@ -285,7 +285,7 @@ class Sentinel2DatasetQueryStep(WorkflowStep):
         }
 
 
-class GlobalLandCoverQueryStepInputs(QueryStepInputsBase):
+class GlobalLandCoverQueryTaskInputs(QueryTaskInputsBase):
     stac_collection: Literal["esa-lccci-glcm"] = "esa-lccci-glcm"
     area: Polygon
     date_start: Annotated[datetime | None, Field(None, ge="1992-01-01T00:00:00", le="2015-12-31T23:59:59")]
@@ -293,9 +293,9 @@ class GlobalLandCoverQueryStepInputs(QueryStepInputsBase):
     limit: int | None = 10
 
 
-class GlobalLandCoverDatasetQueryStep(WorkflowStep):
+class GlobalLandCoverDatasetQueryTask(WorkflowTask):
     identifier: Literal["esa-glc-ds-query"] = "esa-glc-ds-query"
-    inputs: GlobalLandCoverQueryStepInputs
+    inputs: GlobalLandCoverQueryTaskInputs
     outputs: DirectoryOutputs
 
     @classmethod
@@ -361,7 +361,7 @@ class GlobalLandCoverDatasetQueryStep(WorkflowStep):
         }
 
 
-class CorineLandCoverQueryStepInputs(QueryStepInputsBase):
+class CorineLandCoverQueryTaskInputs(QueryTaskInputsBase):
     stac_collection: Literal["clms-corine-lc"] = "clms-corine-lc"
     area: Polygon
     date_start: Annotated[datetime | None, Field(None, ge="1990-01-01T00:00:00", le="2018-12-31T23:59:59")]
@@ -369,9 +369,9 @@ class CorineLandCoverQueryStepInputs(QueryStepInputsBase):
     limit: int | None = 10
 
 
-class CorineLandCoverDatasetQueryStep(WorkflowStep):
+class CorineLandCoverDatasetQueryTask(WorkflowTask):
     identifier: Literal["corine-lc-ds-query"] = "corine-lc-ds-query"
-    inputs: CorineLandCoverQueryStepInputs
+    inputs: CorineLandCoverQueryTaskInputs
     outputs: DirectoryOutputs
 
     @classmethod
@@ -437,7 +437,7 @@ class CorineLandCoverDatasetQueryStep(WorkflowStep):
         }
 
 
-class WaterBodiesQueryStepInputs(QueryStepInputsBase):
+class WaterBodiesQueryTaskInputs(QueryTaskInputsBase):
     stac_collection: Literal["clms-water-bodies"] = "clms-water-bodies"
     area: Polygon
     date_start: Annotated[datetime | None, Field(None, ge="2020-01-01T00:00:00")]
@@ -445,9 +445,9 @@ class WaterBodiesQueryStepInputs(QueryStepInputsBase):
     limit: int | None = 10
 
 
-class WaterBodiesDatasetQueryStep(WorkflowStep):
+class WaterBodiesDatasetQueryTask(WorkflowTask):
     identifier: Literal["water-bodies-ds-query"] = "water-bodies-ds-query"
-    inputs: WaterBodiesQueryStepInputs
+    inputs: WaterBodiesQueryTaskInputs
     outputs: DirectoryOutputs
 
     @classmethod
@@ -520,7 +520,7 @@ class DirectoryInputs(BaseModel):
     data_dir: DataDirInput
 
 
-class NDVIStep(WorkflowStep):
+class NDVITask(WorkflowTask):
     identifier: Literal["ndvi"] = "ndvi"
     inputs: DirectoryInputs
     outputs: DirectoryOutputs
@@ -553,7 +553,7 @@ class NDVIStep(WorkflowStep):
         }
 
 
-class EVIStep(WorkflowStep):
+class EVITask(WorkflowTask):
     identifier: Literal["evi"] = "evi"
     inputs: DirectoryInputs
     outputs: DirectoryOutputs
@@ -586,7 +586,7 @@ class EVIStep(WorkflowStep):
         }
 
 
-class SAVIStep(WorkflowStep):
+class SAVITask(WorkflowTask):
     identifier: Literal["savi"] = "savi"
     inputs: DirectoryInputs
     outputs: DirectoryOutputs
@@ -619,7 +619,7 @@ class SAVIStep(WorkflowStep):
         }
 
 
-class NDWIStep(WorkflowStep):
+class NDWITask(WorkflowTask):
     identifier: Literal["ndwi"] = "ndwi"
     inputs: DirectoryInputs
     outputs: DirectoryOutputs
@@ -652,7 +652,7 @@ class NDWIStep(WorkflowStep):
         }
 
 
-class CYAStep(WorkflowStep):
+class CYATask(WorkflowTask):
     identifier: Literal["cya"] = "cya"
     inputs: DirectoryInputs
     outputs: DirectoryOutputs
@@ -685,7 +685,7 @@ class CYAStep(WorkflowStep):
         }
 
 
-class CDOMStep(WorkflowStep):
+class CDOMTask(WorkflowTask):
     identifier: Literal["cdom"] = "cdom"
     inputs: DirectoryInputs
     outputs: DirectoryOutputs
@@ -718,7 +718,7 @@ class CDOMStep(WorkflowStep):
         }
 
 
-class DOCStep(WorkflowStep):
+class DOCTask(WorkflowTask):
     identifier: Literal["doc"] = "doc"
     inputs: DirectoryInputs
     outputs: DirectoryOutputs
@@ -751,7 +751,7 @@ class DOCStep(WorkflowStep):
         }
 
 
-class SARWaterMask(WorkflowStep):
+class SARWaterMask(WorkflowTask):
     identifier: Literal["sar-water-mask"] = "sar-water-mask"
     inputs: DirectoryInputs
     outputs: DirectoryOutputs
@@ -795,7 +795,7 @@ class ClipInputs(BaseModel):
         return v
 
 
-class ClipStep(WorkflowStep):
+class ClipTask(WorkflowTask):
     identifier: Literal["clip"] = "clip"
     inputs: ClipInputs
     outputs: DirectoryOutputs
@@ -846,7 +846,7 @@ class ReprojectInputs(BaseModel):
     epsg: Literal[*EPSG_CODES] = "EPSG:4326"  # type: ignore[valid-type]
 
 
-class ReprojectStep(WorkflowStep):
+class ReprojectTask(WorkflowTask):
     identifier: Literal["reproject"] = "reproject"
     inputs: ReprojectInputs
     outputs: DirectoryOutputs
@@ -894,7 +894,7 @@ class ReprojectStep(WorkflowStep):
         }
 
 
-class SummarizeClassStatisticsStep(WorkflowStep):
+class SummarizeClassStatisticsTask(WorkflowTask):
     identifier: Literal["summarize-class-statistics"] = "summarize-class-statistics"
     inputs: DirectoryInputs
     outputs: DirectoryOutputs
@@ -928,7 +928,7 @@ class SummarizeClassStatisticsStep(WorkflowStep):
         }
 
 
-class DefraCalibrateStep(WorkflowStep):
+class DefraCalibrateTask(WorkflowTask):
     identifier: Literal["defra-calibrate"] = "defra-calibrate"
     inputs: DirectoryInputs
     outputs: DirectoryOutputs
@@ -965,67 +965,68 @@ class WorkflowValidationResult(BaseModel):
     valid: bool
 
 
-WORKFLOW_STEPS = [
+WORKFLOW_TASKS = [
     # DS Queries
-    Sentinel1DatasetQueryStep,
-    Sentinel2DatasetQueryStep,
-    GlobalLandCoverDatasetQueryStep,
-    CorineLandCoverDatasetQueryStep,
-    WaterBodiesDatasetQueryStep,
+    Sentinel1DatasetQueryTask,
+    Sentinel2DatasetQueryTask,
+    GlobalLandCoverDatasetQueryTask,
+    CorineLandCoverDatasetQueryTask,
+    WaterBodiesDatasetQueryTask,
     # Indices
-    NDVIStep,
-    EVIStep,
-    NDWIStep,
-    SAVIStep,
-    CYAStep,
-    CDOMStep,
-    DOCStep,
+    NDVITask,
+    EVITask,
+    NDWITask,
+    SAVITask,
+    CYATask,
+    CDOMTask,
+    DOCTask,
     SARWaterMask,
     # Raster ops
-    ClipStep,
-    ReprojectStep,
+    ClipTask,
+    ReprojectTask,
     # Water quality
-    DefraCalibrateStep,
+    DefraCalibrateTask,
     # Pixel classification
-    SummarizeClassStatisticsStep,
+    SummarizeClassStatisticsTask,
 ]
 
-TWorkflowStep = Annotated[Union[*WORKFLOW_STEPS], Field(discriminator="identifier")]  # type: ignore[valid-type]
-FUNCTIONS = [s.as_function_spec() for s in WORKFLOW_STEPS]
+TWorkflowTask = Annotated[Union[*WORKFLOW_TASKS], Field(discriminator="identifier")]  # type: ignore[valid-type]
+FUNCTIONS = [s.as_function_spec() for s in WORKFLOW_TASKS]
 FUNCTIONS_REGISTRY = {f["identifier"]: f for f in FUNCTIONS}
 
 
-class StepCompatibility(StrEnum):
+class TaskCompatibility(StrEnum):
     yes = auto()
     no = auto()
     maybe = auto()
 
 
-def is_query_step(s: str) -> bool:
+def is_query_task(s: str) -> bool:
     return "ds-query" in s
 
 
-def is_raster_ops_step(s: str) -> bool:
+def is_raster_ops_task(s: str) -> bool:
     return s in [f["identifier"] for f in FUNCTIONS if f["category"] == "raster_ops"]
 
 
 @functools.cache
-def load_step_compatibility_matrix() -> pd.DataFrame:
-    return pd.read_csv(consts.directories.ASSETS_DIR / "wf-step-compatibility-matrix.csv", index_col=0, header=0)
+def load_task_compatibility_matrix() -> pd.DataFrame:
+    return pd.read_csv(consts.directories.ASSETS_DIR / "wf-task-compatibility-matrix.csv", index_col=0, header=0)
 
 
-def check_step_compatibility(s1: str, s2: str) -> StepCompatibility:
-    """Checks whether Workflow Steps ``s1`` and ``s2`` are compatible with each other.
+def check_task_compatibility(s1: str, s2: str) -> TaskCompatibility:
+    """Checks whether Workflow Tasks ``s1`` and ``s2`` are compatible with each other.
 
     i.e. if output of ``s1`` can be used as an input for ``s2``.
 
     Arguments:
-        s1: The identifier of first function step.
-        s2: The identifier of second function step.
+        s1: The identifier of first function task.
+        s2: The identifier of second function task.
 
     Returns:
         Compatibility flag.
-        If result is ``maybe`` then additional checks with previous steps in the WF are required.
+        If result is ``maybe`` then additional checks with previous tasks in the WF are required.
+
     """
     # Load compatibility matrix and get results from it
-    return load_step_compatibility_matrix().loc[s1, s2]
+    return load_task_compatibility_matrix().loc[s1, s2]  # type: ignore[no-any-return]
