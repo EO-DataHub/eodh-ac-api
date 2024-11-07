@@ -18,10 +18,7 @@ from src.api.v1_2.action_creator.schemas.history import (
     PaginationResults,
 )
 from src.api.v1_2.action_creator.schemas.presets import (
-    ERR_AOI_TOO_BIG_NDVI_WORKFLOW_SPEC,
-    ERR_INVALID_DATASET_NDVI_WORKFLOW_SPEC,
-    ERR_INVALID_DATE_RANGE_NDVI_WORKFLOW_SPEC,
-    ERR_INVALID_REF_PATH_WORKFLOW_SPEC,
+    ERROR_WF_PRESETS,
     NDVI_WORKFLOW_SPEC,
     PRESET_LOOKUP,
     PRESETS,
@@ -64,22 +61,7 @@ TWorkflowSpec = Annotated[
                 "description": "Calculate NDVI and clip the results to selected Area",
                 "value": NDVI_WORKFLOW_SPEC,
             },
-            "err-ndvi-area-too-big": {
-                "summary": "Error - Area too big",
-                "value": ERR_AOI_TOO_BIG_NDVI_WORKFLOW_SPEC,
-            },
-            "err-ndvi-invalid-date-range": {
-                "summary": "Error - Invalid date range",
-                "value": ERR_INVALID_DATE_RANGE_NDVI_WORKFLOW_SPEC,
-            },
-            "err-ndvi-invalid-dataset": {
-                "summary": "Error - Dataset not supported for this function",
-                "value": ERR_INVALID_DATASET_NDVI_WORKFLOW_SPEC,
-            },
-            "err-ndvi-invalid-reference": {
-                "summary": "Error - Invalid input reference path",
-                "value": ERR_INVALID_REF_PATH_WORKFLOW_SPEC,
-            },
+            **ERROR_WF_PRESETS,
         },
     ),
 ]

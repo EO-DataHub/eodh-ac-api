@@ -194,7 +194,7 @@ def check_task_collection_support(data: dict[str, Any]) -> None:
     for task in data["functions"].values():
         func_spec = FUNCTIONS_REGISTRY[task["identifier"]]
         if ds not in func_spec["compatible_input_datasets"]:
-            invalid_tasks.append(task)
+            invalid_tasks.append(task["identifier"])
     if invalid_tasks:
         raise CollectionNotSupportedForTaskError.make(invalid_tasks=invalid_tasks, dataset=ds)
 
