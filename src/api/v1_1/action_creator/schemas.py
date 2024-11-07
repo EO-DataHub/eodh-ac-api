@@ -65,6 +65,7 @@ class ActionCreatorFunctionSpec(BaseModel):
     visible: bool = False
     standalone: bool = False
     inputs: dict[str, FuncInputSpec]
+    outputs: dict[str, FuncOutputSpec]
 
 
 class ActionCreatorPresetSpec(BaseModel):
