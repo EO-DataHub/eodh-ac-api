@@ -23,6 +23,7 @@ LAND_COVER_CHANGE_DETECTION_PRESET_SPEC = {
     "workflow": {
         "land-cover-change-detection": {
             "identifier": "land-cover-change-detection",
+            "order": 0,
             "inputs": {
                 "stac_collection": "esacci-globallc",
                 "date_start": "1992-01-01T00:00:00",
@@ -32,6 +33,7 @@ LAND_COVER_CHANGE_DETECTION_PRESET_SPEC = {
         },
         "clip": {
             "identifier": "clip",
+            "order": 1,
             "inputs": {
                 "aoi": HEATHROW_AOI,
             },
@@ -44,6 +46,7 @@ NDVI_PRESET = {
     "workflow": {
         "ndvi": {
             "identifier": "ndvi",
+            "order": 0,
             "inputs": {
                 "stac_collection": "sentinel-2-l2a",
                 "date_start": "2024-01-01T00:00:00",
@@ -58,6 +61,7 @@ NDVI_CLIP_PRESET = {
     "workflow": {
         "ndvi": {
             "identifier": "ndvi",
+            "order": 0,
             "inputs": {
                 "stac_collection": "sentinel-2-l2a",
                 "date_start": "2024-01-01T00:00:00",
@@ -67,6 +71,7 @@ NDVI_CLIP_PRESET = {
         },
         "clip": {
             "identifier": "clip",
+            "order": 1,
             "inputs": {
                 "aoi": INDIAN_OCEAN_AOI,
             },

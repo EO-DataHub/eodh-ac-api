@@ -3,7 +3,7 @@ from __future__ import annotations
 import abc
 from datetime import datetime  # noqa: TCH003
 from enum import StrEnum, auto
-from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Generic, Literal, Sequence, TypeVar, Union
+from typing import TYPE_CHECKING, Annotated, Any, Generic, Literal, Sequence, TypeVar, Union
 
 from geojson_pydantic.geometries import Polygon
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -188,8 +188,11 @@ class ActionCreatorJobStatus(StrEnum):
     cancelled = "cancelled"
 
 
-class ClipWorkflowStep(BaseModel):
-    _identifier: ClassVar[Literal["clip"]] = "clip"
+class WorkflowStepBase(BaseModel):
+    order: int
+
+
+class ClipWorkflowStep(WorkflowStepBase):
     identifier: Literal["clip"] = "clip"
     inputs: ClipFunctionInputs
 
@@ -198,7 +201,7 @@ class NDVIFunctionInputs(RasterCalculatorFunctionInputs):
     identifier: Literal["ndvi"] = "ndvi"
 
 
-class NDVIWorkflowStep(BaseModel):
+class NDVIWorkflowStep(WorkflowStepBase):
     identifier: Literal["ndvi"] = "ndvi"
     inputs: NDVIFunctionInputs
 
@@ -207,7 +210,7 @@ class EVIFunctionInputs(RasterCalculatorFunctionInputs):
     identifier: Literal["evi"] = "evi"
 
 
-class EVIWorkflowStep(BaseModel):
+class EVIWorkflowStep(WorkflowStepBase):
     identifier: Literal["evi"] = "evi"
     inputs: RasterCalculatorFunctionInputs
 
@@ -216,7 +219,7 @@ class SAVIFunctionInputs(RasterCalculatorFunctionInputs):
     identifier: Literal["savi"] = "savi"
 
 
-class SAVIWorkflowStep(BaseModel):
+class SAVIWorkflowStep(WorkflowStepBase):
     identifier: Literal["savi"] = "savi"
     inputs: RasterCalculatorFunctionInputs
 
@@ -225,12 +228,12 @@ class NDWIFunctionInputs(RasterCalculatorFunctionInputs):
     identifier: Literal["ndwi"] = "ndwi"
 
 
-class NDWIWorkflowStep(BaseModel):
+class NDWIWorkflowStep(WorkflowStepBase):
     identifier: Literal["ndwi"] = "ndwi"
     inputs: RasterCalculatorFunctionInputs
 
 
-class LandCoverChangeDetectionWorkflowStep(BaseModel):
+class LandCoverChangeDetectionWorkflowStep(WorkflowStepBase):
     identifier: Literal["land-cover-change-detection"] = "land-cover-change-detection"
     inputs: LandCoverChangeDetectionFunctionInputs
 
