@@ -37,7 +37,7 @@ def test_should_raise_ex_if_area_too_big(wf: dict[str, Any]) -> None:
         WorkflowSpec(**wf)
 
 
-def test_should_raise_ex_if_step_does_not_support_collection(wf: dict[str, Any]) -> None:
+def test_should_raise_ex_if_task_does_not_support_collection(wf: dict[str, Any]) -> None:
     # Arrange
     wf["functions"].pop("reproject")
     wf["functions"]["summarize"] = {
@@ -70,17 +70,17 @@ def test_should_raise_ex_if_invalid_date_range(wf: dict[str, Any]) -> None:
         WorkflowSpec(**wf)
 
 
-def test_should_raise_ex_if_too_many_steps(wf: dict[str, Any]) -> None:
+def test_should_raise_ex_if_too_many_tasks(wf: dict[str, Any]) -> None:
     # Arrange
     for i in range(10):
         wf["functions"][f"ndvi-{i}"] = wf["functions"]["ndvi"]
 
     # Act & Assert
-    with pytest.raises(ValidationError, match="Maximum number of steps exceeded"):
+    with pytest.raises(ValidationError, match="Maximum number of tasks exceeded"):
         WorkflowSpec(**wf)
 
 
-def test_should_raise_ex_if_last_steps_have_no_outputs_mapping(wf: dict[str, Any]) -> None:
+def test_should_raise_ex_if_last_tasks_have_no_outputs_mapping(wf: dict[str, Any]) -> None:
     # Arrange
     wf["functions"]["ndvi-2"] = {
         "identifier": "ndvi",
@@ -101,7 +101,7 @@ def test_should_raise_ex_if_last_steps_have_no_outputs_mapping(wf: dict[str, Any
         WorkflowSpec(**wf)
 
 
-def test_should_raise_ex_if_invalid_step_order(wf: dict[str, Any]) -> None:
+def test_should_raise_ex_if_invalid_task_order(wf: dict[str, Any]) -> None:
     # Arrange
     wf["functions"]["savi"] = deepcopy(wf["functions"]["ndvi"])
     wf["functions"]["savi"]["inputs"]["data_dir"] = {
@@ -117,19 +117,19 @@ def test_should_raise_ex_if_invalid_step_order(wf: dict[str, Any]) -> None:
     # Act & Assert
     with pytest.raises(
         ValidationError,
-        match="Step 'savi' with identifier 'functions.savi' cannot be used with",
+        match="Task 'savi' with identifier 'functions.savi' cannot be used with",
     ):
         WorkflowSpec(**wf)
 
 
-def test_should_raise_ex_if_wf_output_not_mapped_to_step_result(wf: dict[str, Any]) -> None:
+def test_should_raise_ex_if_wf_output_not_mapped_to_task_result(wf: dict[str, Any]) -> None:
     # Arrange
     wf["outputs"]["test_output"] = {"name": "test_output", "type": "directory"}
 
     # Act & Assert
     with pytest.raises(
         ValidationError,
-        match="Please map which function outputs map to those workflow outputs.",
+        match="Please map which function outputs should be used for those workflow outputs.",
     ):
         WorkflowSpec(**wf)
 
@@ -194,7 +194,8 @@ def test_should_raise_ex_if_disjoined_subgraph_exist(wf: dict[str, Any]) -> None
     # Act & Assert
     with pytest.raises(
         ValidationError,
-        match="The workflow specification must be a single, fully connected directed acyclic graph. Found 2 subgraphs.",
+        match="The workflow specification must be a single, fully connected directed acyclic graph. "
+        "Subgraphs found: 2.",
     ):
         WorkflowSpec(**wf)
 

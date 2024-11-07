@@ -5,9 +5,9 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from src.api.v1_2.action_creator.schemas.workflow_steps import (
+from src.api.v1_2.action_creator.schemas.workflow_tasks import (
     DirectoryOutputs,
-    DirectoryStepOutputSpec,
+    DirectoryTaskOutputSpec,
     InputOutputValue,
 )
 from src.api.v1_2.action_creator.schemas.workflows import MainWorkflowInputs
@@ -108,6 +108,8 @@ WATER_QUALITY_WORKFLOW_SPEC: dict[str, Any] = {
                 "date_start": {"$type": "ref", "value": ["inputs", "date_start"]},
                 "date_end": {"$type": "ref", "value": ["inputs", "date_end"]},
                 "limit": {"$type": "atom", "value": 10},
+                "cloud_cover_min": {"$type": "atom", "value": 0},
+                "cloud_cover_max": {"$type": "atom", "value": 100},
             },
             "outputs": {"results": {"name": "results", "type": "directory"}},
         },
@@ -189,6 +191,8 @@ SIMPLEST_NDVI_WORKFLOW_SPEC: dict[str, Any] = {
                 "date_start": {"$type": "ref", "value": ["inputs", "date_start"]},
                 "date_end": {"$type": "ref", "value": ["inputs", "date_end"]},
                 "limit": {"$type": "atom", "value": 10},
+                "cloud_cover_min": {"$type": "atom", "value": 0},
+                "cloud_cover_max": {"$type": "atom", "value": 100},
             },
             "outputs": {"results": {"name": "results", "type": "directory"}},
         },
@@ -223,6 +227,8 @@ NDVI_WORKFLOW_SPEC: dict[str, Any] = {
                 "date_start": {"$type": "ref", "value": ["inputs", "date_start"]},
                 "date_end": {"$type": "ref", "value": ["inputs", "date_end"]},
                 "limit": {"$type": "atom", "value": 10},
+                "cloud_cover_min": {"$type": "atom", "value": 0},
+                "cloud_cover_max": {"$type": "atom", "value": 100},
             },
             "outputs": {"results": {"name": "results", "type": "directory"}},
         },
@@ -279,6 +285,8 @@ ERR_AOI_TOO_BIG_NDVI_WORKFLOW_SPEC: dict[str, Any] = {
                 "date_start": {"$type": "ref", "value": ["inputs", "date_start"]},
                 "date_end": {"$type": "ref", "value": ["inputs", "date_end"]},
                 "limit": {"$type": "atom", "value": 10},
+                "cloud_cover_min": {"$type": "atom", "value": 0},
+                "cloud_cover_max": {"$type": "atom", "value": 100},
             },
             "outputs": {"results": {"name": "results", "type": "directory"}},
         },
@@ -313,6 +321,8 @@ ERR_INVALID_DATE_RANGE_NDVI_WORKFLOW_SPEC: dict[str, Any] = {
                 "date_start": {"$type": "ref", "value": ["inputs", "date_start"]},
                 "date_end": {"$type": "ref", "value": ["inputs", "date_end"]},
                 "limit": {"$type": "atom", "value": 10},
+                "cloud_cover_min": {"$type": "atom", "value": 0},
+                "cloud_cover_max": {"$type": "atom", "value": 100},
             },
             "outputs": {"results": {"name": "results", "type": "directory"}},
         },
@@ -347,6 +357,8 @@ ERR_INVALID_DATASET_NDVI_WORKFLOW_SPEC: dict[str, Any] = {
                 "date_start": {"$type": "ref", "value": ["inputs", "date_start"]},
                 "date_end": {"$type": "ref", "value": ["inputs", "date_end"]},
                 "limit": {"$type": "atom", "value": 10},
+                "cloud_cover_min": {"$type": "atom", "value": 0},
+                "cloud_cover_max": {"$type": "atom", "value": 100},
             },
             "outputs": {"results": {"name": "results", "type": "directory"}},
         },
@@ -381,6 +393,8 @@ ERR_INVALID_REF_PATH_WORKFLOW_SPEC: dict[str, Any] = {
                 "date_start": {"$type": "ref", "value": ["inputs", "date_start"]},
                 "date_end": {"$type": "ref", "value": ["inputs", "date_end"]},
                 "limit": {"$type": "atom", "value": 10},
+                "cloud_cover_min": {"$type": "atom", "value": 0},
+                "cloud_cover_max": {"$type": "atom", "value": 100},
             },
             "outputs": {"results": {"name": "results", "type": "directory"}},
         },
@@ -407,16 +421,16 @@ EXAMPLE_WORKFLOWS: dict[str, Any] = {
 }
 
 
-class WorkflowPresetStep(BaseModel):
+class WorkflowPresetTask(BaseModel):
     identifier: str
     inputs: dict[str, InputOutputValue]
-    outputs: dict[str, DirectoryStepOutputSpec | InputOutputValue]
+    outputs: dict[str, DirectoryTaskOutputSpec | InputOutputValue]
 
 
 class WorkflowPresetSpec(BaseModel):
     inputs: MainWorkflowInputs
     outputs: DirectoryOutputs
-    functions: dict[str, WorkflowPresetStep]
+    functions: dict[str, WorkflowPresetTask]
 
 
 class WorkflowPreset(BaseModel):

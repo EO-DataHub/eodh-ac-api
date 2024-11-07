@@ -28,7 +28,7 @@ from src.api.v1_2.action_creator.schemas.presets import (
     SIMPLEST_NDVI_WORKFLOW_SPEC,
     PresetList,
 )
-from src.api.v1_2.action_creator.schemas.workflow_steps import (
+from src.api.v1_2.action_creator.schemas.workflow_tasks import (
     FUNCTIONS,
     WorkflowValidationResult,
 )
