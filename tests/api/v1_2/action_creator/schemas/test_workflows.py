@@ -210,7 +210,7 @@ def test_example_workflows(wf_spec: tuple[str, dict[str, Any]]) -> None:
 
 def test_wf_visualization(tmp_path: Path) -> None:
     for wf_id, wf_spec in EXAMPLE_WORKFLOWS.items():
-        g = wf_as_networkx_graph(wf_spec, directed=False)
+        g = wf_as_networkx_graph(wf_spec, directed=True)
         fig = visualize_workflow_graph(g)
         fig.savefig(tmp_path / f"workflow-{wf_id}.png")
         plt.close(fig)
