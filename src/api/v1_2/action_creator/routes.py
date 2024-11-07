@@ -230,7 +230,7 @@ async def get_job_history(
 
 
 @action_creator_router_v1_2.get(
-    "/submissions/{submission_id}",
+    "/workflow-submissions/{submission_id}",
     response_model=ActionCreatorJobSummary,
     response_model_exclude_unset=False,
     status_code=status.HTTP_200_OK,

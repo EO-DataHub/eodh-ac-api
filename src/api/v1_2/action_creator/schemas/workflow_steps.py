@@ -33,11 +33,6 @@ def get_crs_list() -> list[str]:
 EPSG_CODES = get_crs_list()
 
 
-class WorkflowStepsResponse(BaseModel):
-    steps: list[Any]
-    total: int
-
-
 class ValueType(StrEnum):
     ref = auto()
     atom = auto()
