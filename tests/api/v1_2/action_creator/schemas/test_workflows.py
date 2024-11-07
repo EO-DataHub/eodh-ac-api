@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import operator
-from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -10,194 +9,108 @@ from matplotlib import pyplot as plt
 from pydantic import ValidationError
 
 from src.api.v1_2.action_creator.schemas.presets import (
+    AREA_TOO_BIG_PRESET,
+    COLLECTION_NOT_SUPPORTED_PRESET,
+    CYCLE_DETECTED_PRESET,
+    DISJOINED_SUBGRAPH_EXIST_PRESET,
     EXAMPLE_WORKFLOWS,
-    LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC,
-    NDVI_WORKFLOW_SPEC,
+    INVALID_DATE_RANGE_PRESET,
+    INVALID_PATH_REFERENCE_PRESET,
+    INVALID_TASK_ORDER_PRESET,
+    SELF_LOOP_DETECTED_PRESET,
+    TASKS_HAVE_NO_OUTPUTS_MAPPING_PRESET,
+    TOO_MANY_TASKS_PRESET,
+    WF_OUTPUT_NOT_MAPPED_TO_TASK_RESULT_PRESET,
 )
 from src.api.v1_2.action_creator.schemas.workflows import WorkflowSpec, visualize_workflow_graph, wf_as_networkx_graph
-from src.consts.geometries import UK_AOI
 
 
-@pytest.fixture
-def lulc_wf() -> dict[str, Any]:
-    return deepcopy(LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC)
-
-
-@pytest.fixture
-def wf() -> dict[str, Any]:
-    return deepcopy(NDVI_WORKFLOW_SPEC)
-
-
-def test_should_raise_ex_if_area_too_big(wf: dict[str, Any]) -> None:
-    # Arrange
-    wf["inputs"]["area"] = UK_AOI
-
+def test_should_raise_ex_if_area_too_big() -> None:
     # Act & Assert
     with pytest.raises(ValidationError, match="Area exceeds"):
-        WorkflowSpec(**wf)
+        WorkflowSpec(**AREA_TOO_BIG_PRESET)
 
 
-def test_should_raise_ex_if_task_does_not_support_collection(wf: dict[str, Any]) -> None:
-    # Arrange
-    wf["functions"].pop("reproject")
-    wf["functions"]["summarize"] = {
-        "identifier": "summarize-class-statistics",
-        "inputs": {
-            "data_dir": {
-                "$type": "ref",
-                "value": ["functions", "ndvi", "outputs", "results"],
-            },
-        },
-        "outputs": {
-            "results": {"$type": "ref", "value": ["outputs", "results"]},
-        },
-    }
+def test_should_raise_ex_if_task_does_not_support_collection() -> None:
     # Act & Assert
     with pytest.raises(
         ValidationError,
         match="cannot be used with data coming from",
     ):
-        WorkflowSpec(**wf)
+        WorkflowSpec(**COLLECTION_NOT_SUPPORTED_PRESET)
 
 
-def test_should_raise_ex_if_invalid_date_range(wf: dict[str, Any]) -> None:
-    # Arrange
-    wf["inputs"]["date_start"] = "2003-01-01"
-    wf["inputs"]["date_end"] = "2000-01-01"
-
+def test_should_raise_ex_if_invalid_date_range() -> None:
     # Act & Assert
     with pytest.raises(ValidationError, match="End date cannot be before start date"):
-        WorkflowSpec(**wf)
+        WorkflowSpec(**INVALID_DATE_RANGE_PRESET)
 
 
-def test_should_raise_ex_if_too_many_tasks(wf: dict[str, Any]) -> None:
-    # Arrange
-    for i in range(10):
-        wf["functions"][f"ndvi-{i}"] = wf["functions"]["ndvi"]
-
+def test_should_raise_ex_if_too_many_tasks() -> None:
     # Act & Assert
     with pytest.raises(ValidationError, match="Maximum number of tasks exceeded"):
-        WorkflowSpec(**wf)
+        WorkflowSpec(**TOO_MANY_TASKS_PRESET)
 
 
-def test_should_raise_ex_if_last_tasks_have_no_outputs_mapping(wf: dict[str, Any]) -> None:
-    # Arrange
-    wf["functions"]["ndvi-2"] = {
-        "identifier": "ndvi",
-        "inputs": {
-            "data_dir": {
-                "$type": "ref",
-                "value": ["functions", "query", "outputs", "results"],
-            },
-        },
-        "outputs": {"results": {"name": "results", "type": "directory"}},
-    }
-
+def test_should_raise_ex_if_last_tasks_have_no_outputs_mapping() -> None:
     # Act & Assert
     with pytest.raises(
         ValidationError,
         match="Those functions are wasted computations. Please ensure that their outputs map to workflow outputs.",
     ):
-        WorkflowSpec(**wf)
+        WorkflowSpec(**TASKS_HAVE_NO_OUTPUTS_MAPPING_PRESET)
 
 
-def test_should_raise_ex_if_invalid_task_order(wf: dict[str, Any]) -> None:
-    # Arrange
-    wf["functions"]["savi"] = deepcopy(wf["functions"]["ndvi"])
-    wf["functions"]["savi"]["inputs"]["data_dir"] = {
-        "$type": "ref",
-        "value": ["functions", "ndvi", "outputs", "results"],
-    }
-    wf["functions"]["savi"]["identifier"] = "savi"
-    wf["functions"]["reproject"]["inputs"]["data_dir"] = {
-        "$type": "ref",
-        "value": ["functions", "savi", "outputs", "results"],
-    }
-
+def test_should_raise_ex_if_invalid_task_order() -> None:
     # Act & Assert
     with pytest.raises(
         ValidationError,
         match="Task 'savi' with identifier 'functions.savi' cannot be used with",
     ):
-        WorkflowSpec(**wf)
+        WorkflowSpec(**INVALID_TASK_ORDER_PRESET)
 
 
-def test_should_raise_ex_if_wf_output_not_mapped_to_task_result(wf: dict[str, Any]) -> None:
-    # Arrange
-    wf["outputs"]["test_output"] = {"name": "test_output", "type": "directory"}
-
+def test_should_raise_ex_if_wf_output_not_mapped_to_task_result() -> None:
     # Act & Assert
     with pytest.raises(
         ValidationError,
         match="Please map which function outputs should be used for those workflow outputs.",
     ):
-        WorkflowSpec(**wf)
+        WorkflowSpec(**WF_OUTPUT_NOT_MAPPED_TO_TASK_RESULT_PRESET)
 
 
-def test_should_raise_ex_if_invalid_path_reference(wf: dict[str, Any]) -> None:
-    # Arrange
-    wf["functions"]["ndvi"]["inputs"]["data_dir"] = {
-        "$type": "ref",
-        "value": ["functions", "invalid", "function", "ref"],
-    }
-
+def test_should_raise_ex_if_invalid_path_reference() -> None:
     # Act & Assert
     with pytest.raises(ValidationError, match="Invalid reference path:"):
-        WorkflowSpec(**wf)
+        WorkflowSpec(**INVALID_PATH_REFERENCE_PRESET)
 
 
-def test_should_raise_ex_if_self_loop_detected(wf: dict[str, Any]) -> None:
-    # Arrange
-    wf["functions"]["reproject"]["inputs"]["data_dir"] = {
-        "$type": "ref",
-        "value": ["functions", "reproject", "outputs", "results"],
-    }
-
+def test_should_raise_ex_if_self_loop_detected() -> None:
     # Act & Assert
     with pytest.raises(
         ValidationError,
         match="Workflow specification cannot contain cycles or self loops, but following cycles were found",
     ):
-        WorkflowSpec(**wf)
+        WorkflowSpec(**SELF_LOOP_DETECTED_PRESET)
 
 
-def test_should_raise_ex_if_cycle_detected(wf: dict[str, Any]) -> None:
-    # Arrange
-    wf["functions"]["ndvi"]["inputs"]["data_dir"] = {
-        "$type": "ref",
-        "value": ["functions", "reproject", "outputs", "results"],
-    }
-
+def test_should_raise_ex_if_cycle_detected() -> None:
     # Act & Assert
     with pytest.raises(
         ValidationError,
         match="Workflow specification cannot contain cycles or self loops, but following cycles were found",
     ):
-        WorkflowSpec(**wf)
+        WorkflowSpec(**CYCLE_DETECTED_PRESET)
 
 
-def test_should_raise_ex_if_disjoined_subgraph_exist(wf: dict[str, Any]) -> None:
-    # Arrange
-    wf["functions"]["ndvi-2"] = {
-        "identifier": "ndvi",
-        "inputs": {
-            "data_dir": {
-                "$type": "atom",
-                "value": {"name": "data_dir", "type": "directory"},
-            },
-        },
-        "outputs": {
-            "results": {"$type": "atom", "value": {"name": "results", "type": "directory"}},
-        },
-    }
-
+def test_should_raise_ex_if_disjoined_subgraph_exist() -> None:
     # Act & Assert
     with pytest.raises(
         ValidationError,
         match="The workflow specification must be a single, fully connected directed acyclic graph. "
         "Subgraphs found: 2.",
     ):
-        WorkflowSpec(**wf)
+        WorkflowSpec(**DISJOINED_SUBGRAPH_EXIST_PRESET)
 
 
 @pytest.mark.parametrize(

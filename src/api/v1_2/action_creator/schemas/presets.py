@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import functools
+from copy import deepcopy
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -268,156 +269,191 @@ NDVI_WORKFLOW_SPEC: dict[str, Any] = {
         },
     },
 }
-ERR_AOI_TOO_BIG_NDVI_WORKFLOW_SPEC: dict[str, Any] = {
-    "inputs": {
-        "area": UK_AOI,
-        "dataset": "sentinel-2-l2a",
-        "date_start": "2024-03-01",
-        "date_end": "2024-10-10",
-    },
-    "outputs": {"results": {"name": "results", "type": "directory"}},
-    "functions": {
-        "query": {
-            "identifier": "s2-ds-query",
-            "inputs": {
-                "area": {"$type": "ref", "value": ["inputs", "area"]},
-                "stac_collection": {"$type": "ref", "value": ["inputs", "dataset"]},
-                "date_start": {"$type": "ref", "value": ["inputs", "date_start"]},
-                "date_end": {"$type": "ref", "value": ["inputs", "date_end"]},
-                "limit": {"$type": "atom", "value": 10},
-                "cloud_cover_min": {"$type": "atom", "value": 0},
-                "cloud_cover_max": {"$type": "atom", "value": 100},
-            },
-            "outputs": {"results": {"name": "results", "type": "directory"}},
-        },
-        "ndvi": {
-            "identifier": "ndvi",
-            "inputs": {
-                "data_dir": {
-                    "$type": "ref",
-                    "value": ["functions", "query", "outputs", "results"],
-                },
-            },
-            "outputs": {
-                "results": {"$type": "ref", "value": ["outputs", "results"]},
-            },
-        },
-    },
-}
-ERR_INVALID_DATE_RANGE_NDVI_WORKFLOW_SPEC: dict[str, Any] = {
-    "inputs": {
-        "area": HEATHROW_AOI,
-        "dataset": "sentinel-2-l2a",
-        "date_start": "2024-03-01",
-        "date_end": "2023-10-10",
-    },
-    "outputs": {"results": {"name": "results", "type": "directory"}},
-    "functions": {
-        "query": {
-            "identifier": "s2-ds-query",
-            "inputs": {
-                "area": {"$type": "ref", "value": ["inputs", "area"]},
-                "stac_collection": {"$type": "ref", "value": ["inputs", "dataset"]},
-                "date_start": {"$type": "ref", "value": ["inputs", "date_start"]},
-                "date_end": {"$type": "ref", "value": ["inputs", "date_end"]},
-                "limit": {"$type": "atom", "value": 10},
-                "cloud_cover_min": {"$type": "atom", "value": 0},
-                "cloud_cover_max": {"$type": "atom", "value": 100},
-            },
-            "outputs": {"results": {"name": "results", "type": "directory"}},
-        },
-        "ndvi": {
-            "identifier": "ndvi",
-            "inputs": {
-                "data_dir": {
-                    "$type": "ref",
-                    "value": ["functions", "query", "outputs", "results"],
-                },
-            },
-            "outputs": {
-                "results": {"$type": "ref", "value": ["outputs", "results"]},
-            },
-        },
-    },
-}
-ERR_INVALID_DATASET_NDVI_WORKFLOW_SPEC: dict[str, Any] = {
-    "inputs": {
-        "area": HEATHROW_AOI,
-        "dataset": "sentinel-1-grd",
-        "date_start": "2024-03-01",
-        "date_end": "2024-10-10",
-    },
-    "outputs": {"results": {"name": "results", "type": "directory"}},
-    "functions": {
-        "query": {
-            "identifier": "s2-ds-query",
-            "inputs": {
-                "area": {"$type": "ref", "value": ["inputs", "area"]},
-                "stac_collection": {"$type": "ref", "value": ["inputs", "dataset"]},
-                "date_start": {"$type": "ref", "value": ["inputs", "date_start"]},
-                "date_end": {"$type": "ref", "value": ["inputs", "date_end"]},
-                "limit": {"$type": "atom", "value": 10},
-                "cloud_cover_min": {"$type": "atom", "value": 0},
-                "cloud_cover_max": {"$type": "atom", "value": 100},
-            },
-            "outputs": {"results": {"name": "results", "type": "directory"}},
-        },
-        "ndvi": {
-            "identifier": "ndvi",
-            "inputs": {
-                "data_dir": {
-                    "$type": "ref",
-                    "value": ["functions", "query", "outputs", "results"],
-                },
-            },
-            "outputs": {
-                "results": {"$type": "ref", "value": ["outputs", "results"]},
-            },
-        },
-    },
-}
-ERR_INVALID_REF_PATH_WORKFLOW_SPEC: dict[str, Any] = {
-    "inputs": {
-        "area": HEATHROW_AOI,
-        "dataset": "sentinel-2-l2a",
-        "date_start": "2024-03-01",
-        "date_end": "2024-10-10",
-    },
-    "outputs": {"results": {"name": "results", "type": "directory"}},
-    "functions": {
-        "query": {
-            "identifier": "s2-ds-query",
-            "inputs": {
-                "area": {"$type": "ref", "value": ["inputs", "area"]},
-                "stac_collection": {"$type": "ref", "value": ["inputs", "dataset"]},
-                "date_start": {"$type": "ref", "value": ["inputs", "date_start"]},
-                "date_end": {"$type": "ref", "value": ["inputs", "date_end"]},
-                "limit": {"$type": "atom", "value": 10},
-                "cloud_cover_min": {"$type": "atom", "value": 0},
-                "cloud_cover_max": {"$type": "atom", "value": 100},
-            },
-            "outputs": {"results": {"name": "results", "type": "directory"}},
-        },
-        "ndvi": {
-            "identifier": "ndvi",
-            "inputs": {
-                "data_dir": {
-                    "$type": "ref",
-                    "value": ["functions", "clip", "outputs", "results"],
-                },
-            },
-            "outputs": {
-                "results": {"$type": "ref", "value": ["outputs", "results"]},
-            },
-        },
-    },
-}
+
 
 EXAMPLE_WORKFLOWS: dict[str, Any] = {
     "land-cover": LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC,
     "water-quality": WATER_QUALITY_WORKFLOW_SPEC,
     "simplest-ndvi": SIMPLEST_NDVI_WORKFLOW_SPEC,
     "ndvi-crop-reproject": NDVI_WORKFLOW_SPEC,
+}
+
+
+def area_too_big_preset() -> dict[str, Any]:
+    wf = deepcopy(NDVI_WORKFLOW_SPEC)
+    wf["inputs"]["area"] = UK_AOI
+    return wf
+
+
+def collection_not_supported_preset() -> dict[str, Any]:
+    wf = deepcopy(NDVI_WORKFLOW_SPEC)
+    wf["functions"].pop("reproject")
+    wf["functions"]["summarize"] = {
+        "identifier": "summarize-class-statistics",
+        "inputs": {
+            "data_dir": {
+                "$type": "ref",
+                "value": ["functions", "ndvi", "outputs", "results"],
+            },
+        },
+        "outputs": {
+            "results": {"$type": "ref", "value": ["outputs", "results"]},
+        },
+    }
+    return wf
+
+
+def invalid_date_range_preset() -> dict[str, Any]:
+    wf = deepcopy(NDVI_WORKFLOW_SPEC)
+    wf["inputs"]["date_start"] = "2003-01-01"
+    wf["inputs"]["date_end"] = "2000-01-01"
+    return wf
+
+
+def too_many_tasks_preset() -> dict[str, Any]:
+    wf = deepcopy(NDVI_WORKFLOW_SPEC)
+    for i in range(10):
+        wf["functions"][f"ndvi-{i}"] = wf["functions"]["ndvi"]
+    return wf
+
+
+def tasks_have_no_outputs_mapping_preset() -> dict[str, Any]:
+    wf = deepcopy(NDVI_WORKFLOW_SPEC)
+    wf["functions"]["ndvi-2"] = {
+        "identifier": "ndvi",
+        "inputs": {
+            "data_dir": {
+                "$type": "ref",
+                "value": ["functions", "query", "outputs", "results"],
+            },
+        },
+        "outputs": {"results": {"name": "results", "type": "directory"}},
+    }
+    return wf
+
+
+def invalid_task_order_preset() -> dict[str, Any]:
+    wf = deepcopy(NDVI_WORKFLOW_SPEC)
+    wf["functions"]["savi"] = deepcopy(wf["functions"]["ndvi"])
+    wf["functions"]["savi"]["inputs"]["data_dir"] = {
+        "$type": "ref",
+        "value": ["functions", "ndvi", "outputs", "results"],
+    }
+    wf["functions"]["savi"]["identifier"] = "savi"
+    wf["functions"]["reproject"]["inputs"]["data_dir"] = {
+        "$type": "ref",
+        "value": ["functions", "savi", "outputs", "results"],
+    }
+    return wf
+
+
+def wf_output_not_mapped_to_task_result_preset() -> dict[str, Any]:
+    wf = deepcopy(NDVI_WORKFLOW_SPEC)
+    wf["outputs"]["test_output"] = {"name": "test_output", "type": "directory"}
+    return wf
+
+
+def invalid_path_reference_preset() -> dict[str, Any]:
+    wf = deepcopy(NDVI_WORKFLOW_SPEC)
+    wf["functions"]["ndvi"]["inputs"]["data_dir"] = {
+        "$type": "ref",
+        "value": ["functions", "invalid", "function", "ref"],
+    }
+    return wf
+
+
+def self_loop_detected_preset() -> dict[str, Any]:
+    wf = deepcopy(NDVI_WORKFLOW_SPEC)
+    wf["functions"]["reproject"]["inputs"]["data_dir"] = {
+        "$type": "ref",
+        "value": ["functions", "reproject", "outputs", "results"],
+    }
+    return wf
+
+
+def cycle_detected_preset() -> dict[str, Any]:
+    wf = deepcopy(NDVI_WORKFLOW_SPEC)
+    wf["functions"]["ndvi"]["inputs"]["data_dir"] = {
+        "$type": "ref",
+        "value": ["functions", "reproject", "outputs", "results"],
+    }
+    return wf
+
+
+def disjoined_subgraph_exist_preset() -> dict[str, Any]:
+    wf = deepcopy(NDVI_WORKFLOW_SPEC)
+    wf["functions"]["ndvi-2"] = {
+        "identifier": "ndvi",
+        "inputs": {
+            "data_dir": {
+                "$type": "atom",
+                "value": {"name": "data_dir", "type": "directory"},
+            },
+        },
+        "outputs": {
+            "results": {"$type": "atom", "value": {"name": "results", "type": "directory"}},
+        },
+    }
+    return wf
+
+
+AREA_TOO_BIG_PRESET = area_too_big_preset()
+COLLECTION_NOT_SUPPORTED_PRESET = collection_not_supported_preset()
+INVALID_DATE_RANGE_PRESET = invalid_date_range_preset()
+TOO_MANY_TASKS_PRESET = too_many_tasks_preset()
+TASKS_HAVE_NO_OUTPUTS_MAPPING_PRESET = tasks_have_no_outputs_mapping_preset()
+INVALID_TASK_ORDER_PRESET = invalid_task_order_preset()
+WF_OUTPUT_NOT_MAPPED_TO_TASK_RESULT_PRESET = wf_output_not_mapped_to_task_result_preset()
+INVALID_PATH_REFERENCE_PRESET = invalid_path_reference_preset()
+SELF_LOOP_DETECTED_PRESET = self_loop_detected_preset()
+CYCLE_DETECTED_PRESET = cycle_detected_preset()
+DISJOINED_SUBGRAPH_EXIST_PRESET = disjoined_subgraph_exist_preset()
+
+ERROR_WF_PRESETS = {
+    "err-area-too-big": {
+        "summary": "Error - Area too big",
+        "value": AREA_TOO_BIG_PRESET,
+    },
+    "err-invalid-date-range": {
+        "summary": "Error - Invalid date range",
+        "value": INVALID_DATE_RANGE_PRESET,
+    },
+    "err-invalid-dataset": {
+        "summary": "Error - Dataset not supported for this function",
+        "value": COLLECTION_NOT_SUPPORTED_PRESET,
+    },
+    "err-invalid-reference": {
+        "summary": "Error - Invalid input reference path",
+        "value": INVALID_PATH_REFERENCE_PRESET,
+    },
+    "err-invalid-task-order": {
+        "summary": "Error - Invalid task order",
+        "value": INVALID_TASK_ORDER_PRESET,
+    },
+    "err-too-many-tasks": {
+        "summary": "Error - Too many tasks",
+        "value": TOO_MANY_TASKS_PRESET,
+    },
+    "err-tasks-have-no-outputs-mapping": {
+        "summary": "Error - No output mapping",
+        "value": WF_OUTPUT_NOT_MAPPED_TO_TASK_RESULT_PRESET,
+    },
+    "err-wf-output-not-mapped-to-task-result": {
+        "summary": "Error - WF output not mapped to task result",
+        "value": WF_OUTPUT_NOT_MAPPED_TO_TASK_RESULT_PRESET,
+    },
+    "err-self-loop-detected": {
+        "summary": "Error - Self loop detected",
+        "value": SELF_LOOP_DETECTED_PRESET,
+    },
+    "err-cycle-detected": {
+        "summary": "Error - Cycle detected",
+        "value": CYCLE_DETECTED_PRESET,
+    },
+    "err-disjoined-subgraph-exist": {
+        "summary": "Error - Disjoined subgraph exist",
+        "value": DISJOINED_SUBGRAPH_EXIST_PRESET,
+    },
 }
 
 
