@@ -26,8 +26,8 @@ LAND_COVER_CHANGE_DETECTION_PRESET_SPEC = {
             "order": 0,
             "inputs": {
                 "stac_collection": "esacci-globallc",
-                "date_start": "1992-01-01T00:00:00",
-                "date_end": "2015-12-31T23:59:59",
+                "date_start": "1992-01-01T00:00:00Z",
+                "date_end": "2015-12-31T23:59:59Z",
                 "aoi": HEATHROW_AOI,
             },
         },
@@ -49,8 +49,8 @@ NDVI_PRESET = {
             "order": 0,
             "inputs": {
                 "stac_collection": "sentinel-2-l2a",
-                "date_start": "2024-01-01T00:00:00",
-                "date_end": "2024-12-31T23:59:59",
+                "date_start": "2024-01-01T00:00:00Z",
+                "date_end": "2024-12-31T23:59:59Z",
                 "aoi": INDIAN_OCEAN_AOI,
             },
         }
@@ -64,8 +64,8 @@ NDVI_CLIP_PRESET = {
             "order": 0,
             "inputs": {
                 "stac_collection": "sentinel-2-l2a",
-                "date_start": "2024-01-01T00:00:00",
-                "date_end": "2024-12-31T23:59:59",
+                "date_start": "2024-01-01T00:00:00Z",
+                "date_end": "2024-12-31T23:59:59Z",
                 "aoi": INDIAN_OCEAN_AOI,
             },
         },
