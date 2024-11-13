@@ -35,12 +35,6 @@ class ADESClientBase(abc.ABC):
     async def cancel_job(self, job_id: str | UUID) -> tuple[ErrorResponse | None, StatusInfo | None]: ...
 
     @abc.abstractmethod
-    async def register_process_from_cwl_href(
-        self,
-        cwl_href: str,
-    ) -> tuple[ErrorResponse | None, ProcessSummary | None]: ...
-
-    @abc.abstractmethod
     async def register_process_from_local_cwl_file(
         self,
         cwl_location: Path,

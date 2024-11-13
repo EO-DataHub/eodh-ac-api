@@ -1089,9 +1089,6 @@ class FakeADESClient(ADESClientBase):
         job.status = StatusCode.dismissed
         return None, job
 
-    async def register_process_from_cwl_href(self, cwl_href: str) -> tuple[ErrorResponse | None, ProcessSummary | None]:
-        return None, ProcessSummary(**REGISTER_PROCESS_RESPONSE)
-
     async def register_process_from_local_cwl_file(
         self,
         cwl_location: Path,

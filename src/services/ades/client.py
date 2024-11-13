@@ -188,36 +188,6 @@ class ADESClient(ADESClientBase):
         finally:
             await client_session.close()
 
-    async def register_process_from_cwl_href(
-        self,
-        cwl_href: str,
-    ) -> tuple[ErrorResponse | None, ProcessSummary | None]:
-        client_session, retry_client = self._get_retry_client()
-        try:
-            async with retry_client.post(
-                url=self.processes_endpoint_url,
-                headers=self.headers,
-                json={"executionUnit": {"href": cwl_href, "type": "application/cwl"}},
-            ) as response:
-                if response.status == status.HTTP_400_BAD_REQUEST:
-                    return ErrorResponse(
-                        code=status.HTTP_400_BAD_REQUEST,
-                        detail="Invalid payload.",
-                    ), None
-                if response.status == status.HTTP_409_CONFLICT:
-                    return (
-                        ErrorResponse(
-                            code=status.HTTP_409_CONFLICT,
-                            detail=f"Process with identical identifier as in '{cwl_href}' already exists.",
-                        ),
-                        None,
-                    )
-                if err := await self._handle_common_errors_if_necessary(response):
-                    return err, None
-                return None, ProcessSummary(**await response.json())
-        finally:
-            await client_session.close()
-
     async def register_process_from_cwl_href_with_download(
         self,
         cwl_href: str,
