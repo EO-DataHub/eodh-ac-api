@@ -55,21 +55,6 @@ async def get_cwl_from_href(cwl_href: str, save_dir: Path) -> Path:
 
 
 @pytest.mark.asyncio(scope="function")
-async def test_ades_registering_process_from_url(ades: ADESClient) -> None:
-    # Arrange - ensure process not registered
-    err = await ades.unregister_process(RASTER_CALCULATOR_PROCESS_IDENTIFIER)
-    assert err is None or err.code == status.HTTP_404_NOT_FOUND
-
-    # Act
-    err, result = await ades.register_process_from_cwl_href(RASTER_CALCULATOR_CWL_HREF)
-
-    # Assert
-    assert err is None
-    assert result is not None
-    assert result.id == RASTER_CALCULATOR_PROCESS_IDENTIFIER
-
-
-@pytest.mark.asyncio(scope="function")
 async def test_ades_registering_process_from_url_with_download(ades: ADESClient) -> None:
     # Arrange - ensure process not registered
     err = await ades.unregister_process(RASTER_CALCULATOR_PROCESS_IDENTIFIER)
@@ -105,11 +90,11 @@ async def test_ades_ensure_process_exists(ades: ADESClient) -> None:
 @pytest.mark.asyncio(scope="function")
 async def test_ades_registering_process_twice_results_in_conflict(ades: ADESClient) -> None:
     # Arrange - ensure process registered
-    err, _ = await ades.register_process_from_cwl_href(RASTER_CALCULATOR_CWL_HREF)
+    err, _ = await ades.register_process_from_cwl_href_with_download(RASTER_CALCULATOR_CWL_HREF)
     assert err is None or err.code == status.HTTP_409_CONFLICT
 
     # Act - register 2nd time
-    err, _ = await ades.register_process_from_cwl_href(RASTER_CALCULATOR_CWL_HREF)
+    err, _ = await ades.register_process_from_cwl_href_with_download(RASTER_CALCULATOR_CWL_HREF)
 
     # Assert
     assert err is not None
