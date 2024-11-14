@@ -12,7 +12,7 @@ ENV CONDA_ENV=notebook \
 # Install basic apt packages
 RUN echo "Installing Apt-get packages..." \
     && apt-get update --fix-missing > /dev/null \
-    && apt-get install -y apt-utils wget zip tzdata proj-bin > /dev/null \
+    && apt-get install -y apt-utils wget build-essential graphviz graphviz-dev zip tzdata proj-bin > /dev/null \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
