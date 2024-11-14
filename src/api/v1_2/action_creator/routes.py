@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import json
 import math
 import uuid
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from fastapi.security import HTTPAuthorizationCredentials
+from pydantic import ValidationError
 from starlette import status
 
 from src.api.v1_0.auth.routes import decode_token, validate_access_token
@@ -37,7 +39,7 @@ from src.utils.logging import get_logger
 _logger = get_logger(__name__)
 
 TWorkflowSpec = Annotated[
-    WorkflowSpec,
+    dict[str, Any],
     Body(
         openapi_examples={
             "land-cover-change-preset": {
@@ -119,7 +121,17 @@ async def get_available_presets() -> PresetList:
         }
     },
 )
-async def validate_workflow_specification(workflow_spec: TWorkflowSpec) -> WorkflowValidationResult:  # noqa: ARG001
+async def validate_workflow_specification(
+    workflow_spec: TWorkflowSpec,
+    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
+) -> WorkflowValidationResult:
+    try:
+        WorkflowSpec.model_validate(workflow_spec)
+    except ValidationError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=json.loads(exc.json(include_url=False)),
+        ) from exc
     return WorkflowValidationResult(valid=True)
 
 
@@ -135,9 +147,16 @@ async def validate_workflow_specification(workflow_spec: TWorkflowSpec) -> Workf
     },
 )
 async def submit_workflow(
-    workflow_spec: TWorkflowSpec,  # noqa: ARG001
+    workflow_spec: TWorkflowSpec,
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
 ) -> ActionCreatorJob:
+    try:
+        _ = WorkflowSpec.model_validate(workflow_spec)
+    except ValidationError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=json.loads(exc.json(include_url=False)),
+        ) from exc
     _ = decode_token(credential.credentials)
 
     raise HTTPException(

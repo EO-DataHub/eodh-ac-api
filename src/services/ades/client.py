@@ -8,6 +8,7 @@ from tempfile import TemporaryDirectory
 from typing import TYPE_CHECKING, Any
 from urllib.parse import urlparse
 
+import yaml
 from aiohttp import ClientSession
 from aiohttp_retry import ExponentialRetry, RetryClient
 from dotenv import load_dotenv
@@ -15,7 +16,7 @@ from starlette import status
 
 from src import consts
 from src.consts.action_creator import FUNCTIONS_REGISTRY
-from src.consts.functions import WORKFLOW_REGISTRY
+from src.consts.functions import WORKFLOW_ID_OVERRIDE_LOOKUP, WORKFLOW_REGISTRY
 from src.services.ades.base_client import ADESClientBase, ErrorResponse
 from src.services.ades.schemas import JobList, Process, ProcessList, ProcessSummary, StatusInfo
 from src.utils.logging import get_logger
@@ -41,6 +42,18 @@ def replace_placeholders_in_cwl_file(file_path: Path) -> None:
         content = content.replace(f"<<{placeholder}>>", replacement)
 
     file_path.write_text(content)
+
+
+def override_id_in_cwl_if_necessary(file_path: Path, id_override: str | None) -> bytes:
+    if id_override is not None:
+        data = yaml.safe_load(file_path.open(encoding="utf-8"))
+        for obj in data["$graph"]:
+            if obj["class"] == "Workflow":
+                obj["id"] = id_override
+                break
+        file_path.write_text(yaml.dump(data), encoding="utf-8")
+
+    return file_path.read_bytes()
 
 
 class ADESClient(ADESClientBase):
@@ -191,6 +204,7 @@ class ADESClient(ADESClientBase):
     async def register_process_from_cwl_href_with_download(
         self,
         cwl_href: str,
+        id_override: str | None = None,
     ) -> tuple[ErrorResponse | None, ProcessSummary | None]:
         with TemporaryDirectory() as tmp_dir:
             tmp_dir_path = Path(tmp_dir)
@@ -200,18 +214,20 @@ class ADESClient(ADESClientBase):
             if fp is None:
                 return ErrorResponse(code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error."), None
             replace_placeholders_in_cwl_file(fp)
-            return await self.register_process_from_local_cwl_file(fp)
+            return await self.register_process_from_local_cwl_file(fp, id_override)
 
     async def register_process_from_local_cwl_file(
         self,
         cwl_location: Path,
+        id_override: str | None = None,
     ) -> tuple[ErrorResponse | None, ProcessSummary | None]:
         client_session, retry_client = self._get_retry_client()
         try:
+            data = override_id_in_cwl_if_necessary(cwl_location, id_override)
             async with retry_client.post(
                 url=self.processes_endpoint_url,
                 headers=self.headers | {"Content-Type": "application/cwl+yaml"},
-                data=cwl_location.read_bytes(),
+                data=data,
             ) as response:
                 if response.status == status.HTTP_400_BAD_REQUEST:
                     return ErrorResponse(
@@ -368,7 +384,8 @@ class ADESClient(ADESClientBase):
         return await self.register_process_from_cwl_href_with_download(cwl_href)
 
     async def reregister_process_v1_1(
-        self, process_identifier: str
+        self,
+        process_identifier: str,
     ) -> tuple[ErrorResponse | None, ProcessSummary | None]:
         if process_identifier not in WORKFLOW_REGISTRY:
             return ErrorResponse(
@@ -379,7 +396,8 @@ class ADESClient(ADESClientBase):
         if await self.process_exists(process_identifier):
             await self.unregister_process(process_identifier)
         cwl_href = WORKFLOW_REGISTRY[process_identifier]["cwl_href"]
-        return await self.register_process_from_cwl_href_with_download(cwl_href)
+        id_override = WORKFLOW_ID_OVERRIDE_LOOKUP.get(process_identifier)
+        return await self.register_process_from_cwl_href_with_download(cwl_href, id_override=id_override)
 
     @staticmethod
     async def _handle_common_errors_if_necessary(response: ClientResponse) -> ErrorResponse | None:

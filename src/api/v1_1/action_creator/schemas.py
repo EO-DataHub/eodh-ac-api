@@ -72,8 +72,9 @@ class ActionCreatorPresetSpec(BaseModel):
     identifier: str
     name: str
     description: str | None = None
+    disabled: bool
     thumbnail_b64: str | None = None
-    workflow: dict[str, TWorkflowStep]
+    workflow: dict[str, TWorkflowStep] | None = None
 
 
 class PresetsResponse(BaseModel):
