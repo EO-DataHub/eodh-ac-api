@@ -218,13 +218,14 @@ FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING = {
     "ndvi": "raster-calculate",
     "ndwi": "raster-calculate",
     "savi": "raster-calculate",
-    "land-cover-change-detection": "lulc-change",
+    "land-cover-change-detection": "land-cover-change",
 }
 WORKFLOW_REGISTRY = {
-    "lulc-change": {
+    "land-cover-change": {
         "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/lulc-change-app.cwl",
     },
     "raster-calculate": {
         "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/raster-calculate-app.cwl",
     },
 }
+WORKFLOW_ID_OVERRIDE_LOOKUP = {"lulc-change": "land-cover-change", "land-cover-change": "land-cover-change"}

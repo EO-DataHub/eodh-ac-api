@@ -95,7 +95,7 @@ async def get_available_functions(
 async def get_available_presets(
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
 ) -> PresetsResponse:
-    presets = [p for p in PRESETS if p["visible"]]
+    presets = [p for p in PRESETS if p["visible"]]  # type: ignore[index]
     return PresetsResponse(presets=presets, total=len(presets))
 
 

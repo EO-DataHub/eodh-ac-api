@@ -11,7 +11,7 @@ import pytest
 import yaml
 
 from src import consts
-from src.services.ades.client import replace_placeholders_in_cwl_file
+from src.services.ades.client import override_id_in_cwl_if_necessary, replace_placeholders_in_cwl_file
 from src.services.ades.factory import ades_client_factory
 
 if TYPE_CHECKING:
@@ -109,3 +109,18 @@ def test_placeholder_replacement(tmp_cwl_file: Path, monkeypatch: MonkeyPatch) -
         for var_name, var_val in env_vars.items():
             if var_name in {"SENTINEL_HUB__CLIENT_ID", "SENTINEL_HUB__CLIENT_SECRET"}:
                 assert var_val == os.environ[var_name]
+
+
+def test_id_override(tmp_cwl_file: Path) -> None:
+    # Arrange
+    override_id = str(uuid.uuid4())
+
+    # Act
+    override_id_in_cwl_if_necessary(tmp_cwl_file, override_id)
+
+    # Assert
+    data = yaml.safe_load(tmp_cwl_file.open(encoding="utf-8"))
+    for obj in data["$graph"]:
+        if obj["class"] == "Workflow":
+            assert obj["id"] == override_id
+            break
