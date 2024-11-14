@@ -5,9 +5,11 @@ cryptography==43.0.1
 fastapi[standard]==0.115.0
 geojson-pydantic==1.1.1
 geopandas==1.0.1
+matplotlib==3.9.2
 networkx==3.3
 pydantic==2.9.2
 pydantic-settings==2.5.2
+pygraphviz==1.14
 pyjwt==2.9.0
 pyproj==3.7.0
 python-dotenv==1.0.1
