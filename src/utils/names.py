@@ -1,4 +1,11 @@
-"""Name utils - taken from MLFlow: https://github.com/mlflow/mlflow."""
+"""Name utils.
+
+Credits:
+
+- MLFlow: https://github.com/mlflow/mlflow
+- Names Generator: https://github.com/shamrin/namesgenerator/
+
+"""
 
 from __future__ import annotations
 
@@ -41,13 +48,13 @@ def _generate_string(sep: str, integer_scale: int) -> str:
 
     """
     predicate = random.choice(_GENERATOR_PREDICATES).lower()  # noqa: S311
-    noun = random.choice(_GENERATOR_NOUNS).lower()  # noqa: S311
+    noun = random.choice(_GENERATOR_SUFFIX).lower()  # noqa: S311
     num = random.randint(0, 10**integer_scale)  # noqa: S311
     return f"{predicate}{sep}{noun}{sep}{num}"
 
 
 def generate_random_name(sep: str = "-", integer_scale: int = 3, max_length: int = 18) -> str:
-    """Helper function for generating a random predicate, noun, and integer combination.
+    """Helper function for generating a random predicate, noun/name, and integer combination.
 
     Args:
         sep: String separator for word spacing.
@@ -64,7 +71,7 @@ def generate_random_name(sep: str = "-", integer_scale: int = 3, max_length: int
         if len(name) <= max_length:
             return name
     # If the combined length isn't below the threshold after 10 iterations, truncate it.
-    return name[:max_length]
+    return name[:max_length].strip("-")
 
 
 _GENERATOR_NOUNS = [
@@ -192,7 +199,169 @@ _GENERATOR_NOUNS = [
     "yak",
     "zebra",
 ]
-
+_GENERATOR_NAMES = [
+    "albattani",
+    "allen",
+    "almeida",
+    "agnesi",
+    "archimedes",
+    "ardinghelli",
+    "aryabhata",
+    "austin",
+    "babbage",
+    "banach",
+    "bardeen",
+    "bartik",
+    "bassi",
+    "beaver",
+    "bell",
+    "benz",
+    "bhabha",
+    "bhaskara",
+    "blackwell",
+    "bohr",
+    "booth",
+    "borg",
+    "bose",
+    "boyd",
+    "brahmagupta",
+    "brattain",
+    "brown",
+    "carson",
+    "chandrasekhar",
+    "shannon",
+    "clarke",
+    "colden",
+    "cori",
+    "cray",
+    "curran",
+    "curie",
+    "darwin",
+    "davinci",
+    "dijkstra",
+    "dubinsky",
+    "easley",
+    "edison",
+    "einstein",
+    "elion",
+    "engelbart",
+    "euclid",
+    "euler",
+    "fermat",
+    "fermi",
+    "feynman",
+    "franklin",
+    "galileo",
+    "gates",
+    "goldberg",
+    "goldstine",
+    "goldwasser",
+    "golick",
+    "goodall",
+    "haibt",
+    "hamilton",
+    "hawking",
+    "heisenberg",
+    "hermann",
+    "heyrovsky",
+    "hodgkin",
+    "hoover",
+    "hopper",
+    "hugle",
+    "hypatia",
+    "jackson",
+    "jang",
+    "jennings",
+    "jepsen",
+    "johnson",
+    "joliot",
+    "jones",
+    "kalam",
+    "kare",
+    "keller",
+    "kepler",
+    "khorana",
+    "kilby",
+    "kirch",
+    "knuth",
+    "kowalevski",
+    "lalande",
+    "lamarr",
+    "lamport",
+    "leakey",
+    "leavitt",
+    "lewin",
+    "lichterman",
+    "liskov",
+    "lovelace",
+    "lumiere",
+    "mahavira",
+    "mayer",
+    "mccarthy",
+    "mcclintock",
+    "mclean",
+    "mcnulty",
+    "meitner",
+    "meninsky",
+    "mestorf",
+    "minsky",
+    "mirzakhani",
+    "morse",
+    "murdock",
+    "neumann",
+    "newton",
+    "nightingale",
+    "nobel",
+    "noether",
+    "northcutt",
+    "noyce",
+    "panini",
+    "pare",
+    "pasteur",
+    "payne",
+    "perlman",
+    "pike",
+    "poincare",
+    "poitras",
+    "ptolemy",
+    "raman",
+    "ramanujan",
+    "ride",
+    "montalcini",
+    "ritchie",
+    "roentgen",
+    "rosalind",
+    "saha",
+    "sammet",
+    "shaw",
+    "shirley",
+    "shockley",
+    "sinoussi",
+    "snyder",
+    "spence",
+    "stallman",
+    "stonebraker",
+    "swanson",
+    "swartz",
+    "swirles",
+    "tesla",
+    "thompson",
+    "torvalds",
+    "turing",
+    "varahamihira",
+    "visvesvaraya",
+    "volhard",
+    "wescoff",
+    "wiles",
+    "williams",
+    "wilson",
+    "wing",
+    "wozniak",
+    "wright",
+    "yalow",
+    "yonath",
+]
+_GENERATOR_SUFFIX = [*_GENERATOR_NOUNS, *_GENERATOR_NAMES]
 _GENERATOR_PREDICATES = [
     "abundant",
     "able",
