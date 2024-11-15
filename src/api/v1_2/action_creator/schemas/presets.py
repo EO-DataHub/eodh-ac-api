@@ -275,7 +275,7 @@ EXAMPLE_WORKFLOWS: dict[str, Any] = {
     "land-cover": LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC,
     "water-quality": WATER_QUALITY_WORKFLOW_SPEC,
     "simplest-ndvi": SIMPLEST_NDVI_WORKFLOW_SPEC,
-    "ndvi-crop-reproject": NDVI_WORKFLOW_SPEC,
+    "ndvi-clip-reproject": NDVI_WORKFLOW_SPEC,
 }
 
 

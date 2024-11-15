@@ -1,0 +1,26 @@
+class: CommandLineTool
+id: summarize-class-statistics
+
+requirements:
+  ResourceRequirement:
+    coresMax: 1
+    ramMax: 1024
+
+hints:
+  DockerRequirement:
+    dockerPull: eopro-workflows:latest
+
+baseCommand: [ "eopro", "classification", "summarize" ]
+
+inputs:
+  data_dir:
+    type: Directory
+    inputBinding:
+      position: 1
+      prefix: --data_dir
+
+outputs:
+  results:
+    type: Directory
+    outputBinding:
+      glob: ./data/stac-catalog/

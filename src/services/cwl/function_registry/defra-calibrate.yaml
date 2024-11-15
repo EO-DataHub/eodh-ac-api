@@ -1,0 +1,31 @@
+class: CommandLineTool
+id: defra-calibrate
+
+requirements:
+  ResourceRequirement:
+    coresMax: 1
+    ramMax: 1024
+
+hints:
+  DockerRequirement:
+    dockerPull: eopro-workflows:latest
+
+baseCommand: [ "eopro", "spectral", "calibrate" ]
+
+inputs:
+  data_dir:
+    type: Directory
+    inputBinding:
+      position: 1
+      prefix: --data_dir
+  index:
+    type: string
+    inputBinding:
+      position: 2
+      prefix: --index
+
+outputs:
+  results:
+    type: Directory
+    outputBinding:
+      glob: ./data/stac-catalog/
