@@ -77,17 +77,17 @@ class WorkflowCreator:
                 }
 
         # TODO:
-        #   Generate some meaningful ID
         #   Generate label
         #   Generate doc
         #   Generate requirements
         #   Generate steps section
-
+        wf_name = generate_random_name()
         return {
             "class": "Workflow",
-            "id": generate_random_name(),
-            "label": "workflow",
-            "doc": "workflow",
+            "id": wf_name,
+            "label": f"AC Workflow {wf_name}",
+            "doc": f'AC Workflow that uses {user_inputs["dataset"]} STAC collection '
+            f'to execute following tasks: {list(wf_spec["functions"])}',
             "requirements": {"ResourceRequirement": {"coresMax": 1, "ramMax": 1024}},
             "inputs": wf_inputs,
             "outputs": wf_outputs,
