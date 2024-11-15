@@ -6,6 +6,8 @@ from typing import Any, ClassVar
 
 import yaml
 
+from src.utils.names import generate_random_name
+
 _BASE_APP_CWL_FP = Path(__file__).resolve().parent / "app.cwl"
 _FUNCTION_REGISTRY_DIR = Path(__file__).parent / "function_registry"
 
@@ -83,7 +85,7 @@ class WorkflowCreator:
 
         return {
             "class": "Workflow",
-            "id": "workflow",
+            "id": generate_random_name(),
             "label": "workflow",
             "doc": "workflow",
             "requirements": {"ResourceRequirement": {"coresMax": 1, "ramMax": 1024}},
