@@ -221,6 +221,9 @@ FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING = {
     "land-cover-change-detection": "land-cover-change",
 }
 WORKFLOW_REGISTRY = {
+    "lulc-change": {
+        "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/lulc-change-app.cwl",
+    },
     "land-cover-change": {
         "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/lulc-change-app.cwl",
     },
