@@ -41,13 +41,17 @@ class WorkflowCreator:
         return spec
 
     @classmethod
-    def wf_class_from_json_graph(cls, wf_spec: dict[str, Any]) -> dict[str, Any]:
+    def wf_class_from_json_graph(cls, wf_spec: dict[str, Any]) -> list[dict[str, Any]]:
         # Keep copy of inputs for job execution
         user_inputs = deepcopy(wf_spec["inputs"])
 
-        # Resolve WF inputs/outputs
+        # Resolve WF specs
         wf_inputs = {}
         wf_outputs = {}
+        wf_steps = {}
+
+        max_ram = 1024
+        max_cpu = 1
 
         for wf_id in wf_spec["inputs"]:
             wf_inputs[wf_id] = {
@@ -57,46 +61,31 @@ class WorkflowCreator:
             }
 
         for task_id, task in wf_spec["functions"].items():
+            wf_steps[task_id] = {"run": f"#{task_id}", "in": {}, "out": []}
+
             for input_id, task_input in task["inputs"].items():
+                wf_steps[task_id]["in"][input_id] = "TODO"  # type: ignore[index]
+
                 if task_input["$type"] != "atom":
                     continue
+
                 wf_inputs[input_id] = {
                     "label": input_id,
                     "doc": input_id,
                     "type": "string",
                 }
+
                 user_inputs[f"{task_id}/{input_id}"] = task_input["value"]
 
             for output_id, task_output in task["outputs"].items():
                 if task_output.get("$type") is None or task_output.get("$type") != "ref":
                     continue
+
                 wf_outputs[output_id] = {
                     "id": output_id,
                     "type": "Directory",
                     "outputSource": f"{task_id}/{output_id}",
                 }
-
-        # TODO:
-        #   Generate label
-        #   Generate doc
-        #   Generate requirements
-        #   Generate steps section
-        wf_name = generate_random_name()
-        return {
-            "class": "Workflow",
-            "id": wf_name,
-            "label": f"AC Workflow {wf_name}",
-            "doc": f'AC Workflow that uses {user_inputs["dataset"]} STAC collection '
-            f'to execute following tasks: {list(wf_spec["functions"])}',
-            "requirements": {"ResourceRequirement": {"coresMax": 1, "ramMax": 1024}},
-            "inputs": wf_inputs,
-            "outputs": wf_outputs,
-        }
-
-    @classmethod
-    def cwl_from_wf_spec(cls, wf_spec: dict[str, Any]) -> str:
-        # Build WF spec
-        wf_class = cls.wf_class_from_json_graph(wf_spec)
 
         # Build tasks
         tasks = [
@@ -104,7 +93,31 @@ class WorkflowCreator:
             for task_id, func_spec in wf_spec["functions"].items()
         ]
 
+        for task in tasks:
+            max_ram = max(max_ram, task["requirements"]["ResourceRequirement"]["ramMax"])
+            max_cpu = max(max_ram, task["requirements"]["ResourceRequirement"]["coresMax"])
+
+        # TODO:
+        #   Generate steps section
+        wf_name = generate_random_name()
+        return [
+            {
+                "class": "Workflow",
+                "id": wf_name,
+                "label": f"AC Workflow {wf_name}",
+                "doc": f'AC Workflow that uses {user_inputs["dataset"]} STAC collection '
+                f'to execute following tasks: {list(wf_spec["functions"])}',
+                "requirements": {"ResourceRequirement": {"coresMax": max_cpu, "ramMax": max_ram}},
+                "inputs": wf_inputs,
+                "outputs": wf_outputs,
+                "steps": wf_steps,
+            },
+            *tasks,
+        ]
+
+    @classmethod
+    def cwl_from_wf_spec(cls, wf_spec: dict[str, Any]) -> str:
         # Build full WF app
         app_spec = yaml.safe_load(_BASE_APP_CWL_FP.open(encoding="utf-8"))
-        app_spec["$graph"] = [wf_class, *tasks]
+        app_spec["$graph"] = cls.wf_class_from_json_graph(wf_spec)
         return yaml.dump(app_spec, sort_keys=False, indent=2)
