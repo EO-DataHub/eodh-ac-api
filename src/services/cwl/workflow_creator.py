@@ -42,6 +42,13 @@ class WorkflowCreator:
         return spec
 
     @classmethod
+    def resolve_input(cls, task_input: dict[str, Any]) -> Any:
+        sanitized_input_val = [i for i in task_input["value"] if i not in {"inputs", "functions", "outputs"}]
+        if "inputs" in task_input["value"]:
+            return "/".join(sanitized_input_val)
+        return {"source": "/".join(sanitized_input_val)}
+
+    @classmethod
     def wf_cwl_from_json_graph(cls, wf_spec: dict[str, Any]) -> list[dict[str, Any]]:
         # Keep copy of inputs for job execution
         user_inputs = deepcopy(wf_spec["inputs"])
@@ -65,23 +72,25 @@ class WorkflowCreator:
             wf_steps[task_id] = {"run": f"#{task_id}", "in": {}, "out": []}
 
             for input_id, task_input in task["inputs"].items():
-                wf_steps[task_id]["in"][input_id] = "TODO"  # type: ignore[index]
-
-                if task_input["$type"] != "atom":
+                if task_input["$type"] == "atom":
+                    user_inputs[f"{task_id}/{input_id}"] = task_input["value"]
+                    wf_steps[task_id]["in"][input_id] = task_input["value"]  # type: ignore[index]
                     continue
 
+                wf_steps[task_id]["in"][input_id] = cls.resolve_input(task_input)  # type: ignore[index]
                 wf_inputs[input_id] = {
                     "label": input_id,
                     "doc": input_id,
                     "type": "string",
                 }
-
                 user_inputs[f"{task_id}/{input_id}"] = task_input["value"]
 
             for output_id, task_output in task["outputs"].items():
                 if task_output.get("$type") is None or task_output.get("$type") != "ref":
+                    wf_steps[task_id]["out"].append(output_id)  # type: ignore[attr-defined]
                     continue
 
+                wf_steps[task_id]["out"].append(output_id)  # type: ignore[attr-defined]
                 wf_outputs[output_id] = {
                     "id": output_id,
                     "type": "Directory",
