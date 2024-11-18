@@ -26,7 +26,7 @@ if TYPE_CHECKING:
         "DELETE-job",
     ],
 )
-@pytest.mark.parametrize("api_version", ["/api/v1.0"], ids=["v1.0"])
+@pytest.mark.parametrize("api_version", ["/api/v1.0", "/api/v1.1"], ids=["v1.0", "v1.1"])
 def test_functions_endpoint_returns_forbidden_error_when_no_token_specified(
     api_version: str,
     method: str,
@@ -54,7 +54,7 @@ def test_functions_endpoint_returns_forbidden_error_when_no_token_specified(
         "DELETE-job",
     ],
 )
-@pytest.mark.parametrize("api_version", ["/api/v1.0"], ids=["v1.0"])
+@pytest.mark.parametrize("api_version", ["/api/v1.0", "/api/v1.1"], ids=["v1.0", "v1.1"])
 def test_functions_endpoint_returns_unauthorized_error_when_bad_token(
     api_version: str,
     method: str,

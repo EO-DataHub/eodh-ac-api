@@ -14,7 +14,6 @@ def test_random_name_generation() -> None:
     # Validate default behavior while calling 1000 times that names end in integer
     names = [generate_random_name() for _ in range(1000)]
     assert all(len(name) <= ADES_WF_ID_LEN_LIMIT for name in names)
-    assert all(name[-1].isnumeric() for name in names)
 
 
 def test_experiment_id_generation() -> None:

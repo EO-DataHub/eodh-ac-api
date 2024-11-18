@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import pytest
 from fastapi import status
 
 from src.core.settings import current_settings
@@ -10,11 +11,12 @@ if TYPE_CHECKING:
     from fastapi.testclient import TestClient
 
 
-def test_authenticate_success(client: TestClient) -> None:
+@pytest.mark.parametrize("api_version", ["1.0", "1.1", "1.2"])
+def test_authenticate_success(api_version: str, client: TestClient) -> None:
     settings = current_settings()
 
     response = client.post(
-        "/api/v1.0/auth/token",
+        f"/api/v{api_version}/auth/token",
         json={"username": settings.eodh_auth.username, "password": settings.eodh_auth.password},
     )
 
@@ -23,9 +25,10 @@ def test_authenticate_success(client: TestClient) -> None:
     assert response.json()["refresh_token"] is not None
 
 
-def test_authenticate_failure(client: TestClient) -> None:
+@pytest.mark.parametrize("api_version", ["1.0", "1.1", "1.2"])
+def test_authenticate_failure(api_version: str, client: TestClient) -> None:
     response = client.post(
-        "/api/v1.0/auth/token",
+        f"/api/v{api_version}/auth/token",
         json={"username": "test", "password": "test"},
     )
 
@@ -33,16 +36,17 @@ def test_authenticate_failure(client: TestClient) -> None:
     assert response.json()["detail"]["error_description"] == "Invalid user credentials"
 
 
-def test_introspect_success(client: TestClient) -> None:
+@pytest.mark.parametrize("api_version", ["1.0", "1.1", "1.2"])
+def test_introspect_success(api_version: str, client: TestClient) -> None:
     settings = current_settings()
 
     token_response = client.post(
-        "/api/v1.0/auth/token",
+        f"/api/v{api_version}/auth/token",
         json={"username": settings.eodh_auth.username, "password": settings.eodh_auth.password},
     )
 
     response = client.post(
-        "/api/v1.0/auth/token/introspection",
+        f"/api/v{api_version}/auth/token/introspection",
         headers={"Authorization": f"Bearer {token_response.json()['access_token']}"},
     )
 

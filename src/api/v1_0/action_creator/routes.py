@@ -257,7 +257,7 @@ async def submit_function_websocket(  # noqa: C901
         inputs_cls = FUNCTION_TO_INPUTS_LOOKUP[creation_spec.preset_function.function_identifier]
         inputs = inputs_cls(**creation_spec.preset_function.inputs).as_ogc_process_inputs()
 
-        ades = ades_client_factory(workspace=token, token=introspected_token["preferred_username"])
+        ades = ades_client_factory(token=token, workspace=introspected_token["preferred_username"])
 
         err = await ades.ensure_process_exists(creation_spec.preset_function.function_identifier)
 
