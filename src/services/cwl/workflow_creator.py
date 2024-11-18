@@ -30,6 +30,7 @@ class WorkflowCreator:
         "defra-calibrate": "defra-calibrate.yaml",
         "clip": "clip.yaml",
         "reproject": "reproject.yaml",
+        "stac-join": "stac-join.yaml",
         "summarize-class-statistics": "summarize-class-statistics.yaml",
     }
 
@@ -41,7 +42,7 @@ class WorkflowCreator:
         return spec
 
     @classmethod
-    def wf_class_from_json_graph(cls, wf_spec: dict[str, Any]) -> list[dict[str, Any]]:
+    def wf_cwl_from_json_graph(cls, wf_spec: dict[str, Any]) -> list[dict[str, Any]]:
         # Keep copy of inputs for job execution
         user_inputs = deepcopy(wf_spec["inputs"])
 
@@ -97,8 +98,6 @@ class WorkflowCreator:
             max_ram = max(max_ram, task["requirements"]["ResourceRequirement"]["ramMax"])
             max_cpu = max(max_ram, task["requirements"]["ResourceRequirement"]["coresMax"])
 
-        # TODO:
-        #   Generate steps section
         wf_name = generate_random_name()
         return [
             {
@@ -119,5 +118,5 @@ class WorkflowCreator:
     def cwl_from_wf_spec(cls, wf_spec: dict[str, Any]) -> str:
         # Build full WF app
         app_spec = yaml.safe_load(_BASE_APP_CWL_FP.open(encoding="utf-8"))
-        app_spec["$graph"] = cls.wf_class_from_json_graph(wf_spec)
+        app_spec["$graph"] = cls.wf_cwl_from_json_graph(wf_spec)
         return yaml.dump(app_spec, sort_keys=False, indent=2)

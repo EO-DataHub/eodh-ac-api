@@ -1,0 +1,31 @@
+class: CommandLineTool
+id: stac-join
+
+requirements:
+  ResourceRequirement:
+    coresMax: 1
+    ramMax: 1024
+
+hints:
+  DockerRequirement:
+    dockerPull: eopro-workflows:latest
+
+baseCommand: [ "eopro", "stac", "join" ]
+
+inputs:
+  stac_catalog_dir_1:
+    type: Directory
+    inputBinding:
+      position: 1
+      prefix: --stac_catalog_dir_1
+  stac_catalog_dir_2:
+    type: Directory
+    inputBinding:
+      position: 1
+      prefix: --stac_catalog_dir_2
+
+outputs:
+  results:
+    type: Directory
+    outputBinding:
+      glob: ./data/stac-catalog/
