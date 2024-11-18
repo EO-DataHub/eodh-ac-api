@@ -115,7 +115,7 @@ WATER_QUALITY_WORKFLOW_SPEC: dict[str, Any] = {
             },
             "outputs": {"results": {"name": "results", "type": "directory"}},
         },
-        "calibrate": {
+        "calibrate_cya": {
             "identifier": "defra-calibrate",
             "inputs": {
                 "data_dir": {
@@ -125,14 +125,104 @@ WATER_QUALITY_WORKFLOW_SPEC: dict[str, Any] = {
             },
             "outputs": {"results": {"name": "results", "type": "directory"}},
         },
-        "reproject": {
+        "reproject_cya": {
             "identifier": "reproject",
             "inputs": {
                 "data_dir": {
                     "$type": "ref",
-                    "value": ["functions", "calibrate", "outputs", "results"],
+                    "value": ["functions", "calibrate_cya", "outputs", "results"],
                 },
                 "epsg": {"$type": "atom", "value": "EPSG:3857"},
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "doc": {
+            "identifier": "doc",
+            "inputs": {
+                "data_dir": {
+                    "$type": "ref",
+                    "value": ["functions", "query", "outputs", "results"],
+                },
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "calibrate_doc": {
+            "identifier": "defra-calibrate",
+            "inputs": {
+                "data_dir": {
+                    "$type": "ref",
+                    "value": ["functions", "doc", "outputs", "results"],
+                },
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "reproject_doc": {
+            "identifier": "reproject",
+            "inputs": {
+                "data_dir": {
+                    "$type": "ref",
+                    "value": ["functions", "calibrate_doc", "outputs", "results"],
+                },
+                "epsg": {"$type": "atom", "value": "EPSG:3857"},
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "cdom": {
+            "identifier": "cdom",
+            "inputs": {
+                "data_dir": {
+                    "$type": "ref",
+                    "value": ["functions", "query", "outputs", "results"],
+                },
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "calibrate_cdom": {
+            "identifier": "defra-calibrate",
+            "inputs": {
+                "data_dir": {
+                    "$type": "ref",
+                    "value": ["functions", "cdom", "outputs", "results"],
+                },
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "reproject_cdom": {
+            "identifier": "reproject",
+            "inputs": {
+                "data_dir": {
+                    "$type": "ref",
+                    "value": ["functions", "calibrate_cdom", "outputs", "results"],
+                },
+                "epsg": {"$type": "atom", "value": "EPSG:3857"},
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "stac_join_1": {
+            "identifier": "stac-join",
+            "inputs": {
+                "stac_catalog_dir_1": {
+                    "$type": "ref",
+                    "value": ["functions", "reproject_cya", "outputs", "results"],
+                },
+                "stac_catalog_dir_2": {
+                    "$type": "ref",
+                    "value": ["functions", "reproject_doc", "outputs", "results"],
+                },
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "stac_join_2": {
+            "identifier": "stac-join",
+            "inputs": {
+                "stac_catalog_dir_1": {
+                    "$type": "ref",
+                    "value": ["functions", "stac_join_1", "outputs", "results"],
+                },
+                "stac_catalog_dir_2": {
+                    "$type": "ref",
+                    "value": ["functions", "reproject_cdom", "outputs", "results"],
+                },
             },
             "outputs": {
                 "results": {

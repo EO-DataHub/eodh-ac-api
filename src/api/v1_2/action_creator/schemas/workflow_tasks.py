@@ -986,19 +986,9 @@ class DefraCalibrateTask(WorkflowTask):
         }
 
 
-class StacJoinInput1(BaseModel):
-    name: Literal["stac_catalog_dir_1"] = "stac_catalog_dir_1"
-    type: Literal["directory"] = "directory"
-
-
-class StacJoinInput2(BaseModel):
-    name: Literal["stac_catalog_dir_2"] = "stac_catalog_dir_2"
-    type: Literal["directory"] = "directory"
-
-
 class StacJoinInputs(BaseModel):
-    stac_catalog_dir_1: StacJoinInput1
-    stac_catalog_dir_2: StacJoinInput2
+    stac_catalog_dir_1: DataDirInput
+    stac_catalog_dir_2: DataDirInput
 
 
 class StacJoinTask(WorkflowTask):
