@@ -373,7 +373,7 @@ def invalid_date_range_preset() -> dict[str, Any]:
 
 def too_many_tasks_preset() -> dict[str, Any]:
     wf = deepcopy(NDVI_WORKFLOW_SPEC)
-    for i in range(10):
+    for i in range(50):
         wf["functions"][f"ndvi-{i}"] = wf["functions"]["ndvi"]
     return wf
 

@@ -31,7 +31,7 @@ from src.api.v1_2.action_creator.schemas.workflow_tasks import (
 )
 from src.services.validation_utils import aoi_must_be_present, ensure_area_smaller_than, validate_date_range
 
-MAX_WF_TASKS = 10
+MAX_WF_TASKS = 15
 
 
 class MainWorkflowInputs(BaseModel):

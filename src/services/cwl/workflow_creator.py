@@ -6,6 +6,7 @@ from typing import Any, ClassVar
 
 import yaml
 
+from src.api.v1_2.action_creator.schemas.workflow_tasks import SPECTRAL_INDEX_TASK_IDS
 from src.utils.names import generate_random_name
 
 _BASE_APP_CWL_FP = Path(__file__).resolve().parent / "app.cwl"
@@ -71,19 +72,28 @@ class WorkflowCreator:
         for task_id, task in wf_spec["functions"].items():
             wf_steps[task_id] = {"run": f"#{task_id}", "in": {}, "out": []}
 
+            # Handle `index` input for spectral-index task
+            if task["identifier"] in SPECTRAL_INDEX_TASK_IDS:
+                user_inputs[f"{task_id}_index"] = task_id
+                wf_inputs[f"{task_id}_index"] = {
+                    "label": f"{task_id}_index",
+                    "doc": f"{task_id}_index",
+                    "type": "string",
+                }
+                wf_steps[task_id]["in"]["index"] = f"{task_id}_index"  # type: ignore[index]
+
             for input_id, task_input in task["inputs"].items():
                 if task_input["$type"] == "atom":
-                    user_inputs[f"{task_id}/{input_id}"] = task_input["value"]
-                    wf_steps[task_id]["in"][input_id] = task_input["value"]  # type: ignore[index]
+                    user_inputs[f"{task_id}_{input_id}"] = str(task_input["value"])
+                    wf_steps[task_id]["in"][input_id] = f"{task_id}_{input_id}"  # type: ignore[index]
+                    wf_inputs[f"{task_id}_{input_id}"] = {
+                        "label": f"{task_id}_{input_id}",
+                        "doc": f"{task_id}_{input_id}",
+                        "type": "string",
+                    }
                     continue
 
                 wf_steps[task_id]["in"][input_id] = cls.resolve_input(task_input)  # type: ignore[index]
-                wf_inputs[input_id] = {
-                    "label": input_id,
-                    "doc": input_id,
-                    "type": "string",
-                }
-                user_inputs[f"{task_id}/{input_id}"] = task_input["value"]
 
             for output_id, task_output in task["outputs"].items():
                 if task_output.get("$type") is None or task_output.get("$type") != "ref":
