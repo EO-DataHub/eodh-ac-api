@@ -133,6 +133,7 @@ combine-as-imports = true
 "**/{tests}/*" = [
     "S101", # Allow "use of assert detected"
     "PLC2701", # Allow private imports
+    "S404", # Allow subprocess usage in tests
 ]
 "src/services/validation_utils.py" = [
     "RUF027", # see: https://pypi.org/project/Pylint - Possible f-string without an `f` prefix
