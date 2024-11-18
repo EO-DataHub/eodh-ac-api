@@ -122,9 +122,14 @@ def test_example_workflows(wf_spec: tuple[str, dict[str, Any]]) -> None:
     WorkflowSpec(**wf_spec[1])
 
 
-def test_wf_visualization(tmp_path: Path) -> None:
-    for wf_id, wf_spec in EXAMPLE_WORKFLOWS.items():
-        g = wf_as_networkx_graph(wf_spec, directed=True)
-        fig = visualize_workflow_graph(g)
-        fig.savefig(tmp_path / f"workflow-{wf_id}.png")
-        plt.close(fig)
+@pytest.mark.parametrize(
+    "wf_spec_id_tuple",
+    list(EXAMPLE_WORKFLOWS.items()),
+    ids=operator.itemgetter(0),
+)
+def test_wf_visualization(wf_spec_id_tuple: tuple[str, dict[str, Any]], tmp_path: Path) -> None:
+    wf_id, wf_spec = wf_spec_id_tuple
+    g = wf_as_networkx_graph(wf_spec, directed=True)
+    fig = visualize_workflow_graph(g)
+    fig.savefig(tmp_path / f"workflow-{wf_id}.png")
+    plt.close(fig)
