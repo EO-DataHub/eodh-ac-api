@@ -24,14 +24,7 @@ def test_lulc_change_preset_parsing() -> None:
                     "date_start": "1994-01-01T00:00:00",
                     "date_end": "2015-12-31T00:00:00",
                     "limit": 10,
-                },
-                "outputs": {"results": {"name": "results", "type": "directory"}},
-            },
-            "clip": {
-                "identifier": "clip",
-                "inputs": {
-                    "data_dir": {"name": "results", "type": "directory"},
-                    "aoi": HEATHROW_AOI,
+                    "clip": True,
                 },
                 "outputs": {"results": {"name": "results", "type": "directory"}},
             },
