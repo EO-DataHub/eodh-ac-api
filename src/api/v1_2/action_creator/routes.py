@@ -87,6 +87,7 @@ action_creator_router_v1_2 = APIRouter(
     },
 )
 async def get_available_functions(
+    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
     dataset: Annotated[str | None, Query(max_length=64, description="Dataset")] = None,
 ) -> FunctionsResponse:
     funcs = [f for f in FUNCTIONS if f["visible"]]
@@ -106,7 +107,9 @@ async def get_available_functions(
         }
     },
 )
-async def get_available_presets() -> PresetList:
+async def get_available_presets(
+    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
+) -> PresetList:
     return PresetList(presets=PRESETS, total=len(PRESETS))
 
 
