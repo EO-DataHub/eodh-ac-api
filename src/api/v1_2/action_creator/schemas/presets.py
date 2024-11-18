@@ -42,17 +42,7 @@ LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC: dict[str, Any] = {
                 "date_start": {"$type": "ref", "value": ["inputs", "date_start"]},
                 "date_end": {"$type": "ref", "value": ["inputs", "date_end"]},
                 "limit": {"$type": "atom", "value": 10},
-            },
-            "outputs": {"results": {"name": "results", "type": "directory"}},
-        },
-        "clip": {
-            "identifier": "clip",
-            "inputs": {
-                "data_dir": {
-                    "$type": "ref",
-                    "value": ["functions", "query", "outputs", "results"],
-                },
-                "aoi": {"$type": "ref", "value": ["inputs", "area"]},
+                "clip": {"$type": "atom", "value": True},
             },
             "outputs": {"results": {"name": "results", "type": "directory"}},
         },
@@ -61,7 +51,7 @@ LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC: dict[str, Any] = {
             "inputs": {
                 "data_dir": {
                     "$type": "ref",
-                    "value": ["functions", "clip", "outputs", "results"],
+                    "value": ["functions", "query", "outputs", "results"],
                 },
             },
             "outputs": {"results": {"name": "results", "type": "directory"}},
@@ -108,20 +98,10 @@ WATER_QUALITY_WORKFLOW_SPEC: dict[str, Any] = {
                 "stac_collection": {"$type": "ref", "value": ["inputs", "dataset"]},
                 "date_start": {"$type": "ref", "value": ["inputs", "date_start"]},
                 "date_end": {"$type": "ref", "value": ["inputs", "date_end"]},
+                "clip": {"$type": "atom", "value": True},
                 "limit": {"$type": "atom", "value": 10},
                 "cloud_cover_min": {"$type": "atom", "value": 0},
                 "cloud_cover_max": {"$type": "atom", "value": 100},
-            },
-            "outputs": {"results": {"name": "results", "type": "directory"}},
-        },
-        "clip": {
-            "identifier": "clip",
-            "inputs": {
-                "data_dir": {
-                    "$type": "ref",
-                    "value": ["functions", "query", "outputs", "results"],
-                },
-                "aoi": {"$type": "ref", "value": ["inputs", "area"]},
             },
             "outputs": {"results": {"name": "results", "type": "directory"}},
         },
@@ -130,7 +110,7 @@ WATER_QUALITY_WORKFLOW_SPEC: dict[str, Any] = {
             "inputs": {
                 "data_dir": {
                     "$type": "ref",
-                    "value": ["functions", "clip", "outputs", "results"],
+                    "value": ["functions", "query", "outputs", "results"],
                 },
             },
             "outputs": {"results": {"name": "results", "type": "directory"}},
@@ -191,6 +171,7 @@ SIMPLEST_NDVI_WORKFLOW_SPEC: dict[str, Any] = {
                 "stac_collection": {"$type": "ref", "value": ["inputs", "dataset"]},
                 "date_start": {"$type": "ref", "value": ["inputs", "date_start"]},
                 "date_end": {"$type": "ref", "value": ["inputs", "date_end"]},
+                "clip": {"$type": "atom", "value": True},
                 "limit": {"$type": "atom", "value": 10},
                 "cloud_cover_min": {"$type": "atom", "value": 0},
                 "cloud_cover_max": {"$type": "atom", "value": 100},
@@ -227,20 +208,10 @@ NDVI_WORKFLOW_SPEC: dict[str, Any] = {
                 "stac_collection": {"$type": "ref", "value": ["inputs", "dataset"]},
                 "date_start": {"$type": "ref", "value": ["inputs", "date_start"]},
                 "date_end": {"$type": "ref", "value": ["inputs", "date_end"]},
+                "clip": {"$type": "atom", "value": True},
                 "limit": {"$type": "atom", "value": 10},
                 "cloud_cover_min": {"$type": "atom", "value": 0},
                 "cloud_cover_max": {"$type": "atom", "value": 100},
-            },
-            "outputs": {"results": {"name": "results", "type": "directory"}},
-        },
-        "clip": {
-            "identifier": "clip",
-            "inputs": {
-                "data_dir": {
-                    "$type": "ref",
-                    "value": ["functions", "query", "outputs", "results"],
-                },
-                "aoi": {"$type": "ref", "value": ["inputs", "area"]},
             },
             "outputs": {"results": {"name": "results", "type": "directory"}},
         },
@@ -249,7 +220,7 @@ NDVI_WORKFLOW_SPEC: dict[str, Any] = {
             "inputs": {
                 "data_dir": {
                     "$type": "ref",
-                    "value": ["functions", "clip", "outputs", "results"],
+                    "value": ["functions", "query", "outputs", "results"],
                 },
             },
             "outputs": {"results": {"name": "results", "type": "directory"}},
