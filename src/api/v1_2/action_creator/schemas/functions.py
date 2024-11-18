@@ -62,6 +62,7 @@ class FunctionCategory(StrEnum):
     raster_ops = "Raster Operations"
     vector_ops = "Vector Operations"
     spectral_indices = "Spectral Indices"
+    stac_ops = "STAC Operations"
     other = "Other"
 
 

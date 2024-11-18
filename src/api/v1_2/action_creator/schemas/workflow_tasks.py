@@ -80,6 +80,8 @@ class QueryTaskInputsBase(BaseModel):
     area: Polygon
     date_start: datetime | None
     date_end: datetime | None
+    limit: int | None = 10
+    clip: bool = False
 
     @field_validator("area", mode="after")
     @classmethod
@@ -97,12 +99,9 @@ class QueryTaskInputsBase(BaseModel):
 
 class Sentinel1QueryTaskInputs(QueryTaskInputsBase):
     stac_collection: Literal["sentinel-1-grd"] = "sentinel-1-grd"
-    area: Polygon
     date_start: Annotated[datetime | None, Field(None, ge="2014-10-10")]
-    date_end: datetime | None
     orbit_direction: list[OrbitDirection] = Field(default_factory=list)
     polarization: list[Polarization] = Field(default_factory=list)
-    limit: int | None = 10
 
 
 class Sentinel1DatasetQueryTask(WorkflowTask):
@@ -161,6 +160,13 @@ class Sentinel1DatasetQueryTask(WorkflowTask):
                     "options": [FunctionInputOption(label=i.upper(), value=i) for i in Polarization],
                     "required": True,
                 },
+                "clip": {
+                    "name": "clip",
+                    "description": "A flag indicating whether to clip the results to the specified Area",
+                    "type": FuncInputOutputType.boolean,
+                    "required": False,
+                    "default": False,
+                },
                 "limit": {
                     "name": "limit",
                     "description": "Limit for number of results",
@@ -181,12 +187,9 @@ class Sentinel1DatasetQueryTask(WorkflowTask):
 
 class Sentinel2QueryTaskInputs(QueryTaskInputsBase):
     stac_collection: Literal["sentinel-2-l1c", "sentinel-2-l2a", "sentinel-2-l2a-ard"] = "sentinel-2-l2a-ard"
-    area: Polygon
     date_start: Annotated[datetime | None, Field(None, ge="2015-06-27")]
-    date_end: datetime | None
     cloud_cover_min: Annotated[int, Field(default=0, ge=0, le=100)]
     cloud_cover_max: Annotated[int, Field(default=100, ge=0, le=100)]
-    limit: int | None = 10
 
     @field_validator("cloud_cover_max", mode="after")
     @classmethod
@@ -267,6 +270,13 @@ class Sentinel2DatasetQueryTask(WorkflowTask):
                         FunctionInputConstraint(operator=ConstraintOperator.le, value=100),
                     ],
                 },
+                "clip": {
+                    "name": "clip",
+                    "description": "A flag indicating whether to clip the results to the specified Area",
+                    "type": FuncInputOutputType.boolean,
+                    "required": False,
+                    "default": False,
+                },
                 "limit": {
                     "name": "limit",
                     "description": "Limit for number of results",
@@ -287,10 +297,8 @@ class Sentinel2DatasetQueryTask(WorkflowTask):
 
 class GlobalLandCoverQueryTaskInputs(QueryTaskInputsBase):
     stac_collection: Literal["esa-lccci-glcm"] = "esa-lccci-glcm"
-    area: Polygon
     date_start: Annotated[datetime | None, Field(None, ge="1992-01-01T00:00:00", le="2015-12-31T23:59:59")]
     date_end: Annotated[datetime | None, Field(None, ge="1992-01-01T00:00:00", le="2015-12-31T23:59:59")]
-    limit: int | None = 10
 
 
 class GlobalLandCoverDatasetQueryTask(WorkflowTask):
@@ -350,6 +358,13 @@ class GlobalLandCoverDatasetQueryTask(WorkflowTask):
                     "required": False,
                     "default": 10,
                 },
+                "clip": {
+                    "name": "clip",
+                    "description": "A flag indicating whether to clip the results to the specified Area",
+                    "type": FuncInputOutputType.boolean,
+                    "required": False,
+                    "default": False,
+                },
             },
             "outputs": {
                 "results": {
@@ -363,10 +378,8 @@ class GlobalLandCoverDatasetQueryTask(WorkflowTask):
 
 class CorineLandCoverQueryTaskInputs(QueryTaskInputsBase):
     stac_collection: Literal["clms-corine-lc"] = "clms-corine-lc"
-    area: Polygon
     date_start: Annotated[datetime | None, Field(None, ge="1990-01-01T00:00:00", le="2018-12-31T23:59:59")]
     date_end: Annotated[datetime | None, Field(None, ge="1990-01-01T00:00:00", le="2018-12-31T23:59:59")]
-    limit: int | None = 10
 
 
 class CorineLandCoverDatasetQueryTask(WorkflowTask):
@@ -419,6 +432,13 @@ class CorineLandCoverDatasetQueryTask(WorkflowTask):
                         FunctionInputConstraint(operator=ConstraintOperator.le, value="2018-12-31T23:59:59"),
                     ],
                 },
+                "clip": {
+                    "name": "clip",
+                    "description": "A flag indicating whether to clip the results to the specified Area",
+                    "type": FuncInputOutputType.boolean,
+                    "required": False,
+                    "default": False,
+                },
                 "limit": {
                     "name": "limit",
                     "description": "Limit for number of results",
@@ -439,10 +459,8 @@ class CorineLandCoverDatasetQueryTask(WorkflowTask):
 
 class WaterBodiesQueryTaskInputs(QueryTaskInputsBase):
     stac_collection: Literal["clms-water-bodies"] = "clms-water-bodies"
-    area: Polygon
     date_start: Annotated[datetime | None, Field(None, ge="2020-01-01T00:00:00")]
     date_end: Annotated[datetime | None, Field(None, ge="2020-01-01T00:00:00")]
-    limit: int | None = 10
 
 
 class WaterBodiesDatasetQueryTask(WorkflowTask):
@@ -492,6 +510,13 @@ class WaterBodiesDatasetQueryTask(WorkflowTask):
                     "constraints": [
                         FunctionInputConstraint(operator=ConstraintOperator.ge, value="2020-01-01T00:00:00")
                     ],
+                },
+                "clip": {
+                    "name": "clip",
+                    "description": "A flag indicating whether to clip the results to the specified Area",
+                    "type": FuncInputOutputType.boolean,
+                    "required": False,
+                    "default": False,
                 },
                 "limit": {
                     "name": "limit",
@@ -961,6 +986,68 @@ class DefraCalibrateTask(WorkflowTask):
         }
 
 
+class StacJoinInput1(BaseModel):
+    name: Literal["stac_catalog_dir_1"] = "stac_catalog_dir_1"
+    type: Literal["directory"] = "directory"
+
+
+class StacJoinInput2(BaseModel):
+    name: Literal["stac_catalog_dir_2"] = "stac_catalog_dir_2"
+    type: Literal["directory"] = "directory"
+
+
+class StacJoinInputs(BaseModel):
+    stac_catalog_dir_1: StacJoinInput1
+    stac_catalog_dir_2: StacJoinInput2
+
+
+class StacJoinTask(WorkflowTask):
+    identifier: Literal["stac-join"] = "stac-join"
+    inputs: StacJoinInputs
+    outputs: DirectoryOutputs
+
+    @classmethod
+    def as_function_spec(cls) -> dict[str, Any]:
+        return {
+            "name": "STAC Join",
+            "identifier": "stac-join",
+            "category": FunctionCategory.stac_ops,
+            "tags": ["STAC", "Result Join", "STAC Join"],
+            "description": "Join results from two STAC catalogs.",
+            "visible": True,
+            "compatible_input_datasets": [
+                "sentinel-1-grd",
+                "sentinel-2-l1c",
+                "sentinel-2-l2a",
+                "sentinel-2-l2a-ard",
+                "esa-lccci-glcm",
+                "clms-corine-lc",
+                "clms-water-bodies",
+            ],
+            "inputs": {
+                "stac_catalog_dir_1": {
+                    "name": "stac_catalog_dir_1",
+                    "description": "Directory containing results from first STAC catalog",
+                    "type": FuncInputOutputType.directory,
+                    "required": True,
+                },
+                "stac_catalog_dir_2": {
+                    "name": "stac_catalog_dir_2",
+                    "description": "Directory containing results from second STAC catalog",
+                    "type": FuncInputOutputType.directory,
+                    "required": True,
+                },
+            },
+            "outputs": {
+                "results": {
+                    "name": "results",
+                    "type": FuncInputOutputType.directory,
+                    "description": "Directory to store the joined data",
+                }
+            },
+        }
+
+
 class WorkflowValidationResult(BaseModel):
     valid: bool
 
@@ -988,6 +1075,8 @@ WORKFLOW_TASKS = [
     DefraCalibrateTask,
     # Pixel classification
     SummarizeClassStatisticsTask,
+    # STAC
+    StacJoinTask,
 ]
 
 TWorkflowTask = Annotated[Union[*WORKFLOW_TASKS], Field(discriminator="identifier")]  # type: ignore[valid-type]
