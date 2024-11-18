@@ -14,8 +14,8 @@ _FUNCTION_REGISTRY_DIR = Path(__file__).parent / "function_registry"
 
 class WorkflowCreator:
     _identifier_to_cwl_lookup: ClassVar[dict[str, Any]] = {
-        "s1-ds-query": "ds-query.yaml",
-        "s2-ds-query": "ds-query.yaml",
+        "s1-ds-query": "s1-ds-query.yaml",
+        "s2-ds-query": "s2-ds-query.yaml",
         "esa-glc-ds-query": "ds-query.yaml",
         "corine-lc-ds-query": "ds-query.yaml",
         "water-bodies-ds-query": "ds-query.yaml",

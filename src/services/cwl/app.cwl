@@ -1,4 +1,4 @@
-cwlVersion: v1.0
+cwlVersion: v1.2
 $namespaces:
   s: https://schema.org/
 s:softwareVersion: 0.1.2

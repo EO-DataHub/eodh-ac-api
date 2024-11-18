@@ -1052,14 +1052,7 @@ class WorkflowValidationResult(BaseModel):
     valid: bool
 
 
-WORKFLOW_TASKS = [
-    # DS Queries
-    Sentinel1DatasetQueryTask,
-    Sentinel2DatasetQueryTask,
-    GlobalLandCoverDatasetQueryTask,
-    CorineLandCoverDatasetQueryTask,
-    WaterBodiesDatasetQueryTask,
-    # Indices
+SPECTRAL_INDEX_TASKS = [
     NDVITask,
     EVITask,
     NDWITask,
@@ -1068,6 +1061,17 @@ WORKFLOW_TASKS = [
     CDOMTask,
     DOCTask,
     SARWaterMask,
+]
+
+WORKFLOW_TASKS = [
+    # DS Queries
+    Sentinel1DatasetQueryTask,
+    Sentinel2DatasetQueryTask,
+    GlobalLandCoverDatasetQueryTask,
+    CorineLandCoverDatasetQueryTask,
+    WaterBodiesDatasetQueryTask,
+    # Indices
+    *SPECTRAL_INDEX_TASKS,
     # Raster ops
     ClipTask,
     ReprojectTask,
@@ -1082,6 +1086,7 @@ WORKFLOW_TASKS = [
 TWorkflowTask = Annotated[Union[*WORKFLOW_TASKS], Field(discriminator="identifier")]  # type: ignore[valid-type]
 FUNCTIONS = [s.as_function_spec() for s in WORKFLOW_TASKS]
 FUNCTIONS_REGISTRY = {f["identifier"]: f for f in FUNCTIONS}
+SPECTRAL_INDEX_TASK_IDS = [*[s.as_function_spec()["identifier"] for s in SPECTRAL_INDEX_TASKS], "defra-calibrate"]
 
 
 class TaskCompatibility(StrEnum):

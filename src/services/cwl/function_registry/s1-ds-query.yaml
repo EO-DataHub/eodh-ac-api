@@ -43,6 +43,16 @@ inputs:
     inputBinding:
       position: 6
       prefix: --limit
+  polarization:
+    type: string[]
+    inputBinding:
+      position: 7
+      prefix: --polarization
+  orbit_direction:
+    type: string[]
+    inputBinding:
+      position: 8
+      prefix: --orbit_direction
 
 outputs:
   results:
