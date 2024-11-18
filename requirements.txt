@@ -2,6 +2,7 @@ aiodns==3.2.0
 aiohttp-retry==2.8.3
 aiohttp[speedups]==3.10.8
 cryptography==43.0.1
+cwltool==3.1.20241112140730
 fastapi[standard]==0.115.0
 geojson-pydantic==1.1.1
 geopandas==1.0.1

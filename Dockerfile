@@ -10,9 +10,9 @@ ENV CONDA_ENV=notebook \
     LC_ALL=C.UTF-8
 
 # Install basic apt packages
-RUN echo "Installing Apt-get packages..." \
+RUN echo "Installing apt-get packages..." \
     && apt-get update --fix-missing > /dev/null \
-    && apt-get install -y apt-utils wget build-essential graphviz graphviz-dev zip tzdata proj-bin > /dev/null \
+    && apt-get install -y apt-utils wget build-essential cwltool graphviz graphviz-dev zip tzdata proj-bin > /dev/null \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

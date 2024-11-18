@@ -24,6 +24,11 @@ jobs:
       - name: Setup Graphviz
         uses: ts-graphviz/setup-graphviz@v2
 
+      - name: Setup cwltool
+        run: |
+          sudo apt update
+          sudo apt install -y cwltool
+
       - name: Install dependencies
         run: |
           python -m pip install -r requirements.txt
