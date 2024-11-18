@@ -43,6 +43,16 @@ inputs:
     inputBinding:
       position: 6
       prefix: --limit
+  cloud_cover_min:
+    type: string
+    inputBinding:
+      position: 7
+      prefix: --cloud_cover_min
+  cloud_cover_max:
+    type: string
+    inputBinding:
+      position: 8
+      prefix: --cloud_cover_max
 
 outputs:
   results:
