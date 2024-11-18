@@ -253,6 +253,10 @@ TWorkflowStep = Annotated[
 ]
 
 
+class ActionCreatorJobStatusRequest(BaseModel):
+    submission_id: str
+
+
 class ActionCreatorSubmissionRequest(BaseModel):
     workflow: dict[str, TWorkflowStep]
 

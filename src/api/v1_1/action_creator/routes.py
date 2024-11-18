@@ -13,6 +13,7 @@ from starlette import status
 from src.api.v1_0.auth.routes import decode_token, validate_access_token, validate_token_from_websocket
 from src.api.v1_1.action_creator.schemas import (
     ActionCreatorJob,
+    ActionCreatorJobStatusRequest,
     ActionCreatorJobSummary,
     ActionCreatorSubmissionRequest,
     ActionCreatorSubmissionsQueryParams,
@@ -186,7 +187,7 @@ async def submit_function_websocket(  # noqa: C901
         if any(step.identifier == "clip" for step in workflow_spec.workflow.values()):
             ogc_inputs["clip"] = "True"
 
-        ades = ades_client_factory(workspace=token, token=introspected_token["preferred_username"])
+        ades = ades_client_factory(token=token, workspace=introspected_token["preferred_username"])
 
         err, _ = await ades.reregister_process_v1_1(wf_identifier)
 
@@ -239,6 +240,70 @@ async def submit_function_websocket(  # noqa: C901
 
         while True:
             err, status_result = await ades.get_job_details(execution_result.job_id)
+
+            if err is not None:
+                await websocket.send_json({
+                    "status_code": err.code,
+                    "result": err.detail,
+                })
+                raise WebSocketException(
+                    code=status.WS_1011_INTERNAL_ERROR,
+                    reason=err.detail,
+                )
+
+            if status_result is None:
+                raise WebSocketException(
+                    code=status.WS_1011_INTERNAL_ERROR,
+                    reason="An unknown error occurred while polling for the Job execution status",
+                )
+
+            if status_result.status != StatusCode.running:
+                break
+
+            await asyncio.sleep(5)
+
+        await websocket.send_json({
+            "status_code": status.HTTP_200_OK,
+            "result": ActionCreatorJobSummary(
+                submission_id=status_result.job_id,
+                function_identifier=status_result.process_id,
+                status=status_result.status.value,
+                submitted_at=status_result.created,
+                finished_at=status_result.finished,
+            ).model_dump(mode="json"),
+        })
+    except WebSocketDisconnect:
+        _logger.info("Websocket disconnected")
+        raise
+    finally:
+        await websocket.close()
+
+
+@action_creator_router_v1_1.websocket("/ws/submission-status")
+async def get_job_status_websocket(
+    websocket: WebSocket,
+) -> None:
+    await websocket.accept()
+
+    try:
+        # Manually get the Authorization header and validate it
+        token, introspected_token = validate_token_from_websocket(websocket.headers.get("Authorization"))
+
+        # Receive the submission status request from the client
+        try:
+            job_status_request = ActionCreatorJobStatusRequest(**await websocket.receive_json())
+        except ValidationError as e:
+            # Manually construct a validation error response
+            error_response = {
+                "detail": [{"loc": ["body", *err["loc"]], "msg": err["msg"], "type": err["type"]} for err in e.errors()]
+            }
+            await websocket.send_json({"status_code": status.HTTP_422_UNPROCESSABLE_ENTITY, "result": error_response})
+            raise WebSocketException(code=status.WS_1003_UNSUPPORTED_DATA, reason="Data validation error") from e
+
+        ades = ades_client_factory(token=token, workspace=introspected_token["preferred_username"])
+
+        while True:
+            err, status_result = await ades.get_job_details(job_status_request.submission_id)
 
             if err is not None:
                 await websocket.send_json({
