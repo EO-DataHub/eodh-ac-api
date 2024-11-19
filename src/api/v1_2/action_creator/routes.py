@@ -207,7 +207,7 @@ async def submit_workflow(
 
 
 @action_creator_router_v1_2.get(
-    "/submissions",
+    "/workflow-submissions",
     response_model=PaginationResults[ActionCreatorJobSummary],
     response_model_exclude_unset=False,
     response_model_exclude_none=False,
