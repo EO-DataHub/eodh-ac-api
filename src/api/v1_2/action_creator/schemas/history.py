@@ -6,8 +6,6 @@ from typing import Annotated, Any, Generic, Literal, Sequence, TypeVar
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
-from src.api.v1_2.action_creator.schemas.workflows import WorkflowSpec
-
 T = TypeVar("T", bound=BaseModel)
 DEFAULT_PAGE_IDX = 1
 MIN_PAGE_IDX = 1
@@ -26,8 +24,8 @@ class ActionCreatorJobStatus(StrEnum):
 
 
 class ActionCreatorJob(BaseModel):
-    submission_id: str
-    spec: WorkflowSpec
+    job_id: str
+    workflow_spec: dict[str, Any]
     status: ActionCreatorJobStatus = ActionCreatorJobStatus.submitted
     submitted_at: datetime
     running_at: datetime | None = None
@@ -36,7 +34,7 @@ class ActionCreatorJob(BaseModel):
 
 
 class ActionCreatorJobSummary(BaseModel):
-    submission_id: str
+    job_id: str
     status: ActionCreatorJobStatus
     workflow_identifier: str
     submitted_at: datetime

@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import json
 import math
+import tempfile
 import uuid
+from pathlib import Path
 from typing import Annotated, Any
 
+import yaml
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import ValidationError
@@ -34,6 +37,7 @@ from src.api.v1_2.action_creator.schemas.workflow_tasks import (
 from src.api.v1_2.action_creator.schemas.workflows import WorkflowSpec
 from src.services.ades.factory import ades_client_factory
 from src.services.ades.schemas import StatusCode
+from src.services.cwl.workflow_creator import WorkflowCreator
 from src.utils.logging import get_logger
 
 _logger = get_logger(__name__)
@@ -160,11 +164,45 @@ async def submit_workflow(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=json.loads(exc.json(include_url=False)),
         ) from exc
-    _ = decode_token(credential.credentials)
 
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail="Not implemented",
+    introspected_token = decode_token(credential.credentials)
+
+    ades = ades_client_factory(workspace=introspected_token["preferred_username"], token=credential.credentials)
+
+    wf_creation_result = WorkflowCreator.cwl_from_wf_spec(workflow_spec)
+    with tempfile.TemporaryDirectory() as tmpdir:
+        cwl_fp = Path(tmpdir) / "app.cwl"
+        yaml.safe_dump(wf_creation_result.app_spec, cwl_fp.open("w", encoding="utf-8"))
+        err, _ = await ades.register_process_from_local_cwl_file(cwl_fp)
+
+    if err is not None:
+        raise HTTPException(
+            status_code=err.code,
+            detail=err.detail,
+        )
+
+    err, response = await ades.execute_process(
+        process_identifier=wf_creation_result.wf_id,
+        process_inputs=wf_creation_result.user_inputs,
+    )
+
+    if err is not None:  # Will happen if there are race conditions and the process was deleted or ADES is unresponsive
+        raise HTTPException(
+            status_code=err.code,
+            detail=err.detail,
+        )
+
+    if response is None:  # Impossible case
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An error occurred while executing preset function",
+        )
+
+    return ActionCreatorJob(
+        job_id=response.job_id,
+        workflow_spec=workflow_spec,
+        status=response.status.value,
+        submitted_at=response.created,
     )
 
 
@@ -199,8 +237,8 @@ async def get_job_history(
     # To result schema
     results = [
         {
-            "submission_id": job["jobID"],
-            "function_identifier": job["processID"],
+            "job_id": job["jobID"],
+            "workflow_identifier": job["processID"],
             "status": job["status"],
             "submitted_at": job["created"],
             "finished_at": job.get("finished"),
@@ -257,7 +295,7 @@ async def get_job_status(
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error")
 
     return ActionCreatorJobSummary(
-        submission_id=job.job_id,
+        job_id=job.job_id,
         workflow_identifier=job.process_id,
         status=job.status if job.status != StatusCode.dismissed else "cancelled",
         submitted_at=job.created,
