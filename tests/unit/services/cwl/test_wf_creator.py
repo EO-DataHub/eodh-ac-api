@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 )
 def test_function_registry_should_load_task_spec(function_identifier: str) -> None:
     # Act
-    spec = WorkflowCreator.get_task_spec(function_identifier)
+    spec = WorkflowCreator._resolve_task_spec(function_identifier)  # noqa: SLF001
 
     # Assert
     assert spec["id"] == function_identifier
@@ -36,7 +36,7 @@ def test_function_registry_should_load_task_spec_with_id_override(function_ident
     id_override = str(uuid4())
 
     # Act
-    spec = WorkflowCreator.get_task_spec(function_identifier, id_override=id_override)
+    spec = WorkflowCreator._resolve_task_spec(function_identifier, id_override=id_override)  # noqa: SLF001
 
     # Assert
     assert spec["id"] == id_override
@@ -48,12 +48,11 @@ def test_function_registry_should_load_task_spec_with_id_override(function_ident
 )
 def test_presets(identifier: str, wf_spec: dict[str, Any]) -> None:  # noqa: ARG001
     # Act
-    app_cwl = WorkflowCreator.cwl_from_wf_spec(wf_spec)
+    result = WorkflowCreator.cwl_from_wf_spec(wf_spec)
 
     # Assert
-    app_spec = yaml.safe_load(app_cwl)
-    assert app_spec["$graph"] is not None
-    assert len(app_spec["$graph"]) == len(wf_spec["functions"]) + 1
+    assert result.app_spec["$graph"] is not None
+    assert len(result.app_spec["$graph"]) == len(wf_spec["functions"]) + 1
 
 
 @pytest.mark.parametrize(
@@ -62,15 +61,15 @@ def test_presets(identifier: str, wf_spec: dict[str, Any]) -> None:  # noqa: ARG
 )
 def test_generated_cwl_spec(identifier: str, wf_spec: dict[str, Any], tmp_path: Path) -> None:
     # Act
-    app_cwl = WorkflowCreator.cwl_from_wf_spec(wf_spec)
+    create_result = WorkflowCreator.cwl_from_wf_spec(wf_spec)
 
     # Assert
     tmp_cwl_fp = tmp_path / f"{identifier}.yaml"
-    tmp_cwl_fp.write_text(app_cwl, encoding="utf-8")
-    result = subprocess.run(  # noqa: S603
+    tmp_cwl_fp.write_text(yaml.safe_dump(create_result.app_spec), encoding="utf-8")
+    sp_result = subprocess.run(  # noqa: S603
         ["cwltool", "--validate", tmp_cwl_fp.as_posix()],  # noqa: S607
         capture_output=True,
         text=True,
         check=False,
     )
-    assert result.returncode == 0
+    assert sp_result.returncode == 0
