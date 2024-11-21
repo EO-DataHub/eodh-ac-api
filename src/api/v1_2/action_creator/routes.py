@@ -242,7 +242,7 @@ async def get_job_history(
             "status": job["status"],
             "submitted_at": job["created"],
             "finished_at": job.get("finished"),
-            "successful": job["status"] == "successful",
+            "successful": True if job["status"] == "successful" else False if job["status"] == "failed" else None,
         }
         for job in ades_jobs["jobs"]
         if (params.status and job["status"] in params.status) or not params.status
@@ -256,11 +256,9 @@ async def get_job_history(
     )
 
     # Paginate
-    offset = (params.page - 1) * params.per_page
-    total_pages = math.ceil(len(results) / params.per_page)
-    if params.status:
-        results = [r for r in results if r["status"] in params.status]
-    limited_jobs = results[offset : offset + params.per_page]
+    offset = (params.page - 1) * params.per_page if params.per_page else 0
+    total_pages = math.ceil(len(results) / params.per_page) if params.per_page else 1 if results else 0
+    limited_jobs = results[offset : offset + params.per_page] if params.per_page else results
 
     return {
         "results": limited_jobs,
