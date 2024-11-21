@@ -986,7 +986,7 @@ GET_JOB_LIST_RESPONSE = {
             "href": "https://test.eodatahub.org.uk/ades/eopro_spyro_test/ogc-api/jobs",
         }
     ],
-    "numberTotal": 1,
+    "numberTotal": len(GET_ALL_FAILED_JOBS_RESPONSE) + 2,
 }
 GET_JOB_RESULTS_RESPONSE = {
     "type": "Collection",

@@ -8,7 +8,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from starlette import status
 
-from src.api.v1_2.action_creator.schemas.history import (
+from src.api.v1_1.action_creator.schemas import (
     DEFAULT_PAGE_IDX,
     ActionCreatorJobSummary,
     OrderDirection,
@@ -29,9 +29,7 @@ def test_get_job_submissions_endpoint_returns_valid_response_no_params(
     auth_token: str,
 ) -> None:
     # Act
-    response = client.get(
-        "/api/v1.2/action-creator/workflow-submissions", headers={"Authorization": f"Bearer {auth_token}"}
-    )
+    response = client.get("/api/v1.1/action-creator/submissions", headers={"Authorization": f"Bearer {auth_token}"})
 
     # Assert
     pagination_results = PaginationResults[ActionCreatorJobSummary](**response.json())
@@ -47,7 +45,7 @@ def test_get_job_submissions_endpoint_returns_valid_response_no_params(
         assert pagination_results.results[i].submitted_at <= pagination_results.results[i + 1].submitted_at
 
 
-@patch("src.api.v1_2.action_creator.routes.ades_client_factory")
+@patch("src.api.v1_1.action_creator.routes.ades_client_factory")
 def test_get_job_submissions_returns_empty_result_set_when_ades_job_history_is_empty(
     ades_factory_mock: MagicMock,
     client: TestClient,
@@ -60,9 +58,7 @@ def test_get_job_submissions_returns_empty_result_set_when_ades_job_history_is_e
     ades_factory_mock.return_value = ades_mock
 
     # Act
-    response = client.get(
-        "/api/v1.2/action-creator/workflow-submissions", headers={"Authorization": f"Bearer {auth_token}"}
-    )
+    response = client.get("/api/v1.1/action-creator/submissions", headers={"Authorization": f"Bearer {auth_token}"})
 
     # Assert
     assert response.status_code == status.HTTP_200_OK
@@ -76,7 +72,7 @@ def test_get_job_submissions_returns_empty_result_set_when_ades_job_history_is_e
     assert len(pagination_results.results) == 0
 
 
-@patch("src.api.v1_2.action_creator.routes.ades_client_factory")
+@patch("src.api.v1_1.action_creator.routes.ades_client_factory")
 def test_get_job_submissions_returns_correct_pagination_with_fewer_jobs_than_per_page(
     ades_factory_mock: MagicMock,
     client: TestClient,
@@ -104,9 +100,7 @@ def test_get_job_submissions_returns_correct_pagination_with_fewer_jobs_than_per
     ades_factory_mock.return_value = fake_ades_client
 
     # Act
-    response = client.get(
-        "/api/v1.2/action-creator/workflow-submissions", headers={"Authorization": f"Bearer {auth_token}"}
-    )
+    response = client.get("/api/v1.1/action-creator/submissions", headers={"Authorization": f"Bearer {auth_token}"})
 
     # Assert
     assert response.status_code == status.HTTP_200_OK
@@ -128,7 +122,7 @@ def test_get_job_submissions_returns_correct_pagination_with_fewer_jobs_than_per
 )
 @pytest.mark.parametrize(
     "order_by",
-    ["job_id", "status", "workflow_identifier", "submitted_at", "finished_at", "successful"],
+    ["submission_id", "status", "function_identifier", "submitted_at", "finished_at", "successful"],
 )
 def test_get_job_submissions_sorts_results_by_order_by_and_direction(
     mocked_ades_factory: MagicMock,  # noqa: ARG001
@@ -139,7 +133,7 @@ def test_get_job_submissions_sorts_results_by_order_by_and_direction(
 ) -> None:
     # Act
     response = client.get(
-        "/api/v1.2/action-creator/workflow-submissions",
+        "/api/v1.1/action-creator/submissions",
         headers={"Authorization": f"Bearer {auth_token}"},
         params={
             "order_by": order_by,
@@ -185,7 +179,7 @@ def test_get_job_submissions_with_custom_per_page_item_count_and_page_idx(
     params = {"page": page, "per_page": per_page}
 
     # Act
-    response = client.get("/api/v1.2/action-creator/workflow-submissions", headers=headers, params=params)
+    response = client.get("/api/v1.1/action-creator/submissions", headers=headers, params=params)
 
     # Assert
     assert response.status_code == status.HTTP_200_OK

@@ -75,12 +75,11 @@ class ActionCreatorSubmissionsQueryParams(BaseModel):
         Field(DEFAULT_PAGE_IDX, description="Page number - 1 by default", ge=MIN_PAGE_IDX),
     ]
     per_page: Annotated[
-        int,
+        int | None,
         Field(
-            DEFAULT_RESULTS_PER_PAGE,
-            description="Number of results to return - 25 by default",
+            None,
+            description="Number of results to return - all by default",
             ge=MIN_RESULTS_PER_PAGE,
-            le=MAX_RESULTS_PER_PAGE,
         ),
     ]
     status: Annotated[
@@ -118,6 +117,6 @@ class PaginationResults(BaseModel, Generic[T]):
     current_page: int
     total_pages: int
     results_on_current_page: int
-    results_per_page: int
+    results_per_page: int | None = None
     ordered_by: str
     order_direction: OrderDirection
