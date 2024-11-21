@@ -83,6 +83,13 @@ class ActionCreatorSubmissionsQueryParams(BaseModel):
             le=MAX_RESULTS_PER_PAGE,
         ),
     ]
+    status: Annotated[
+        list[ActionCreatorJobStatus],
+        Field(
+            default_factory=list,
+            description="Filter by submission status",
+        ),
+    ]
 
     @classmethod
     @field_validator("order_by", mode="before")

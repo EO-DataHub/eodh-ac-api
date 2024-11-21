@@ -313,12 +313,18 @@ class ActionCreatorSubmissionsQueryParams(BaseModel):
         Field(DEFAULT_PAGE_IDX, description="Page number - 1 by default", ge=MIN_PAGE_IDX),
     ]
     per_page: Annotated[
-        int,
+        int | None,
         Field(
             DEFAULT_RESULTS_PER_PAGE,
             description="Number of results to return - 25 by default",
             ge=MIN_RESULTS_PER_PAGE,
-            le=MAX_RESULTS_PER_PAGE,
+        ),
+    ]
+    status: Annotated[
+        list[ActionCreatorJobStatus],
+        Field(
+            default_factory=list,
+            description="Filter by submission status",
         ),
     ]
 
