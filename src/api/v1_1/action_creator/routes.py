@@ -352,7 +352,7 @@ async def get_job_status_websocket(
 )
 async def get_job_history(
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
-    params: Annotated[ActionCreatorSubmissionsQueryParams, Query()],
+    params: Annotated[ActionCreatorSubmissionsQueryParams, Query(...)],
 ) -> dict[str, Any]:
     introspected_token = decode_token(credential.credentials)
     username = introspected_token["preferred_username"]
@@ -382,6 +382,7 @@ async def get_job_history(
             "successful": job["status"] == "successful",
         }
         for job in ades_jobs["jobs"]
+        if (params.status and job["status"] in params.status) or not params.status
     ]
 
     # Order by
@@ -392,13 +393,15 @@ async def get_job_history(
     )
 
     # Paginate
-    offset = (params.page - 1) * params.per_page
-    total_pages = math.ceil(len(ades_jobs["jobs"]) / params.per_page)
-    limited_jobs = results[offset : offset + params.per_page]
+    offset = (params.page - 1) * params.per_page if params.per_page else 0
+    total_pages = math.ceil(len(results) / params.per_page) if params.per_page else 1
+    if params.status:
+        results = [r for r in results if r["status"] in params.status]
+    limited_jobs = results[offset : offset + params.per_page] if params.per_page else results
 
     return {
         "results": limited_jobs,
-        "total_items": len(ades_jobs["jobs"]),  # Use len() as ADES returns count for the unregistered processes too
+        "total_items": len(results),  # Use len() as ADES returns count for the unregistered processes too
         "total_pages": total_pages,
         "ordered_by": params.order_by,
         "order_direction": params.order_direction,
