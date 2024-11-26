@@ -75,7 +75,7 @@ LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC: dict[str, Any] = {
     },
 }
 LULC_CHANGE_PRESET: dict[str, Any] = {
-    "identifier": "lulc-change",
+    "identifier": "land-cover-change",
     "name": "Land Cover Change Detection",
     "description": "Analyses time-series satellite imagery to detect changes in land cover, identifying shifts in "
     "urban areas, forests, water bodies, and agriculture over specified periods.",
@@ -84,6 +84,52 @@ LULC_CHANGE_PRESET: dict[str, Any] = {
     "workflow": LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC,
 }
 WATER_QUALITY_WORKFLOW_SPEC: dict[str, Any] = {
+    "inputs": {
+        "area": HEATHROW_AOI,
+        "dataset": "sentinel-2-l2a",
+        "date_start": "2024-03-01",
+        "date_end": "2024-10-10",
+    },
+    "outputs": {"results": {"name": "results", "type": "directory"}},
+    "functions": {
+        "query": {
+            "identifier": "s2-ds-query",
+            "inputs": {
+                "area": {"$type": "ref", "value": ["inputs", "area"]},
+                "stac_collection": {"$type": "ref", "value": ["inputs", "dataset"]},
+                "date_start": {"$type": "ref", "value": ["inputs", "date_start"]},
+                "date_end": {"$type": "ref", "value": ["inputs", "date_end"]},
+                "clip": {"$type": "atom", "value": True},
+                "limit": {"$type": "atom", "value": 10},
+                "cloud_cover_min": {"$type": "atom", "value": 0},
+                "cloud_cover_max": {"$type": "atom", "value": 100},
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "water-quality": {
+            "identifier": "water-quality",
+            "inputs": {
+                "data_dir": {
+                    "$type": "ref",
+                    "value": ["functions", "query", "outputs", "results"],
+                },
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "reproject": {
+            "identifier": "reproject",
+            "inputs": {
+                "data_dir": {
+                    "$type": "ref",
+                    "value": ["functions", "water-quality", "outputs", "results"],
+                },
+                "epsg": {"$type": "atom", "value": "EPSG:3857"},
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+    },
+}
+ADVANCED_WATER_QUALITY_WORKFLOW_SPEC: dict[str, Any] = {
     "inputs": {
         "area": HEATHROW_AOI,
         "dataset": "sentinel-2-l2a",
@@ -234,6 +280,15 @@ WATER_QUALITY_WORKFLOW_SPEC: dict[str, Any] = {
         },
     },
 }
+WATER_QUALITY_ADVANCED_PRESET: dict[str, Any] = {
+    "identifier": "water-quality",
+    "name": "Water Quality",
+    "description": "Evaluates water quality by analysing spectral data from satellite imagery, calibrated with DEFRA's "
+    "in-situ measurements, to assess parameters like chlorophyll concentration and turbidity.",
+    "thumbnail_b64": _load_base_64_thumbnail("water-quality"),
+    "disabled": True,
+    "workflow": ADVANCED_WATER_QUALITY_WORKFLOW_SPEC,
+}
 WATER_QUALITY_PRESET: dict[str, Any] = {
     "identifier": "water-quality",
     "name": "Water Quality",
@@ -337,6 +392,7 @@ NDVI_WORKFLOW_SPEC: dict[str, Any] = {
 EXAMPLE_WORKFLOWS: dict[str, Any] = {
     "land-cover": LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC,
     "water-quality": WATER_QUALITY_WORKFLOW_SPEC,
+    "advanced-water-quality": WATER_QUALITY_WORKFLOW_SPEC,
     "simplest-ndvi": SIMPLEST_NDVI_WORKFLOW_SPEC,
     "ndvi-clip-reproject": NDVI_WORKFLOW_SPEC,
 }

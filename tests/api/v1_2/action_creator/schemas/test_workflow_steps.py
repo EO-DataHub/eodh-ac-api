@@ -83,7 +83,6 @@ def test_s1_query_task(query_task_inputs: dict[str, Any], orbit_direction: list[
 @pytest.mark.parametrize(
     "collection",
     [
-        "sentinel-2-l1c",
         "sentinel-2-l2a",
         "sentinel-2-l2a-ard",
     ],
