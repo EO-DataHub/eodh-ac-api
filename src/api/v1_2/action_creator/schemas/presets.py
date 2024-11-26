@@ -125,7 +125,9 @@ WATER_QUALITY_WORKFLOW_SPEC: dict[str, Any] = {
                 },
                 "epsg": {"$type": "atom", "value": "EPSG:3857"},
             },
-            "outputs": {"results": {"name": "results", "type": "directory"}},
+            "outputs": {
+                "results": {"$type": "ref", "value": ["outputs", "results"]},
+            },
         },
     },
 }
@@ -392,7 +394,7 @@ NDVI_WORKFLOW_SPEC: dict[str, Any] = {
 EXAMPLE_WORKFLOWS: dict[str, Any] = {
     "land-cover": LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC,
     "water-quality": WATER_QUALITY_WORKFLOW_SPEC,
-    "advanced-water-quality": WATER_QUALITY_WORKFLOW_SPEC,
+    "advanced-water-quality": ADVANCED_WATER_QUALITY_WORKFLOW_SPEC,
     "simplest-ndvi": SIMPLEST_NDVI_WORKFLOW_SPEC,
     "ndvi-clip-reproject": NDVI_WORKFLOW_SPEC,
 }
