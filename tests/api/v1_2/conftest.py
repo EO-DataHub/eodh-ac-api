@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.api.v1_2.action_creator.schemas.presets import (
+    ADVANCED_WATER_QUALITY_WORKFLOW_SPEC,
     AREA_TOO_BIG_PRESET,
     COLLECTION_NOT_SUPPORTED_PRESET,
     CYCLE_DETECTED_PRESET,
@@ -43,6 +44,10 @@ TEST_WORKFLOWS = {
     },
     "water-quality": {
         "value": WATER_QUALITY_WORKFLOW_SPEC,
+        "should_raise": False,
+    },
+    "advanced-water-quality": {
+        "value": ADVANCED_WATER_QUALITY_WORKFLOW_SPEC,
         "should_raise": False,
     },
     "simplest-ndvi": {
