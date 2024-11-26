@@ -186,7 +186,7 @@ class Sentinel1DatasetQueryTask(WorkflowTask):
 
 
 class Sentinel2QueryTaskInputs(QueryTaskInputsBase):
-    stac_collection: Literal["sentinel-2-l1c", "sentinel-2-l2a", "sentinel-2-l2a-ard"] = "sentinel-2-l2a-ard"
+    stac_collection: Literal["sentinel-2-l2a-ard", "sentinel-2-l2a"] = "sentinel-2-l2a-ard"
     date_start: Annotated[datetime | None, Field(None, ge="2015-06-27")]
     cloud_cover_min: Annotated[int, Field(default=0, ge=0, le=100)]
     cloud_cover_max: Annotated[int, Field(default=100, ge=0, le=100)]
@@ -215,7 +215,7 @@ class Sentinel2DatasetQueryTask(WorkflowTask):
             "tags": ["Sentinel-2", "Satellite"],
             "description": "Query Sentinel-2 datasets.",
             "visible": True,
-            "compatible_input_datasets": ["sentinel-2-l1c", "sentinel-2-l2a", "sentinel-2-l2a-ard"],
+            "compatible_input_datasets": ["sentinel-2-l2a-ard", "sentinel-2-l2a", "sentinel-2-l2a-ard"],
             "inputs": {
                 "stac_collection": {
                     "name": "stac_collection",
@@ -223,7 +223,6 @@ class Sentinel2DatasetQueryTask(WorkflowTask):
                     "type": FuncInputOutputType.string,
                     "required": True,
                     "options": [
-                        FunctionInputOption(label="Sentinel-2 L1C", value="sentinel-2-l1c"),
                         FunctionInputOption(label="Sentinel-2 L2A", value="sentinel-2-l2a"),
                         FunctionInputOption(label="Sentinel-2 L2A ARD", value="sentinel-2-l2a-ard"),
                     ],
@@ -559,7 +558,7 @@ class NDVITask(WorkflowTask):
             "tags": ["NDVI", "Vegetation Index", "Spectral indices"],
             "description": "Calculate Normalized Difference Vegetation Index (NDVI).",
             "visible": True,
-            "compatible_input_datasets": ["sentinel-2-l1c", "sentinel-2-l2a"],
+            "compatible_input_datasets": ["sentinel-2-l2a-ard", "sentinel-2-l2a"],
             "inputs": {
                 "data_dir": {
                     "name": "data_dir",
@@ -592,7 +591,7 @@ class EVITask(WorkflowTask):
             "tags": ["EVI", "Vegetation Index", "Spectral indices"],
             "description": "Calculate Enhanced Vegetation Index (EVI).",
             "visible": True,
-            "compatible_input_datasets": ["sentinel-2-l1c", "sentinel-2-l2a"],
+            "compatible_input_datasets": ["sentinel-2-l2a-ard", "sentinel-2-l2a"],
             "inputs": {
                 "data_dir": {
                     "name": "data_dir",
@@ -625,7 +624,7 @@ class SAVITask(WorkflowTask):
             "tags": ["SAVI", "Vegetation Index", "Spectral indices"],
             "description": "Soil Adjusted Vegetation Index (SAVI).",
             "visible": True,
-            "compatible_input_datasets": ["sentinel-2-l1c", "sentinel-2-l2a"],
+            "compatible_input_datasets": ["sentinel-2-l2a-ard", "sentinel-2-l2a"],
             "inputs": {
                 "data_dir": {
                     "name": "data_dir",
@@ -657,8 +656,8 @@ class NDWITask(WorkflowTask):
             "category": FunctionCategory.spectral_indices,
             "tags": ["NDWI", "Water Index", "Spectral indices"],
             "description": "Normalized Difference Water Index (NDWI).",
-            "visible": False,
-            "compatible_input_datasets": ["sentinel-2-l1c", "sentinel-2-l2a"],
+            "visible": True,
+            "compatible_input_datasets": ["sentinel-2-l2a-ard", "sentinel-2-l2a"],
             "inputs": {
                 "data_dir": {
                     "name": "data_dir",
@@ -685,13 +684,13 @@ class CYATask(WorkflowTask):
     @classmethod
     def as_function_spec(cls) -> dict[str, Any]:
         return {
-            "name": "CYA Calculation",
+            "name": "CYA",
             "identifier": "cya",
             "category": FunctionCategory.spectral_indices,
             "tags": ["CYA", "Water Quality", "Spectral indices"],
             "description": "Cyanobacteria Density Index (CYA).",
-            "visible": False,
-            "compatible_input_datasets": ["sentinel-2-l1c", "sentinel-2-l2a"],
+            "visible": True,
+            "compatible_input_datasets": ["sentinel-2-l2a-ard", "sentinel-2-l2a"],
             "inputs": {
                 "data_dir": {
                     "name": "data_dir",
@@ -723,8 +722,8 @@ class CDOMTask(WorkflowTask):
             "category": FunctionCategory.spectral_indices,
             "tags": ["CDOM", "Water Quality"],
             "description": "Colored Dissolved Organic Matter Index (CDOM).",
-            "visible": False,
-            "compatible_input_datasets": ["sentinel-2-l1c", "sentinel-2-l2a"],
+            "visible": True,
+            "compatible_input_datasets": ["sentinel-2-l2a-ard", "sentinel-2-l2a"],
             "inputs": {
                 "data_dir": {
                     "name": "data_dir",
@@ -756,8 +755,8 @@ class DOCTask(WorkflowTask):
             "category": FunctionCategory.spectral_indices,
             "tags": ["DOC", "Water Quality"],
             "description": "Dissolved Organic Carbon Index (DOC).",
-            "visible": False,
-            "compatible_input_datasets": ["sentinel-2-l1c", "sentinel-2-l2a"],
+            "visible": True,
+            "compatible_input_datasets": ["sentinel-2-l2a-ard", "sentinel-2-l2a"],
             "inputs": {
                 "data_dir": {
                     "name": "data_dir",
@@ -836,8 +835,8 @@ class ClipTask(WorkflowTask):
             "visible": True,
             "compatible_input_datasets": [
                 "sentinel-1-grd",
-                "sentinel-2-l1c",
                 "sentinel-2-l2a",
+                "sentinel-2-l2a-ard",
                 "esa-lccci-glcm",
                 "clms-corine-lc",
                 "clms-water-bodies",
@@ -887,7 +886,6 @@ class ReprojectTask(WorkflowTask):
             "visible": True,
             "compatible_input_datasets": [
                 "sentinel-1-grd",
-                "sentinel-2-l1c",
                 "sentinel-2-l2a",
                 "sentinel-2-l2a-ard",
                 "esa-lccci-glcm",
@@ -953,6 +951,39 @@ class SummarizeClassStatisticsTask(WorkflowTask):
         }
 
 
+class WaterQualityTask(WorkflowTask):
+    identifier: Literal["water-quality"] = "water-quality"
+    inputs: DirectoryInputs
+    outputs: DirectoryOutputs
+
+    @classmethod
+    def as_function_spec(cls) -> dict[str, Any]:
+        return {
+            "name": "Water Quality Analysis",
+            "identifier": "water-quality",
+            "category": FunctionCategory.other,
+            "tags": ["DEFRA", "Water Quality"],
+            "description": "Run water quality analysis with DEFRA in-situ data calibration.",
+            "compatible_input_datasets": ["sentinel-2-l2a"],
+            "visible": True,
+            "inputs": {
+                "data_dir": {
+                    "name": "data_dir",
+                    "description": "Directory containing the input data for Water Quality Analysis",
+                    "type": FuncInputOutputType.directory,
+                    "required": True,
+                }
+            },
+            "outputs": {
+                "results": {
+                    "name": "results",
+                    "type": FuncInputOutputType.directory,
+                    "description": "Directory to store the water quality analysis results",
+                }
+            },
+        }
+
+
 class DefraCalibrateTask(WorkflowTask):
     identifier: Literal["defra-calibrate"] = "defra-calibrate"
     inputs: DirectoryInputs
@@ -966,8 +997,8 @@ class DefraCalibrateTask(WorkflowTask):
             "category": FunctionCategory.other,
             "tags": ["DEFRA", "Calibration", "Water Quality"],
             "description": "Calibrate input data based on DEFRA in-situ data.",
-            "compatible_input_datasets": ["sentinel-2-l1c", "sentinel-2-l2a"],
-            "visible": False,
+            "compatible_input_datasets": ["sentinel-2-l2a-ard", "sentinel-2-l2a"],
+            "visible": True,
             "inputs": {
                 "data_dir": {
                     "name": "data_dir",
@@ -1007,7 +1038,6 @@ class StacJoinTask(WorkflowTask):
             "visible": True,
             "compatible_input_datasets": [
                 "sentinel-1-grd",
-                "sentinel-2-l1c",
                 "sentinel-2-l2a",
                 "sentinel-2-l2a-ard",
                 "esa-lccci-glcm",
@@ -1066,6 +1096,7 @@ WORKFLOW_TASKS = [
     ClipTask,
     ReprojectTask,
     # Water quality
+    WaterQualityTask,
     DefraCalibrateTask,
     # Pixel classification
     SummarizeClassStatisticsTask,

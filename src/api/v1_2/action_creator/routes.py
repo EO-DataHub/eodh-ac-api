@@ -49,7 +49,7 @@ TWorkflowSpec = Annotated[
             "land-cover-change-preset": {
                 "summary": "OK - Land Cover Change Detection",
                 "description": "Land Cover Change Detection using ESA LCCCI Global Land Cover Map.",
-                "value": PRESET_LOOKUP["lulc-change"]["workflow"],
+                "value": PRESET_LOOKUP["land-cover-change"]["workflow"],
             },
             "water-quality-preset": {
                 "summary": "OK - Water Quality with in-situ data calibration",

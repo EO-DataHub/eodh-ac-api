@@ -67,7 +67,7 @@ def generate_random_name(sep: str = "-", integer_scale: int = 3, max_length: int
     """
     name = ""
     for _ in range(10):
-        name = _generate_string(sep, integer_scale)
+        name = _generate_string(sep, integer_scale).strip("-")
         if len(name) <= max_length:
             return name
     # If the combined length isn't below the threshold after 10 iterations, truncate it.

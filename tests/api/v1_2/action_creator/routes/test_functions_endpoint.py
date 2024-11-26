@@ -38,7 +38,6 @@ def test_get_action_creator_functions_returns_empty_result_set_for_bad_dataset(
     "dataset",
     [
         "sentinel-1-grd",
-        "sentinel-2-l1c",
         "sentinel-2-l2a",
         "sentinel-2-l2a-ard",
         "esa-lccci-glcm",

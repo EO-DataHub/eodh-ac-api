@@ -9,10 +9,10 @@ def test_random_name_generation() -> None:
     # Validate exhausted loop truncation
     expected_len = 8
     name = generate_random_name(max_length=expected_len)
-    assert len(name) == expected_len
+    assert len(name) <= expected_len
 
-    # Validate default behavior while calling 1000 times that names end in integer
-    names = [generate_random_name() for _ in range(1000)]
+    # Validate default behavior while calling 10,000 times that names end in integer
+    names = [generate_random_name() for _ in range(10000)]
     assert all(len(name) <= ADES_WF_ID_LEN_LIMIT for name in names)
 
 

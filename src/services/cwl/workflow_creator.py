@@ -44,6 +44,7 @@ class WorkflowCreator:
         "doc": "spectral-index.yaml",
         "sar-water-mask": "spectral-index.yaml",
         "defra-calibrate": "defra-calibrate.yaml",
+        "water-quality": "water-quality.yaml",
         "clip": "clip.yaml",
         "reproject": "reproject.yaml",
         "stac-join": "stac-join.yaml",
