@@ -1,21 +1,8 @@
+@api_version=v1.2
+
 ### Ping
-GET {{api_url}}/health/ping
+GET {{api_url}}/{{api_version}}/health/ping
 Accept: application/json
-
-> {%
-    client.test("Request executed successfully", function() {
-        client.assert(response.status === 200, "Response status is not 200");
-    });
-%}
-
-### Token
-POST {{api_url}}/auth/token
-Accept: application/json
-
-{
-  "username": "{{username}}",
-  "password": "{{password}}"
-}
 
 > {%
     client.test("Request executed successfully", function() {
@@ -24,9 +11,9 @@ Accept: application/json
 %}
 
 ### Introspect Token
-POST {{api_url}}/auth/token/introspection
+POST {{api_url}}/{{api_version}}/auth/token/introspection
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 > {%
     client.test("Request executed successfully", function() {
@@ -35,9 +22,9 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 %}
 
 ### List Functions
-GET {{api_url}}/action-creator/functions
+GET {{api_url}}/{{api_version}}/action-creator/functions
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 > {%
     client.test("Request executed successfully", function() {
@@ -46,20 +33,19 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 %}
 
 ### List Functions For Collection
-GET {{api_url}}/action-creator/functions?collection=sentinel-2-l2a
+GET {{api_url}}/{{api_version}}/action-creator/functions?dataset=sentinel-2-l2a
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 > {%
     client.test("Request executed successfully", function() {
         client.assert(response.status === 200, "Response status is not 200");
     });
 %}
-
 ### List Functions For Non Existent Collection
-GET {{api_url}}/action-creator/functions?collection=i-dont-exist
+GET {{api_url}}/{{api_version}}/action-creator/functions?collection=i-dont-exist
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 > {%
     client.test("Request status is 404", function() {
@@ -67,10 +53,21 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     });
 %}
 
-### List Function Submissions No Params
-GET {{api_url}}/action-creator/submissions
+### List Presets
+GET {{api_url}}/{{api_version}}/action-creator/presets
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### List WF Submissions No Params
+GET {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Authorization: Bearer {{token}}
 
 > {%
     client.test("Request executed successfully", function() {

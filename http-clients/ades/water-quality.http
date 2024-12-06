@@ -1,12 +1,12 @@
-@app_cwl_href=https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/raster-calculator-app.cwl
-@app_name=raster-calculate
+@app_cwl_href=https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/water-quality-app.cwl
+@app_name=water-quality
 @ades_url=https://test.eodatahub.org.uk/ades
 
 
-### Get Raster Calculator File
+### Get Water Quality File
 GET {{app_cwl_href}}
 
->> raster-calculate-app.cwl
+>> water-quality-app.cwl
 
 ### Unregister Process
 DELETE {{ades_url}}/{{workspace}}/ogc-api/processes/{{app_name}}
@@ -19,7 +19,7 @@ Accept: application/json
 Authorization: Bearer {{token}}
 Content-Type: application/cwl+yaml
 
-< raster-calculate-app.cwl
+< water-quality-app.cwl
 
 ### Get Process details
 GET {{ades_url}}/{{workspace}}/ogc-api/processes/{{app_name}}
@@ -40,7 +40,6 @@ Prefer: respond-async
         "aoi": "{\"type\":\"Polygon\",\"coordinates\":[[[71.57683969558222,4.278154706539496],[71.96061157730237,4.278154706539496],[71.96061157730237,4.62344048537264],[71.57683969558222,4.62344048537264],[71.57683969558222,4.278154706539496]]]}",
         "date_start": "2024-01-01",
         "date_end": "2024-08-01",
-        "index": "doc",
         "limit": 10,
         "clip": "True"
     }
@@ -53,7 +52,7 @@ Prefer: respond-async
 %}
 
 ### Get Job status
-GET https://test.eodatahub.org.uk/ades/{{workspace}}/ogc-api/jobs/524689c0-b242-11ef-b505-ee3aaed8a789
+GET https://test.eodatahub.org.uk/ades/{{workspace}}/ogc-api/jobs/{{execute_process_response.jobID}}
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -89,6 +88,6 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Cancel Job
-DELETE {{ades_url}}/{{workspace}}/ogc-api/jobs/{{execute_process_response.jobID}}
+DELETE {{ades_url}}/{{workspace}}/ogc-api/jobs/73cd79a8-b23a-11ef-a1ea-ee3aaed8a789
 Accept: application/json
 Authorization: Bearer {{token}}
