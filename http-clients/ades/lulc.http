@@ -1,30 +1,35 @@
-### Get Land Cover Change Detection File
-GET {{lulc_change_cwl_href}}
+@app_cwl_href=https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/lulc-change-app.cwl
+@app_name=land-cover-change
+@ades_url=https://test.eodatahub.org.uk/ades
 
->> lulc-change-app.cwl
+
+### Get Land Cover Change Detection File
+GET {{app_cwl_href}}
+
+>> land-cover-change-app.cwl
 
 ### Unregister Process
-DELETE {{ades_url}}/{{workspace}}/ogc-api/processes/lulc-change
+DELETE {{ades_url}}/{{workspace}}/ogc-api/processes/{{app_name}}
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 ### Register Process
 POST {{ades_url}}/{{workspace}}/ogc-api/processes
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 Content-Type: application/cwl+yaml
 
-< lulc-change-app.cwl
+< land-cover-change-app.cwl
 
 ### Get Process details
-GET {{ades_url}}/{{workspace}}/ogc-api/processes/lulc-change
+GET {{ades_url}}/{{workspace}}/ogc-api/processes/{{app_name}}
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 ### Execute Process
-POST {{ades_url}}/{{workspace}}/ogc-api/processes/lulc-change/execution
+POST {{ades_url}}/{{workspace}}/ogc-api/processes/{{app_name}}/execution
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 Prefer: respond-async
 
@@ -46,7 +51,7 @@ Prefer: respond-async
 
 ### Get Job status
 GET https://test.eodatahub.org.uk/ades/{{workspace}}/ogc-api/jobs/{{execute_process_response.jobID}}
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 > {%
@@ -57,30 +62,30 @@ Content-Type: application/json
 
 ### Get results
 GET https://test.eodatahub.org.uk/ades/{{workspace}}/ogc-api/jobs/{{execute_process_response.jobID}}/results
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 ### Get Job Logs
 GET {{job_status.links[2].href}}
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 ### Get Job Stage Out Logs
 GET {{job_status.links[3].href}}
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 ### Get Failed Job Logs
 GET {{job_status.links[1].href}}
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 ### Get Failed Job Stage Out Logs
 GET {{job_status.links[2].href}}
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 ### Cancel Job
 DELETE {{ades_url}}/{{workspace}}/ogc-api/jobs/{{execute_process_response.jobID}}
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
