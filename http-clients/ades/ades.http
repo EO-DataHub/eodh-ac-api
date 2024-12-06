@@ -1,12 +1,18 @@
+@raster_calculator_cwl_href=https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/raster-calculate-app.cwl
+@lulc_change_cwl_href=https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/lulc-change-app.cwl
+@water_quality_cwl_href=https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/water-quality-app.cwl
+@ades_url=https://test.eodatahub.org.uk/ades
+
+
 ### List Processes
 GET {{ades_url}}/{{workspace}}/ogc-api/processes
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 ### Register Process From URL
 POST {{ades_url}}/{{workspace}}/ogc-api/processes
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 { "executionUnit": {"href": "{{raster_calculator_cwl_href}}", "type": "application/cwl" }}
@@ -20,7 +26,7 @@ Content-Type: application/json
 ### Register Process From Bad URL
 POST {{ades_url}}/{{workspace}}/ogc-api/processes
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 { "executionUnit": {"href": "https://some-site.com/non-existend/cwl/file/spec/path.cwl", "type": "application/cwl" }}
@@ -28,7 +34,7 @@ Content-Type: application/json
 ### Register Process FromLocal File
 POST {{ades_url}}/{{workspace}}/ogc-api/processes
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 Content-Type: application/cwl+yaml
 
 < raster-calculate-app.cwl
@@ -42,27 +48,27 @@ Content-Type: application/cwl+yaml
 ### Unregister Process
 DELETE {{ades_url}}/{{workspace}}/ogc-api/processes/{{register_process_response.id}}
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 ### Unregister Non Existent Process
 DELETE {{ades_url}}/{{workspace}}/ogc-api/processes/i-dont-exist
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 ### Get Process Details
 GET {{ades_url}}/{{workspace}}/ogc-api/processes/{{register_process_response.id}}
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 ### Get Non Existent Process Details
 GET {{ades_url}}/{{workspace}}/ogc-api/processes/i-dont-exist
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 ### Execute Process
 POST {{ades_url}}/{{workspace}}/ogc-api/processes/{{register_process_response.id}}/execution
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 Prefer: respond-async
 
@@ -88,7 +94,7 @@ Prefer: respond-async
 ### Execute Non Existent Process
 POST {{ades_url}}/{{workspace}}/ogc-api/processes/i-dont-exist/execution
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 Prefer: respond-async
 
@@ -106,12 +112,12 @@ Prefer: respond-async
 ### List Jobs
 GET {{ades_url}}/{{workspace}}/ogc-api/jobs
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 ### Get Job Status
-GET {{ades_url}}/{{workspace}}/ogc-api/jobs/{{execute_process_response.jobID}}
+GET {{ades_url}}/{{workspace}}/ogc-api/jobs/5be877ee-b0a9-11ef-9f24-ee3aaed8a789
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 > {%
 
@@ -122,54 +128,54 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 ### Get Non Existent Job Status
 GET {{ades_url}}/{{workspace}}/ogc-api/jobs/non-existent-job-id
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 ### Get Non Existent Job Status
 GET {{ades_url}}/{{workspace}}/ogc-api/jobs/8539da22-7f2e-11ef-92a3-921292eb1c22
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 ### Get Non Existent Job Results
 GET {{ades_url}}/{{workspace}}/ogc-api/jobs/cadbba82-7f1f-11ef-a100-921292eb1c22/results
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 ### Get Job Results
-GET {{ades_url}}/{{workspace}}/ogc-api/jobs/{{execute_process_response.jobID}}/results
+GET {{ades_url}}/{{workspace}}/ogc-api/jobs/{{job_status.jobID}}/results
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 ### Get Non Existent Job Results
 GET {{ades_url}}/{{workspace}}/ogc-api/jobs/non-existent-job-id/results
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 ### Get Job Logs
 GET {{job_status.links[2].href}}
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 ### Get Job StageOut Logs
 GET {{job_status.links[3].href}}
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 ### Get Failed Job Logs
 GET {{job_status.links[1].href}}
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 ### Get Failed Job Stage Out Logs
 GET {{job_status.links[2].href}}
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 ### Cance lJob
 DELETE {{ades_url}}/{{workspace}}/ogc-api/jobs/{{execute_process_response.jobID}}
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
 
 ### Cancel Non Existent Job
 DELETE {{ades_url}}/{{workspace}}/ogc-api/jobs/non-existent-job-id
 Accept: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
+Authorization: Bearer {{token}}
