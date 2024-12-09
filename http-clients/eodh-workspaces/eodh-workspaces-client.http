@@ -1,0 +1,27 @@
+### Get S3 credentials
+GET https://test.eodatahub.org.uk/api/workspaces/s3/credentials
+Authorization: Bearer {{token}}
+Accept: application/json
+
+>> tmp_s3_credentials.json
+
+### List Access Token
+GET https://test.eodatahub.org.uk/api/tokens
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Get Access Token
+POST https://test.eodatahub.org.uk/api/tokens
+Authorization: Bearer {{token}}
+Accept: application/json
+
+> {%
+
+    client.global.set("access_token_response", JSON.parse(response.body));
+
+%}
+
+### Invalidate Access Token
+DELETE https://test.eodatahub.org.uk/api/tokens/{{access_token_response.id}}
+Authorization: Bearer {{token}}
+Accept: */*

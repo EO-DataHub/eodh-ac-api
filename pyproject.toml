@@ -151,7 +151,7 @@ combine-as-imports = true
 ]
 "**/{schemas}/*" = ["TCH001", "TCH002", "TCH003"]  # Ignore "Move to TYPE_CHECKING block" issues in FastAPI schema files
 "**/routes.py" = ["TCH001", "TCH002", "TCH003"]  # Ignore "Move to TYPE_CHECKING block" issues in FastAPI route files
-
+"http-clients/*" = ["INP001"]  # Ignore part of an implicit namespace package errors in http-clients dir
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
