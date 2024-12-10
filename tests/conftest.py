@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import json
 import pathlib
 import typing
 
 import pytest
+import requests
 from starlette.testclient import TestClient
 
 from app import app as fast_api_app
@@ -35,14 +37,31 @@ def client_fixture(app: FastAPI) -> TestClient:
     return TestClient(app)
 
 
-@pytest.fixture(scope="session")
 def auth_token() -> str:
-    client = TestClient(fast_api_app)
     settings = current_settings()
-
+    client = TestClient(fast_api_app)
     response = client.post(
         "/api/v1.0/auth/token",
         json={"username": settings.eodh_auth.username, "password": settings.eodh_auth.password},
     )
-
     return response.json()["access_token"]  # type: ignore[no-any-return]
+
+
+@pytest.fixture(scope="session")
+def ws_token() -> typing.Generator[str]:
+    settings = current_settings()
+
+    response = requests.post(
+        settings.eodh_auth.workspace_tokens_url,
+        headers={"Authorization": f"Bearer {settings.eodh_auth.api_token}"},
+        timeout=30,
+    )
+
+    token_response = json.loads(response.text)
+    yield token_response["token"]
+
+    requests.delete(
+        f"{settings.eodh_auth.workspace_tokens_url}/{token_response['id']}",
+        headers={"Authorization": f"Bearer {settings.eodh_auth.api_token}"},
+        timeout=30,
+    )

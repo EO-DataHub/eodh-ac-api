@@ -204,6 +204,49 @@ LAND_COVER_CHANGE_DETECTION_FUNCTION_SPEC = {
         },
     },
 }
+WATER_QUALITY_FUNCTION_SPEC = {
+    "identifier": "water-quality",
+    "name": "Water Quality Analysis",
+    "description": "Performs Water Quality Analysis by computing various spectral indices.",
+    "visible": True,
+    "standalone": True,
+    "compatible_input_datasets": ["sentinel-2-l2a"],
+    "inputs": {
+        "stac_collection": {
+            "type": "string",
+            "required": False,
+            "default": "sentinel-2-l2a",
+            "description": "The STAC collection to use.",
+            "options": [
+                {
+                    "label": "Sentinel 2 L2A",
+                    "value": "sentinel-2-l2a",
+                },
+            ],
+        },
+        "date_start": {
+            "type": "datetime",
+            "required": False,
+            "description": "The start date and time to use for item filtering. Must be RFC3339 compliant.",
+        },
+        "date_end": {
+            "type": "datetime",
+            "required": False,
+            "description": "The end date and time to use for item filtering. Must be RFC3339 compliant.",
+        },
+        "aoi": {
+            "type": "polygon",
+            "required": True,
+            "description": "The Area of Interest as GeoJSON (polygon).",
+        },
+    },
+    "outputs": {
+        "collection": {
+            "type": "stac_collection",
+            "description": "STAC collection with results.",
+        },
+    },
+}
 
 FUNCTIONS = [
     NDVI_FUNCTION_SPEC,
@@ -211,6 +254,7 @@ FUNCTIONS = [
     SAVI_FUNCTION_SPEC,
     CLIP_FUNCTION_SPEC,
     LAND_COVER_CHANGE_DETECTION_FUNCTION_SPEC,
+    WATER_QUALITY_FUNCTION_SPEC,
 ]
 FUNCTIONS_REGISTRY: dict[str, dict[str, Any]] = {f["identifier"]: f for f in FUNCTIONS}  # type: ignore[misc]
 FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING = {
@@ -219,6 +263,7 @@ FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING = {
     "ndwi": "raster-calculate",
     "savi": "raster-calculate",
     "land-cover-change-detection": "land-cover-change",
+    "water-quality": "water-quality",
 }
 WORKFLOW_REGISTRY = {
     "lulc-change": {
@@ -229,6 +274,9 @@ WORKFLOW_REGISTRY = {
     },
     "raster-calculate": {
         "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/raster-calculate-app.cwl",
+    },
+    "water-quality": {
+        "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/water-quality-app.cwl",
     },
 }
 WORKFLOW_ID_OVERRIDE_LOOKUP = {"lulc-change": "land-cover-change", "land-cover-change": "land-cover-change"}

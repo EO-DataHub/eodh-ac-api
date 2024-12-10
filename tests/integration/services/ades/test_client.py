@@ -37,11 +37,11 @@ NON_EXISTENT_PROCESS_ID = NON_EXISTENT_JOB_ID = "i-dont-exist"
 
 
 @pytest.fixture
-def ades(auth_token: str) -> ADESClient:
+def ades(ws_token: str) -> ADESClient:
     settings = current_settings()
     return ades_client_factory(
         workspace=settings.eodh_auth.username,
-        token=auth_token,
+        token=ws_token,
     )
 
 

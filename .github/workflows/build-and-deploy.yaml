@@ -39,12 +39,14 @@ jobs:
           done
       - name: Create file with environment variables
         run: |
+          echo "EODH_AUTH__API_TOKEN=${{ secrets.EODH_AUTH__API_TOKEN }}" >> envs.env
           echo "EODH_AUTH__BASE_URL=${{ secrets.EODH_AUTH__BASE_URL }}" > envs.env
           echo "EODH_AUTH__CLIENT_ID=${{ secrets.EODH_AUTH__CLIENT_ID }}" >> envs.env
-          echo "EODH_AUTH__CLIENT_SECRET=${{ secrets.EODH_AUTH__CLIENT_SECRET }}" >> envs.env
           echo "EODH_AUTH__PASSWORD=${{ secrets.EODH_AUTH__PASSWORD }}" >> envs.env
           echo "EODH_AUTH__REALM=${{ secrets.EODH_AUTH__REALM }}" >> envs.env
           echo "EODH_AUTH__USERNAME=${{ secrets.EODH_AUTH__USERNAME }}" >> envs.env
+          echo "EODH_AUTH__WORKSPACE_TOKENS_URL=${{ secrets.EODH_AUTH__WORKSPACE_TOKENS_URL }}" >> envs.env
+          echo "EODH_AUTH__TMP_S3_CREDENTIALS_URL=${{ secrets.EODH_AUTH__TMP_S3_CREDENTIALS_URL }}" >> envs.env
           echo "ADES__URL=${{ secrets.ADES__URL }}" >> envs.env
           echo "ADES__OGC_PROCESSES_API_PATH=${{ secrets.ADES__OGC_PROCESSES_API_PATH }}" >> envs.env
           echo "ADES__OGC_JOBS_API_PATH=${{ secrets.ADES__OGC_JOBS_API_PATH }}" >> envs.env
@@ -81,12 +83,14 @@ jobs:
           aws ecr put-image --repository-name ${{ secrets.ECR_REPOSITORY }} --image-tag ${{ vars.TAGS }} --image-manifest "$MANIFEST" --region ${{ vars.AWS_REGION }}
       - name: Create file with environment variables
         run: |
+          echo "EODH_AUTH__API_TOKEN=${{ secrets.EODH_AUTH__API_TOKEN }}" >> envs.env
           echo "EODH_AUTH__BASE_URL=${{ secrets.EODH_AUTH__BASE_URL }}" > envs.env
           echo "EODH_AUTH__CLIENT_ID=${{ secrets.EODH_AUTH__CLIENT_ID }}" >> envs.env
-          echo "EODH_AUTH__CLIENT_SECRET=${{ secrets.EODH_AUTH__CLIENT_SECRET }}" >> envs.env
           echo "EODH_AUTH__PASSWORD=${{ secrets.EODH_AUTH__PASSWORD }}" >> envs.env
           echo "EODH_AUTH__REALM=${{ secrets.EODH_AUTH__REALM }}" >> envs.env
           echo "EODH_AUTH__USERNAME=${{ secrets.EODH_AUTH__USERNAME }}" >> envs.env
+          echo "EODH_AUTH__WORKSPACE_TOKENS_URL=${{ secrets.EODH_AUTH__WORKSPACE_TOKENS_URL }}" >> envs.env
+          echo "EODH_AUTH__TMP_S3_CREDENTIALS_URL=${{ secrets.EODH_AUTH__TMP_S3_CREDENTIALS_URL }}" >> envs.env
           echo "ADES__URL=${{ secrets.ADES__URL }}" >> envs.env
           echo "ADES__OGC_PROCESSES_API_PATH=${{ secrets.ADES__OGC_PROCESSES_API_PATH }}" >> envs.env
           echo "ADES__OGC_JOBS_API_PATH=${{ secrets.ADES__OGC_JOBS_API_PATH }}" >> envs.env
@@ -123,12 +127,14 @@ jobs:
           aws ecr put-image --repository-name ${{ secrets.ECR_REPOSITORY }} --image-tag ${{ vars.TAGS }} --image-manifest "$MANIFEST" --region ${{ vars.AWS_REGION }}
       - name: Create file with environment variables
         run: |
+          echo "EODH_AUTH__API_TOKEN=${{ secrets.EODH_AUTH__API_TOKEN }}" >> envs.env
           echo "EODH_AUTH__BASE_URL=${{ secrets.EODH_AUTH__BASE_URL }}" > envs.env
           echo "EODH_AUTH__CLIENT_ID=${{ secrets.EODH_AUTH__CLIENT_ID }}" >> envs.env
-          echo "EODH_AUTH__CLIENT_SECRET=${{ secrets.EODH_AUTH__CLIENT_SECRET }}" >> envs.env
           echo "EODH_AUTH__PASSWORD=${{ secrets.EODH_AUTH__PASSWORD }}" >> envs.env
           echo "EODH_AUTH__REALM=${{ secrets.EODH_AUTH__REALM }}" >> envs.env
           echo "EODH_AUTH__USERNAME=${{ secrets.EODH_AUTH__USERNAME }}" >> envs.env
+          echo "EODH_AUTH__WORKSPACE_TOKENS_URL=${{ secrets.EODH_AUTH__WORKSPACE_TOKENS_URL }}" >> envs.env
+          echo "EODH_AUTH__TMP_S3_CREDENTIALS_URL=${{ secrets.EODH_AUTH__TMP_S3_CREDENTIALS_URL }}" >> envs.env
           echo "ADES__URL=${{ secrets.ADES__URL }}" >> envs.env
           echo "ADES__OGC_PROCESSES_API_PATH=${{ secrets.ADES__OGC_PROCESSES_API_PATH }}" >> envs.env
           echo "ADES__OGC_JOBS_API_PATH=${{ secrets.ADES__OGC_JOBS_API_PATH }}" >> envs.env

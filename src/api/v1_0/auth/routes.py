@@ -89,11 +89,10 @@ async def authenticate(
         headers=_HEADERS,
         data={
             "client_id": settings.eodh_auth.client_id,
-            "client_secret": settings.eodh_auth.client_secret,
             "username": token_request.username,
             "password": token_request.password,
             "grant_type": "password",
-            "scope": "offline_access",
+            "scope": "openid",
         },
         timeout=TIMEOUT,
     ) as response:
@@ -119,18 +118,6 @@ async def authenticate(
 )
 async def token_introspection(
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
-    settings: Annotated[Settings, Depends(current_settings)],
 ) -> IntrospectResponse:
-    async with aiohttp.ClientSession() as session, session.post(
-        settings.eodh_auth.introspect_url,
-        headers=_HEADERS,
-        data={
-            "client_id": settings.eodh_auth.client_id,
-            "client_secret": settings.eodh_auth.client_secret,
-            "token": credential.credentials,
-        },
-        timeout=TIMEOUT,
-    ) as response:
-        if response.status != status.HTTP_200_OK:
-            raise HTTPException(status_code=response.status, detail=await response.json())
-        return IntrospectResponse(**await response.json())
+    dec = decode_token(credential.credentials)
+    return IntrospectResponse(**dec)

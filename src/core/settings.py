@@ -14,7 +14,9 @@ class OAuth2Settings(BaseModel):
     username: str
     password: str
     client_id: str
-    client_secret: str
+    api_token: str
+    workspace_tokens_url: str
+    tmp_s3_credentials_url: str
 
     @property
     def oid_url(self) -> str:

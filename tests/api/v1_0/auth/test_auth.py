@@ -52,8 +52,8 @@ def test_introspect_success(api_version: str, client: TestClient) -> None:
 
     assert response.status_code == status.HTTP_200_OK
     introspect_data = response.json()
-    assert introspect_data["username"] is not None
-    assert introspect_data["active"]
+    assert introspect_data["preferred_username"] is not None
+    assert introspect_data["active"] is True or introspect_data["active"] is None
     assert {
         "exp",
         "iat",
