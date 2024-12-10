@@ -174,7 +174,6 @@ async def test_ades_unregister_non_existent_process_returns_404_not_found(ades: 
     })
 
 
-@flaky(max_runs=3)
 @pytest.mark.asyncio(scope="function")
 async def test_ades_listing_process(ades: ADESClient) -> None:
     # Act

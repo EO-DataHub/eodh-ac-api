@@ -10,10 +10,25 @@ Accept: application/json
     });
 %}
 
+### Token
+POST {{api_url}}/{{api_version}}/auth/token
+Accept: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
 ### Introspect Token
 POST {{api_url}}/{{api_version}}/auth/token/introspection
 Accept: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{$auth.token("auth-id")}}
 
 > {%
     client.test("Request executed successfully", function() {
@@ -24,7 +39,7 @@ Authorization: Bearer {{token}}
 ### List Functions
 GET {{api_url}}/{{api_version}}/action-creator/functions
 Accept: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{$auth.token("auth-id")}}
 
 > {%
     client.test("Request executed successfully", function() {
@@ -35,28 +50,29 @@ Authorization: Bearer {{token}}
 ### List Functions For Collection
 GET {{api_url}}/{{api_version}}/action-creator/functions?dataset=sentinel-2-l2a
 Accept: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{$auth.token("auth-id")}}
 
 > {%
     client.test("Request executed successfully", function() {
         client.assert(response.status === 200, "Response status is not 200");
     });
 %}
+
 ### List Functions For Non Existent Collection
-GET {{api_url}}/{{api_version}}/action-creator/functions?collection=i-dont-exist
+GET {{api_url}}/{{api_version}}/action-creator/functions?dataset=i-dont-exist
 Accept: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{$auth.token("auth-id")}}
 
 > {%
-    client.test("Request status is 404", function() {
-        client.assert(response.status === 404, "Response status is not 404");
+    client.test("Request status is 200", function() {
+        client.assert(response.status === 200, "Response status is not 200");
     });
 %}
 
 ### List Presets
 GET {{api_url}}/{{api_version}}/action-creator/presets
 Accept: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{$auth.token("auth-id")}}
 
 > {%
     client.test("Request executed successfully", function() {
@@ -64,13 +80,621 @@ Authorization: Bearer {{token}}
     });
 %}
 
-### List WF Submissions No Params
-GET {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+### Validate LULC Change - OK
+POST {{api_url}}/{{api_version}}/action-creator/workflow-validation
 Accept: application/json
-Authorization: Bearer {{token}}
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/lulc-change.json
 
 > {%
     client.test("Request executed successfully", function() {
         client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Validate Water Quality with Defra Calibration - OK
+POST {{api_url}}/{{api_version}}/action-creator/workflow-validation
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/wqc.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Validate NDVI - OK
+POST {{api_url}}/{{api_version}}/action-creator/workflow-validation
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/ndvi.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Validate NDVI + Clip + Reproject - OK
+POST {{api_url}}/{{api_version}}/action-creator/workflow-validation
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/ndvi-clip-reproject.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Validation Error - Area too big
+POST {{api_url}}/{{api_version}}/action-creator/workflow-validation
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-area-too-big.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        let actual_err_type = response.body.detail[0].type;
+        let expected_err_type = "area_of_interest_too_big_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
+### Validation Error - Cycle detected
+POST {{api_url}}/{{api_version}}/action-creator/workflow-validation
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-cycle.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        let actual_err_type = response.body.detail[0].type;
+        let expected_err_type = "cycle_or_self_loop_detected_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
+### Validation Error - Disjoined subgraph detected
+POST {{api_url}}/{{api_version}}/action-creator/workflow-validation
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-disjoined-subgraph.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        let actual_err_type = response.body.detail[0].type;
+        let expected_err_type = "disjoined_subgraphs_detected_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
+### Validation Error - DS not supported by function
+POST {{api_url}}/{{api_version}}/action-creator/workflow-validation
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-ds-not-supported.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        let actual_err_type = response.body.detail[0].type;
+        let expected_err_type = "collection_not_supported_for_task_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
+### Validation Error - Invalid date range
+POST {{api_url}}/{{api_version}}/action-creator/workflow-validation
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-invalid-date-range.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        let actual_err_type = response.body.detail[0].type;
+        let expected_err_type = "invalid_date_range_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
+### Validation Error - Invalid input reference path
+POST {{api_url}}/{{api_version}}/action-creator/workflow-validation
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-invalid-input-ref-path.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        let actual_err_type = response.body.detail[0].type;
+        let expected_err_type = "invalid_reference_path_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
+### Validation Error - Invalid task order
+POST {{api_url}}/{{api_version}}/action-creator/workflow-validation
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-invalid-task-order.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        let actual_err_type = response.body.detail[0].type;
+        let expected_err_type = "invalid_task_order_detected_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
+### Validation Error - No output mapping
+POST {{api_url}}/{{api_version}}/action-creator/workflow-validation
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-no-output.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        let actual_err_type = response.body.detail[0].type;
+        let expected_err_type = "task_output_without_mapping_detected_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
+### Validation Error - Self loop detected
+POST {{api_url}}/{{api_version}}/action-creator/workflow-validation
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-self-loop.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        let actual_err_type = response.body.detail[0].type;
+        let expected_err_type = "cycle_or_self_loop_detected_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
+### Validation Error - Too many tasks
+POST {{api_url}}/{{api_version}}/action-creator/workflow-validation
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-too-many-tasks.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        let actual_err_type = response.body.detail[0].type;
+        let expected_err_type = "maximum_number_of_tasks_exceeded_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
+### Validation Error - WF output not mapped to task output
+POST {{api_url}}/{{api_version}}/action-creator/workflow-validation
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-wf-output-not-mapped.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        actual_err_type = response.body.detail[0].type;
+        expected_err_type = "task_output_without_mapping_detected_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
+### Run LULC Change - OK
+POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/lulc-change.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 202, "Response status is not 202");
+    });
+%}
+
+### Run Water Quality with Defra Calibration - OK
+POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/wqc.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 202, "Response status is not 202");
+    });
+%}
+
+### Run NDVI - OK
+POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/ndvi.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 202, "Response status is not 202");
+    });
+%}
+
+### Run NDVI + Clip + Reproject - OK
+POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/ndvi-clip-reproject.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 202, "Response status is not 202");
+    });
+%}
+
+### Run Error - Area too big
+POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-area-too-big.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        let actual_err_type = response.body.detail[0].type;
+        let expected_err_type = "area_of_interest_too_big_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
+### Run Error - Cycle detected
+POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-cycle.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        let actual_err_type = response.body.detail[0].type;
+        let expected_err_type = "cycle_or_self_loop_detected_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
+### Run Error - Disjoined subgraph detected
+POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-disjoined-subgraph.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        let actual_err_type = response.body.detail[0].type;
+        let expected_err_type = "disjoined_subgraphs_detected_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
+### Run Error - DS not supported by function
+POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-ds-not-supported.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        let actual_err_type = response.body.detail[0].type;
+        let expected_err_type = "collection_not_supported_for_task_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
+### Run Error - Invalid date range
+POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-invalid-date-range.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        let actual_err_type = response.body.detail[0].type;
+        let expected_err_type = "invalid_date_range_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
+### Run Error - Invalid input reference path
+POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-invalid-input-ref-path.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        let actual_err_type = response.body.detail[0].type;
+        let expected_err_type = "invalid_reference_path_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
+### Run Error - Invalid task order
+POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-invalid-task-order.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        let actual_err_type = response.body.detail[0].type;
+        let expected_err_type = "invalid_task_order_detected_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
+### Run Error - No output mapping
+POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-no-output.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        let actual_err_type = response.body.detail[0].type;
+        let expected_err_type = "task_output_without_mapping_detected_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
+### Run Error - Self loop detected
+POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-self-loop.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        let actual_err_type = response.body.detail[0].type;
+        let expected_err_type = "cycle_or_self_loop_detected_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
+### Run Error - Too many tasks
+POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-too-many-tasks.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        let actual_err_type = response.body.detail[0].type;
+        let expected_err_type = "maximum_number_of_tasks_exceeded_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
+### Run Error - WF output not mapped to task output
+POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-wf-output-not-mapped.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        actual_err_type = response.body.detail[0].type;
+        expected_err_type = "task_output_without_mapping_detected_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
+### List WF Submissions No Params
+GET {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### List WF Submissions Pagination
+GET {{api_url}}/{{api_version}}/action-creator/workflow-submissions?page=1&order_by=submitted_at&order_direction=desc&per_page=5&status=successful
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Get Job Status
+GET {{api_url}}/{{api_version}}/action-creator/workflow-submissions/126963dc-b6ec-11ef-94ce-6a040e2afd6f
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Cancel Job
+DELETE {{api_url}}/{{api_version}}/action-creator/workflow-submissions/27e6c068-b644-11ef-ab99-ee3aaed8a789
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 204, "Response status is not 204");
     });
 %}
