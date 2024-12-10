@@ -61,7 +61,14 @@ WATER_QUALITY_PRESET_SPEC = {
                 "date_end": "2024-12-31T23:59:59Z",
                 "aoi": INDIAN_OCEAN_AOI,
             },
-        }
+        },
+        "clip": {
+            "identifier": "clip",
+            "order": 1,
+            "inputs": {
+                "aoi": HEATHROW_AOI,
+            },
+        },
     },
 }
 

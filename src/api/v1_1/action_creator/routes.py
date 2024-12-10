@@ -88,7 +88,7 @@ async def get_available_functions(
 ) -> FunctionsResponse:
     funcs = [f for f in FUNCTIONS if f["visible"]]
     if collection:
-        funcs = [f for f in funcs if collection in f["compatible_with_input_dataset"]]  # type: ignore[operator]
+        funcs = [f for f in funcs if collection in f["compatible_input_datasets"]]  # type: ignore[operator]
     return FunctionsResponse(functions=funcs, total=len(funcs))
 
 

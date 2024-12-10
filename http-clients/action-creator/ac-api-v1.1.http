@@ -10,10 +10,36 @@ Accept: application/json
     });
 %}
 
+### Token
+POST {{api_url}}/{{api_version}}/auth/token
+Accept: application/json
+
+{
+  "username": "{{username}}",
+  "password": "{{password}}"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
 ### Introspect Token
 POST {{api_url}}/{{api_version}}/auth/token/introspection
 Accept: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### List Presets
+GET {{api_url}}/{{api_version}}/action-creator/presets
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
 
 > {%
     client.test("Request executed successfully", function() {
@@ -24,7 +50,7 @@ Authorization: Bearer {{token}}
 ### List Functions
 GET {{api_url}}/{{api_version}}/action-creator/functions
 Accept: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{$auth.token("auth-id")}}
 
 > {%
     client.test("Request executed successfully", function() {
@@ -35,7 +61,7 @@ Authorization: Bearer {{token}}
 ### List Functions For Collection
 GET {{api_url}}/{{api_version}}/action-creator/functions?collection=sentinel-2-l2a
 Accept: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{$auth.token("auth-id")}}
 
 > {%
     client.test("Request executed successfully", function() {
@@ -46,21 +72,111 @@ Authorization: Bearer {{token}}
 ### List Functions For Non Existent Collection
 GET {{api_url}}/{{api_version}}/action-creator/functions?collection=i-dont-exist
 Accept: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{$auth.token("auth-id")}}
 
 > {%
-    client.test("Request status is 404", function() {
-        client.assert(response.status === 404, "Response status is not 404");
+    client.test("Request status is 200", function() {
+        client.assert(response.status === 200, "Response status is not 200");
     });
 %}
 
 ### List Function Submissions No Params
 GET {{api_url}}/{{api_version}}/action-creator/submissions
 Accept: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{$auth.token("auth-id")}}
 
 > {%
     client.test("Request executed successfully", function() {
         client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### List Function Submissions Pagination
+GET {{api_url}}/{{api_version}}/action-creator/submissions?page=1&order_by=submitted_at&order_direction=desc&per_page=5&status=running
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Run LULC Change
+POST {{api_url}}/{{api_version}}/action-creator/submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_1_models/lulc-change.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 202, "Response status is not 202");
+    });
+%}
+
+### Run NDVI
+POST {{api_url}}/{{api_version}}/action-creator/submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_1_models/ndvi.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 202, "Response status is not 202");
+    });
+%}
+
+### Run NDVI + Clip
+POST {{api_url}}/{{api_version}}/action-creator/submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_1_models/ndvi-clip.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 202, "Response status is not 202");
+    });
+%}
+
+### Run Water Quality
+POST {{api_url}}/{{api_version}}/action-creator/submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_1_models/water-quality.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 202, "Response status is not 202");
+    });
+%}
+
+### Get Job Status
+GET {{api_url}}/{{api_version}}/action-creator/submissions/126963dc-b6ec-11ef-94ce-6a040e2afd6f
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Cancel Job
+DELETE {{api_url}}/{{api_version}}/action-creator/submissions/27e6c068-b644-11ef-ab99-ee3aaed8a789
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 204, "Response status is not 204");
     });
 %}
