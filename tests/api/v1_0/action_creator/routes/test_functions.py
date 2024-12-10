@@ -8,7 +8,10 @@ if TYPE_CHECKING:
     from starlette.testclient import TestClient
 
 
-def test_functions_endpoint_returns_all_functions(client: TestClient, auth_token: str) -> None:
+def test_functions_endpoint_returns_all_functions(
+    client: TestClient,
+    auth_token: str,
+) -> None:
     response = client.get("/api/v1.0/action-creator/functions", headers={"Authorization": f"Bearer {auth_token}"})
     assert response.status_code == status.HTTP_200_OK
     assert len(response.json()["functions"]) > 1

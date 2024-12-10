@@ -46,8 +46,9 @@ class IntrospectResponse(BaseModel):
     aud: list[str]
     sub: str
     typ: str
+    arc: str | None = None
     azp: str
-    session_state: str
+    session_state: str | None = None
     allowed_origins: list[str] = Field(..., alias="allowed-origins")
     realm_access: RealmAccess
     resource_access: ResourceAccess
@@ -59,7 +60,7 @@ class IntrospectResponse(BaseModel):
     given_name: str
     family_name: str
     email: str
-    client_id: str
-    username: str
-    token_type: str
-    active: bool
+    client_id: str | None = None
+    username: str | None = None
+    token_type: str | None = None
+    active: bool | None = None

@@ -50,8 +50,19 @@ WATER_QUALITY_PRESET_SPEC = {
     "thumbnail_b64": _load_base_64_thumbnail("water-quality"),
     "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/water-quality-app.cwl",
     "visible": True,
-    "disabled": True,
-    "workflow": None,
+    "disabled": False,
+    "workflow": {
+        "water-quality": {
+            "identifier": "water-quality",
+            "order": 0,
+            "inputs": {
+                "stac_collection": "sentinel-2-l2a",
+                "date_start": "2024-01-01T00:00:00Z",
+                "date_end": "2024-12-31T23:59:59Z",
+                "aoi": INDIAN_OCEAN_AOI,
+            },
+        }
+    },
 }
 
 
@@ -90,6 +101,10 @@ NDVI_CLIP_PRESET = {
             },
         },
     }
+}
+
+WATER_QUALITY_PRESET = {
+    "workflow": WATER_QUALITY_PRESET_SPEC["workflow"],
 }
 
 PRESETS = [LAND_COVER_CHANGE_DETECTION_PRESET_SPEC, WATER_QUALITY_PRESET_SPEC]

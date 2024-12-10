@@ -48,7 +48,9 @@ jobs:
           EODH_AUTH__USERNAME: ${{ secrets.EODH_AUTH__USERNAME }}
           EODH_AUTH__PASSWORD: ${{ secrets.EODH_AUTH__PASSWORD }}
           EODH_AUTH__CLIENT_ID: ${{ secrets.EODH_AUTH__CLIENT_ID }}
-          EODH_AUTH__CLIENT_SECRET: ${{ secrets.EODH_AUTH__CLIENT_SECRET }}
+          EODH_AUTH__API_TOKEN: ${{ secrets.EODH_AUTH__API_TOKEN }}
+          EODH_AUTH__WORKSPACE_TOKENS_URL: ${{ secrets.EODH_AUTH__WORKSPACE_TOKENS_URL }}
+          EODH_AUTH__TMP_S3_CREDENTIALS_URL: ${{ secrets.EODH_AUTH__TMP_S3_CREDENTIALS_URL }}
           ADES__URL: ${{ secrets.ADES__URL }}
           ADES__OGC_PROCESSES_API_PATH: ${{ secrets.ADES__OGC_PROCESSES_API_PATH }}
           ADES__OGC_JOBS_API_PATH: ${{ secrets.ADES__OGC_JOBS_API_PATH }}
