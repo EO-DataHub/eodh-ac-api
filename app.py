@@ -8,10 +8,18 @@ from src.api.v1_0.auth.routes import auth_router_v1_0
 from src.api.v1_0.health.routes import health_router_v1_0
 from src.api.v1_1.action_creator.routes import action_creator_router_v1_1
 from src.api.v1_2.action_creator.routes import action_creator_router_v1_2
+from src.core.settings import current_settings
+
+settings = current_settings()
 
 
 def register_api_v1_0(app: FastAPI) -> FastAPI:
-    sub_app = FastAPI(title="EOPro Action Creator API", version="1.0.0", description="API for Action Creator.")
+    sub_app = FastAPI(
+        title="EOPro Action Creator API",
+        version="1.0.0",
+        description="API for Action Creator.",
+        debug=settings.environment in {"local", "dev"},
+    )
     sub_app.include_router(health_router_v1_0)
     sub_app.include_router(auth_router_v1_0)
     sub_app.include_router(action_creator_router_v1_0)
@@ -20,7 +28,12 @@ def register_api_v1_0(app: FastAPI) -> FastAPI:
 
 
 def register_api_v1_1(app: FastAPI) -> FastAPI:
-    sub_app = FastAPI(title="EOPro Action Creator API", version="1.1.0", description="API for Action Creator.")
+    sub_app = FastAPI(
+        title="EOPro Action Creator API",
+        version="1.1.0",
+        description="API for Action Creator.",
+        debug=settings.environment in {"local", "dev"},
+    )
     sub_app.include_router(health_router_v1_0)
     sub_app.include_router(auth_router_v1_0)
     sub_app.include_router(action_creator_router_v1_1)
@@ -29,7 +42,12 @@ def register_api_v1_1(app: FastAPI) -> FastAPI:
 
 
 def register_api_v1_2(app: FastAPI) -> FastAPI:
-    sub_app = FastAPI(title="EOPro Action Creator API", version="1.2.0", description="API for Action Creator.")
+    sub_app = FastAPI(
+        title="EOPro Action Creator API",
+        version="1.2.0",
+        description="API for Action Creator.",
+        debug=settings.environment in {"local", "dev"},
+    )
     sub_app.include_router(health_router_v1_0)
     sub_app.include_router(auth_router_v1_0)
     sub_app.include_router(action_creator_router_v1_2)
@@ -42,6 +60,7 @@ app = FastAPI(
     version="1.0.0",
     description="Mockup of an API for Action Creator.",
     docs_url=None,
+    debug=True,
 )
 
 app_v1_0 = register_api_v1_0(app)
