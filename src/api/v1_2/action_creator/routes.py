@@ -92,7 +92,7 @@ action_creator_router_v1_2 = APIRouter(
 )
 async def get_available_functions(
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
-    dataset: Annotated[str | None, Query(max_length=64, description="Dataset")] = None,
+    dataset: Annotated[str | None, Query(max_length=128, description="Dataset")] = None,
 ) -> FunctionsResponse:
     funcs = [f for f in FUNCTIONS if f["visible"]]
     if dataset:

@@ -154,6 +154,16 @@ class RasterCalculatorFunctionInputs(CommonFunctionInputs):
         return outputs
 
 
+class WaterQualityFunctionInputs(CommonFunctionInputs):
+    identifier: Literal["water-quality"] = "water-quality"
+    limit: Annotated[int, Field(10, validate_default=True, ge=1, le=100)]
+
+    def as_ogc_process_inputs(self) -> dict[str, Any]:
+        outputs = super().as_ogc_process_inputs()
+        outputs["limit"] = self.limit
+        return outputs
+
+
 class LandCoverChangeDetectionFunctionInputs(CommonFunctionInputs):
     identifier: Literal["land-cover-change-detection"] = "land-cover-change-detection"
 
@@ -235,6 +245,11 @@ class NDWIWorkflowStep(WorkflowStepBase):
     inputs: RasterCalculatorFunctionInputs
 
 
+class WaterQualityWorkflowStep(WorkflowStepBase):
+    identifier: Literal["water-quality"] = "water-quality"
+    inputs: WaterQualityFunctionInputs
+
+
 class LandCoverChangeDetectionWorkflowStep(WorkflowStepBase):
     identifier: Literal["land-cover-change-detection"] = "land-cover-change-detection"
     inputs: LandCoverChangeDetectionFunctionInputs
@@ -248,6 +263,7 @@ TWorkflowStep = Annotated[
         EVIWorkflowStep,
         ClipWorkflowStep,
         LandCoverChangeDetectionWorkflowStep,
+        WaterQualityWorkflowStep,
     ],
     Field(discriminator="identifier"),
 ]

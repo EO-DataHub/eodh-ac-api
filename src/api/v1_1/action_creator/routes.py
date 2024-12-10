@@ -23,7 +23,13 @@ from src.api.v1_1.action_creator.schemas import (
     PresetsResponse,
 )
 from src.consts.functions import FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING, FUNCTIONS
-from src.consts.presets import LAND_COVER_CHANGE_DETECTION_PRESET_SPEC, NDVI_CLIP_PRESET, NDVI_PRESET, PRESETS
+from src.consts.presets import (
+    LAND_COVER_CHANGE_DETECTION_PRESET_SPEC,
+    NDVI_CLIP_PRESET,
+    NDVI_PRESET,
+    PRESETS,
+    WATER_QUALITY_PRESET,
+)
 from src.services.ades.factory import ades_client_factory
 from src.services.ades.schemas import StatusCode
 from src.utils.logging import get_logger
@@ -48,6 +54,11 @@ TWorkflowCreationSpec = Annotated[
                 "summary": "NDVI with Clipping",
                 "description": "NDVI function with additional Clipping of the results",
                 "value": NDVI_CLIP_PRESET,
+            },
+            "water-quality": {
+                "summary": "Water Quality",
+                "description": "Water quality analysis",
+                "value": WATER_QUALITY_PRESET,
             },
         }
     ),
