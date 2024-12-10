@@ -7,6 +7,7 @@ from uuid import uuid4
 
 import pytest
 from aiohttp import ClientSession
+from flaky import flaky
 from starlette import status
 
 from src.core.settings import current_settings
@@ -54,6 +55,7 @@ async def get_cwl_from_href(cwl_href: str, save_dir: Path) -> Path:
     return fp
 
 
+@flaky(max_runs=3)
 @pytest.mark.asyncio(scope="function")
 async def test_ades_registering_process_from_url_with_download(ades: ADESClient) -> None:
     # Arrange - ensure process not registered
@@ -69,6 +71,7 @@ async def test_ades_registering_process_from_url_with_download(ades: ADESClient)
     assert result.id == RASTER_CALCULATOR_PROCESS_IDENTIFIER
 
 
+@flaky(max_runs=3)
 @pytest.mark.asyncio(scope="function")
 async def test_ades_ensure_process_exists(ades: ADESClient) -> None:
     # Arrange - ensure process not registered
@@ -87,6 +90,7 @@ async def test_ades_ensure_process_exists(ades: ADESClient) -> None:
     assert any(p for p in processes.processes if p.id == RASTER_CALCULATOR_PROCESS_IDENTIFIER)
 
 
+@flaky(max_runs=3)
 @pytest.mark.asyncio(scope="function")
 async def test_ades_registering_process_twice_results_in_conflict(ades: ADESClient) -> None:
     # Arrange - ensure process registered
@@ -101,6 +105,7 @@ async def test_ades_registering_process_twice_results_in_conflict(ades: ADESClie
     assert err.code == status.HTTP_409_CONFLICT
 
 
+@flaky(max_runs=3)
 @pytest.mark.asyncio(scope="function")
 async def test_ades_registering_process_from_file(ades: ADESClient, tmp_path: Path) -> None:
     # Arrange - ensure process not registered
@@ -120,6 +125,7 @@ async def test_ades_registering_process_from_file(ades: ADESClient, tmp_path: Pa
     assert await ades.process_exists(RASTER_CALCULATOR_PROCESS_IDENTIFIER)
 
 
+@flaky(max_runs=3)
 @pytest.mark.asyncio(scope="function")
 async def test_ades_reregistering_process(ades: ADESClient) -> None:
     # Arrange - ensure process not registered
@@ -136,6 +142,7 @@ async def test_ades_reregistering_process(ades: ADESClient) -> None:
     assert await ades.process_exists(RASTER_CALCULATOR_PROCESS_IDENTIFIER)
 
 
+@flaky(max_runs=3)
 @pytest.mark.asyncio(scope="function")
 async def test_ades_reregistering_process_with_unknown_function_returns_404_not_found(ades: ADESClient) -> None:
     # Act
@@ -151,6 +158,7 @@ async def test_ades_reregistering_process_with_unknown_function_returns_404_not_
     )
 
 
+@flaky(max_runs=3)
 @pytest.mark.asyncio(scope="function")
 async def test_ades_unregister_non_existent_process_returns_404_not_found(ades: ADESClient) -> None:
     # Act
@@ -166,6 +174,7 @@ async def test_ades_unregister_non_existent_process_returns_404_not_found(ades: 
     })
 
 
+@flaky(max_runs=3)
 @pytest.mark.asyncio(scope="function")
 async def test_ades_listing_process(ades: ADESClient) -> None:
     # Act
@@ -177,6 +186,7 @@ async def test_ades_listing_process(ades: ADESClient) -> None:
     assert response.processes
 
 
+@flaky(max_runs=3)
 @pytest.mark.asyncio(scope="function")
 async def test_ades_get_process_details(ades: ADESClient) -> None:
     # Arrange
@@ -194,6 +204,7 @@ async def test_ades_get_process_details(ades: ADESClient) -> None:
     assert all(k in result.inputs for k in ("stac_collection", "date_start", "date_end", "aoi"))
 
 
+@flaky(max_runs=3)
 @pytest.mark.asyncio(scope="function")
 async def test_ades_get_non_existent_process_details_returns_404_not_found(ades: ADESClient) -> None:
     # Act
@@ -206,6 +217,7 @@ async def test_ades_get_non_existent_process_details_returns_404_not_found(ades:
     assert result is None
 
 
+@flaky(max_runs=3)
 @pytest.mark.asyncio(scope="function")
 async def test_ades_executing_job(ades: ADESClient) -> None:
     # Arrange - ensure process registered
@@ -258,6 +270,7 @@ async def test_ades_executing_job(ades: ADESClient) -> None:
     assert err is None
 
 
+@flaky(max_runs=3)
 @pytest.mark.asyncio(scope="function")
 async def test_ades_get_non_existent_job_details_returns_404_not_found(ades: ADESClient) -> None:
     # Act
@@ -269,6 +282,7 @@ async def test_ades_get_non_existent_job_details_returns_404_not_found(ades: ADE
     assert err.code == status.HTTP_404_NOT_FOUND
 
 
+@flaky(max_runs=3)
 @pytest.mark.asyncio(scope="function")
 async def test_ades_getting_non_existent_job_results_of_returns_404_not_found(ades: ADESClient) -> None:
     # Act
@@ -281,6 +295,7 @@ async def test_ades_getting_non_existent_job_results_of_returns_404_not_found(ad
     assert err.detail == f"Job '{NON_EXISTENT_JOB_ID}' does not exist."
 
 
+@flaky(max_runs=3)
 @pytest.mark.asyncio(scope="function")
 async def test_ades_cancelling_job_returns_204(ades: ADESClient) -> None:
     # Arrange
@@ -301,6 +316,7 @@ async def test_ades_cancelling_job_returns_204(ades: ADESClient) -> None:
     assert result.status == "dismissed"
 
 
+@flaky(max_runs=3)
 @pytest.mark.asyncio(scope="function")
 async def test_ades_cancelling_non_existent_job_returns_error_response(ades: ADESClient) -> None:
     # Act

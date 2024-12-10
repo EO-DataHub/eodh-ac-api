@@ -18,14 +18,16 @@ if TYPE_CHECKING:
     TEST_WORKFLOWS.items(),
     ids=itemgetter(0),
 )
-def test_wf_validation_endpoint(wf_spec: tuple[str, dict[str, Any]], client: TestClient, auth_token: str) -> None:
+def test_wf_validation_endpoint(
+    wf_spec: tuple[str, dict[str, Any]], client: TestClient, auth_token_module_scoped: str
+) -> None:
     # Arrange
     _, wf = wf_spec
 
     # Act
     response = client.post(
         "/api/v1.2/action-creator/workflow-validation",
-        headers={"Authorization": f"Bearer {auth_token}"},
+        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
         json=wf["value"],
     )
 

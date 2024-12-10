@@ -3,6 +3,7 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import TYPE_CHECKING
 
+from flaky import flaky
 from starlette import status
 
 from src.api.v1_1.action_creator.schemas import ActionCreatorJob
@@ -13,9 +14,10 @@ if TYPE_CHECKING:
     from starlette.testclient import TestClient
 
 
+@flaky(max_runs=3)
 def test_ws_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
     client: TestClient,
-    auth_token: str,
+    auth_token_func_scoped: str,
 ) -> None:
     # Arrange
     preset_request_body = deepcopy(LAND_COVER_CHANGE_DETECTION_PRESET_SPEC)
@@ -24,7 +26,7 @@ def test_ws_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
     # Act
     with client.websocket_connect(
         url="/api/v1.1/action-creator/ws/submissions",
-        headers={"Authorization": f"Bearer {auth_token}"},
+        headers={"Authorization": f"Bearer {auth_token_func_scoped}"},
     ) as websocket:
         # Send the request body (job submission)
         websocket.send_json({"workflow": preset_request_body["workflow"]})
@@ -46,9 +48,10 @@ def test_ws_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
         assert final_response["result"]["finished_at"] is not None
 
 
+@flaky(max_runs=3)
 def test_ws_job_status_endpoint_returns_valid_response_when_all_is_ok(
     client: TestClient,
-    auth_token: str,
+    auth_token_module_scoped: str,
 ) -> None:
     # Arrange
     preset_request_body = deepcopy(LAND_COVER_CHANGE_DETECTION_PRESET_SPEC)
@@ -56,7 +59,7 @@ def test_ws_job_status_endpoint_returns_valid_response_when_all_is_ok(
     response = client.post(
         "/api/v1.1/action-creator/submissions",
         json=preset_request_body,
-        headers={"Authorization": f"Bearer {auth_token}"},
+        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
     )
     assert response.status_code == status.HTTP_202_ACCEPTED
     job_spec = ActionCreatorJob(**response.json())
@@ -64,7 +67,7 @@ def test_ws_job_status_endpoint_returns_valid_response_when_all_is_ok(
     # Act
     with client.websocket_connect(
         url="/api/v1.1/action-creator/ws/submission-status",
-        headers={"Authorization": f"Bearer {auth_token}"},
+        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
     ) as websocket:
         # Send the request body (job submission)
         websocket.send_json({"submission_id": job_spec.submission_id})

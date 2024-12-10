@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 def test_post_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
     client: TestClient,
     mocked_ades_factory: MagicMock,  # noqa: ARG001
-    auth_token: str,
+    auth_token_module_scoped: str,
     request_body_fixture: str,
     request: FixtureRequest,
 ) -> None:
@@ -36,7 +36,7 @@ def test_post_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
     # Act
     response = client.post(
         url="/api/v1.0/action-creator/submissions",
-        headers={"Authorization": f"Bearer {auth_token}"},
+        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
         json=request_body,
     )
 
@@ -56,7 +56,7 @@ def test_post_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
 def test_post_job_submissions_endpoint_returns_422_when_invalid_stac_collection_was_provided(
     client: TestClient,
     mocked_ades_factory: MagicMock,  # noqa: ARG001
-    auth_token: str,
+    auth_token_module_scoped: str,
     request_body_fixture: str,
     request: FixtureRequest,
 ) -> None:
@@ -69,7 +69,7 @@ def test_post_job_submissions_endpoint_returns_422_when_invalid_stac_collection_
     # Act
     response = client.post(
         url="/api/v1.0/action-creator/submissions",
-        headers={"Authorization": f"Bearer {auth_token}"},
+        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
         json=request_body,
     )
 
@@ -95,7 +95,7 @@ def test_post_job_submissions_endpoint_returns_422_when_invalid_stac_collection_
 def test_post_job_submissions_endpoint_returns_422_when_missing_geometry(
     client: TestClient,
     mocked_ades_factory: MagicMock,  # noqa: ARG001
-    auth_token: str,
+    auth_token_module_scoped: str,
     request_body_fixture: str,
     request: FixtureRequest,
 ) -> None:
@@ -106,7 +106,7 @@ def test_post_job_submissions_endpoint_returns_422_when_missing_geometry(
     # Act
     response = client.post(
         url="/api/v1.0/action-creator/submissions",
-        headers={"Authorization": f"Bearer {auth_token}"},
+        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
         json=request_body,
     )
 
@@ -129,7 +129,7 @@ def test_post_job_submissions_endpoint_returns_422_when_missing_geometry(
 def test_post_job_submissions_endpoint_returns_422_when_invalid_date_range_was_provided(
     client: TestClient,
     mocked_ades_factory: MagicMock,  # noqa: ARG001
-    auth_token: str,
+    auth_token_module_scoped: str,
     request_body_fixture: str,
     request: FixtureRequest,
 ) -> None:
@@ -140,7 +140,7 @@ def test_post_job_submissions_endpoint_returns_422_when_invalid_date_range_was_p
     # Act
     response = client.post(
         url="/api/v1.0/action-creator/submissions",
-        headers={"Authorization": f"Bearer {auth_token}"},
+        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
         json=request_body,
     )
 

@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 def test_get_job_submissions_status_endpoint_returns_successful_response(
     client: TestClient,
     mocked_ades_factory: MagicMock,  # noqa: ARG001
-    auth_token: str,
+    auth_token_module_scoped: str,
 ) -> None:
     # Arrange
     test_job_id = str(uuid.uuid4())
@@ -24,7 +24,7 @@ def test_get_job_submissions_status_endpoint_returns_successful_response(
     # Act
     response = client.get(
         f"/api/v1.2/action-creator/workflow-submissions/{test_job_id}",
-        headers={"Authorization": f"Bearer {auth_token}"},
+        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
     )
 
     # Assert

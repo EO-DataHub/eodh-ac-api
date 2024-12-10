@@ -12,6 +12,7 @@ dependencies:
   - pip:
       - coverage
       - interrogate
+      - flaky
       - mkdocs
       - mkdocs-material
       - mkdocs-gen-files

@@ -27,10 +27,12 @@ TOTAL_ITEMS = len(GET_JOB_LIST_RESPONSE["jobs"])  # type: ignore[arg-type]
 def test_get_job_submissions_endpoint_returns_valid_response_no_params(
     client: TestClient,
     mocked_ades_factory: MagicMock,  # noqa: ARG001
-    auth_token: str,
+    auth_token_module_scoped: str,
 ) -> None:
     # Act
-    response = client.get("/api/v1.0/action-creator/submissions", headers={"Authorization": f"Bearer {auth_token}"})
+    response = client.get(
+        "/api/v1.0/action-creator/submissions", headers={"Authorization": f"Bearer {auth_token_module_scoped}"}
+    )
 
     # Assert
     pagination_results = PaginationResults[ActionCreatorJobSummary](**response.json())
@@ -50,7 +52,7 @@ def test_get_job_submissions_endpoint_returns_valid_response_no_params(
 def test_get_job_submissions_returns_empty_result_set_when_ades_job_history_is_empty(
     ades_factory_mock: MagicMock,
     client: TestClient,
-    auth_token: str,
+    auth_token_module_scoped: str,
 ) -> None:
     # Arrange
     ades_mock = MagicMock()
@@ -59,7 +61,9 @@ def test_get_job_submissions_returns_empty_result_set_when_ades_job_history_is_e
     ades_factory_mock.return_value = ades_mock
 
     # Act
-    response = client.get("/api/v1.0/action-creator/submissions", headers={"Authorization": f"Bearer {auth_token}"})
+    response = client.get(
+        "/api/v1.0/action-creator/submissions", headers={"Authorization": f"Bearer {auth_token_module_scoped}"}
+    )
 
     # Assert
     assert response.status_code == status.HTTP_200_OK
@@ -77,7 +81,7 @@ def test_get_job_submissions_returns_empty_result_set_when_ades_job_history_is_e
 def test_get_job_submissions_returns_correct_pagination_with_fewer_jobs_than_per_page(
     ades_factory_mock: MagicMock,
     client: TestClient,
-    auth_token: str,
+    auth_token_module_scoped: str,
 ) -> None:
     # Arrange
     num_jobs = 10
@@ -101,7 +105,9 @@ def test_get_job_submissions_returns_correct_pagination_with_fewer_jobs_than_per
     ades_factory_mock.return_value = fake_ades_client
 
     # Act
-    response = client.get("/api/v1.0/action-creator/submissions", headers={"Authorization": f"Bearer {auth_token}"})
+    response = client.get(
+        "/api/v1.0/action-creator/submissions", headers={"Authorization": f"Bearer {auth_token_module_scoped}"}
+    )
 
     # Assert
     assert response.status_code == status.HTTP_200_OK
@@ -128,14 +134,14 @@ def test_get_job_submissions_returns_correct_pagination_with_fewer_jobs_than_per
 def test_get_job_submissions_sorts_results_by_order_by_and_direction(
     mocked_ades_factory: MagicMock,  # noqa: ARG001
     client: TestClient,
-    auth_token: str,
+    auth_token_module_scoped: str,
     order_by: str,
     order_direction: str,
 ) -> None:
     # Act
     response = client.get(
         "/api/v1.0/action-creator/submissions",
-        headers={"Authorization": f"Bearer {auth_token}"},
+        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
         params={
             "order_by": order_by,
             "order_direction": order_direction,
@@ -172,11 +178,11 @@ def test_get_job_submissions_sorts_results_by_order_by_and_direction(
 def test_get_job_submissions_with_custom_per_page_item_count_and_page_idx(
     mocked_ades_factory: MagicMock,  # noqa: ARG001
     client: TestClient,
-    auth_token: str,
+    auth_token_module_scoped: str,
     page: int,
     per_page: int,
 ) -> None:
-    headers = {"Authorization": f"Bearer {auth_token}"}
+    headers = {"Authorization": f"Bearer {auth_token_module_scoped}"}
     params = {"page": page, "per_page": per_page}
 
     # Act
