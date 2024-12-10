@@ -16,13 +16,13 @@ if TYPE_CHECKING:
 def test_ws_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
     client: TestClient,
     mocked_ades_factory: MagicMock,  # noqa: ARG001
-    auth_token: str,
+    auth_token_module_scoped: str,
     raster_calculator_request_body: dict[str, Any],
 ) -> None:
     # Act
     with client.websocket_connect(
         url="/api/v1.0/action-creator/ws/submissions",
-        headers={"Authorization": f"Bearer {auth_token}"},
+        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
     ) as websocket:
         # Send the request body (job submission)
         websocket.send_json(raster_calculator_request_body)
@@ -47,7 +47,7 @@ def test_ws_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
 def test_ws_job_submissions_endpoint_returns_422_when_invalid_stac_collection_was_provided(
     client: TestClient,
     mocked_ades_factory: MagicMock,  # noqa: ARG001
-    auth_token: str,
+    auth_token_module_scoped: str,
     raster_calculator_request_body: dict[str, Any],
 ) -> None:
     # Arrange
@@ -55,7 +55,7 @@ def test_ws_job_submissions_endpoint_returns_422_when_invalid_stac_collection_wa
 
     with pytest.raises(RuntimeError), client.websocket_connect(  # noqa: PT012
         url="/api/v1.0/action-creator/ws/submissions",
-        headers={"Authorization": f"Bearer {auth_token}"},
+        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
     ) as websocket:
         # Send the request body (job submission)
         websocket.send_json(raster_calculator_request_body)
@@ -77,7 +77,7 @@ def test_ws_job_submissions_endpoint_returns_422_when_invalid_stac_collection_wa
 def test_ws_job_submissions_endpoint_returns_422_when_missing_geometry(
     client: TestClient,
     mocked_ades_factory: MagicMock,  # noqa: ARG001
-    auth_token: str,
+    auth_token_module_scoped: str,
     raster_calculator_request_body: dict[str, Any],
 ) -> None:
     # Arrange
@@ -86,7 +86,7 @@ def test_ws_job_submissions_endpoint_returns_422_when_missing_geometry(
     # Act
     with pytest.raises(RuntimeError), client.websocket_connect(  # noqa: PT012
         url="/api/v1.0/action-creator/ws/submissions",
-        headers={"Authorization": f"Bearer {auth_token}"},
+        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
     ) as websocket:
         # Send the request body (job submission)
         websocket.send_json(raster_calculator_request_body)
@@ -104,7 +104,7 @@ def test_ws_job_submissions_endpoint_returns_422_when_missing_geometry(
 def test_ws_job_submissions_endpoint_returns_422_when_invalid_date_range_was_provided(
     client: TestClient,
     mocked_ades_factory: MagicMock,  # noqa: ARG001
-    auth_token: str,
+    auth_token_module_scoped: str,
     raster_calculator_request_body: dict[str, Any],
 ) -> None:
     # Arrange
@@ -113,7 +113,7 @@ def test_ws_job_submissions_endpoint_returns_422_when_invalid_date_range_was_pro
     # Act
     with pytest.raises(RuntimeError), client.websocket_connect(  # noqa: PT012
         url="/api/v1.0/action-creator/ws/submissions",
-        headers={"Authorization": f"Bearer {auth_token}"},
+        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
     ) as websocket:
         # Send the request body (job submission)
         websocket.send_json(raster_calculator_request_body)

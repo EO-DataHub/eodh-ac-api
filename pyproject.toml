@@ -217,6 +217,7 @@ module = [
     "dotenv.*",
     "fastapi.*",
     "fastapi_hypermodel.*",
+    "flaky.*",
     "geojson_pydantic.*",
     "jwt.*",
     "mkdocs_gen_files.*",

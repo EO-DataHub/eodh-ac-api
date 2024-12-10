@@ -11,21 +11,23 @@ if TYPE_CHECKING:
     from starlette.testclient import TestClient
 
 
-def test_get_action_creator_functions_happy_path(client: TestClient, auth_token: str) -> None:
+def test_get_action_creator_functions_happy_path(client: TestClient, auth_token_module_scoped: str) -> None:
     # Act
-    response = client.get("/api/v1.2/action-creator/functions", headers={"Authorization": f"Bearer {auth_token}"})
+    response = client.get(
+        "/api/v1.2/action-creator/functions", headers={"Authorization": f"Bearer {auth_token_module_scoped}"}
+    )
 
     # Assert
     FunctionsResponse(**response.json())
 
 
 def test_get_action_creator_functions_returns_empty_result_set_for_bad_dataset(
-    client: TestClient, auth_token: str
+    client: TestClient, auth_token_module_scoped: str
 ) -> None:
     # Act
     response = client.get(
         "/api/v1.2/action-creator/functions?dataset=dummy-dataset",
-        headers={"Authorization": f"Bearer {auth_token}"},
+        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
     )
 
     # Assert
@@ -46,7 +48,7 @@ def test_get_action_creator_functions_returns_empty_result_set_for_bad_dataset(
     ],
 )
 def test_get_action_creator_functions_returns_expected_functions_for_dataset(
-    dataset: str, client: TestClient, auth_token: str
+    dataset: str, client: TestClient, auth_token_module_scoped: str
 ) -> None:
     # Arrange
     expected_functions = [
@@ -56,7 +58,7 @@ def test_get_action_creator_functions_returns_expected_functions_for_dataset(
     # Act
     response = client.get(
         f"/api/v1.2/action-creator/functions?dataset={dataset}",
-        headers={"Authorization": f"Bearer {auth_token}"},
+        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
     )
 
     # Assert

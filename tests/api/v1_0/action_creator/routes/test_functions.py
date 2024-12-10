@@ -10,29 +10,31 @@ if TYPE_CHECKING:
 
 def test_functions_endpoint_returns_all_functions(
     client: TestClient,
-    auth_token: str,
+    auth_token_module_scoped: str,
 ) -> None:
-    response = client.get("/api/v1.0/action-creator/functions", headers={"Authorization": f"Bearer {auth_token}"})
+    response = client.get(
+        "/api/v1.0/action-creator/functions", headers={"Authorization": f"Bearer {auth_token_module_scoped}"}
+    )
     assert response.status_code == status.HTTP_200_OK
     assert len(response.json()["functions"]) > 1
 
 
-def test_functions_endpoint_returns_functions_for_collection(client: TestClient, auth_token: str) -> None:
+def test_functions_endpoint_returns_functions_for_collection(client: TestClient, auth_token_module_scoped: str) -> None:
     collection = "sentinel-2-l2a"
     response = client.get(
         f"/api/v1.0/action-creator/functions?collection={collection}",
-        headers={"Authorization": f"Bearer {auth_token}"},
+        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
     )
     assert response.status_code == status.HTTP_200_OK
     for f in response.json()["functions"]:
         assert collection in f["inputs"]["stac_collection"]["options"]
 
 
-def test_functions_endpoint_returns_empty_function_list(client: TestClient, auth_token: str) -> None:
+def test_functions_endpoint_returns_empty_function_list(client: TestClient, auth_token_module_scoped: str) -> None:
     collection = "dummy-collection"
     response = client.get(
         f"/api/v1.0/action-creator/functions?collection={collection}",
-        headers={"Authorization": f"Bearer {auth_token}"},
+        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
     )
     assert response.status_code == status.HTTP_200_OK
     assert not response.json()["functions"]

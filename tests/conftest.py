@@ -37,8 +37,19 @@ def client_fixture(app: FastAPI) -> TestClient:
     return TestClient(app)
 
 
+@pytest.fixture(scope="module")
+def auth_token_module_scoped() -> str:
+    settings = current_settings()
+    client = TestClient(fast_api_app)
+    response = client.post(
+        "/api/v1.0/auth/token",
+        json={"username": settings.eodh_auth.username, "password": settings.eodh_auth.password},
+    )
+    return response.json()["access_token"]  # type: ignore[no-any-return]
+
+
 @pytest.fixture
-def auth_token() -> str:
+def auth_token_func_scoped() -> str:
     settings = current_settings()
     client = TestClient(fast_api_app)
     response = client.post(
