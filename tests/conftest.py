@@ -37,6 +37,7 @@ def client_fixture(app: FastAPI) -> TestClient:
     return TestClient(app)
 
 
+@pytest.fixture
 def auth_token() -> str:
     settings = current_settings()
     client = TestClient(fast_api_app)
