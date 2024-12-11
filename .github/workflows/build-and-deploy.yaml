@@ -39,8 +39,9 @@ jobs:
           done
       - name: Create file with environment variables
         run: |
+          echo "ENVIRONMENT=dev" >> envs.env
           echo "EODH_AUTH__API_TOKEN=${{ secrets.EODH_AUTH__API_TOKEN }}" >> envs.env
-          echo "EODH_AUTH__BASE_URL=${{ secrets.EODH_AUTH__BASE_URL }}" > envs.env
+          echo "EODH_AUTH__BASE_URL=${{ secrets.EODH_AUTH__BASE_URL }}" >> envs.env
           echo "EODH_AUTH__CLIENT_ID=${{ secrets.EODH_AUTH__CLIENT_ID }}" >> envs.env
           echo "EODH_AUTH__PASSWORD=${{ secrets.EODH_AUTH__PASSWORD }}" >> envs.env
           echo "EODH_AUTH__REALM=${{ secrets.EODH_AUTH__REALM }}" >> envs.env
@@ -83,8 +84,9 @@ jobs:
           aws ecr put-image --repository-name ${{ secrets.ECR_REPOSITORY }} --image-tag ${{ vars.TAGS }} --image-manifest "$MANIFEST" --region ${{ vars.AWS_REGION }}
       - name: Create file with environment variables
         run: |
+          echo "ENVIRONMENT=qa" >> envs.env
           echo "EODH_AUTH__API_TOKEN=${{ secrets.EODH_AUTH__API_TOKEN }}" >> envs.env
-          echo "EODH_AUTH__BASE_URL=${{ secrets.EODH_AUTH__BASE_URL }}" > envs.env
+          echo "EODH_AUTH__BASE_URL=${{ secrets.EODH_AUTH__BASE_URL }}" >> envs.env
           echo "EODH_AUTH__CLIENT_ID=${{ secrets.EODH_AUTH__CLIENT_ID }}" >> envs.env
           echo "EODH_AUTH__PASSWORD=${{ secrets.EODH_AUTH__PASSWORD }}" >> envs.env
           echo "EODH_AUTH__REALM=${{ secrets.EODH_AUTH__REALM }}" >> envs.env
@@ -127,8 +129,9 @@ jobs:
           aws ecr put-image --repository-name ${{ secrets.ECR_REPOSITORY }} --image-tag ${{ vars.TAGS }} --image-manifest "$MANIFEST" --region ${{ vars.AWS_REGION }}
       - name: Create file with environment variables
         run: |
+          echo "ENVIRONMENT=staging" >> envs.env
           echo "EODH_AUTH__API_TOKEN=${{ secrets.EODH_AUTH__API_TOKEN }}" >> envs.env
-          echo "EODH_AUTH__BASE_URL=${{ secrets.EODH_AUTH__BASE_URL }}" > envs.env
+          echo "EODH_AUTH__BASE_URL=${{ secrets.EODH_AUTH__BASE_URL }}" >> envs.env
           echo "EODH_AUTH__CLIENT_ID=${{ secrets.EODH_AUTH__CLIENT_ID }}" >> envs.env
           echo "EODH_AUTH__PASSWORD=${{ secrets.EODH_AUTH__PASSWORD }}" >> envs.env
           echo "EODH_AUTH__REALM=${{ secrets.EODH_AUTH__REALM }}" >> envs.env
