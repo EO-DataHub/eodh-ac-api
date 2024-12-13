@@ -90,7 +90,7 @@ EVI_FUNCTION_SPEC = {
 }
 SAVI_FUNCTION_SPEC = {
     "identifier": "savi",
-    "name": "Soil Adjusted Vegetation Index (EVI)",
+    "name": "Soil Adjusted Vegetation Index (SAVI)",
     "description": "Computes SAVI spectral index.",
     "visible": True,
     "standalone": True,
