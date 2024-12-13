@@ -168,7 +168,7 @@ class WorkflowCreator:
         max_cpu = 1
         for task in tasks:
             max_ram = max(max_ram, task["requirements"]["ResourceRequirement"]["ramMax"])
-            max_cpu = max(max_ram, task["requirements"]["ResourceRequirement"]["coresMax"])
+            max_cpu = max(max_cpu, task["requirements"]["ResourceRequirement"]["coresMax"])
         return {"ResourceRequirement": {"coresMax": max_cpu, "ramMax": max_ram}}
 
     @classmethod
