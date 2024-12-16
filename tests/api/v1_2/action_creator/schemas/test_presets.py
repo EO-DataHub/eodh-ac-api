@@ -8,6 +8,7 @@ from src.consts.geometries import HEATHROW_AOI
 def test_lulc_change_preset_parsing() -> None:
     # Arrange
     expected = {
+        "identifier": "lcc",
         "inputs": {
             "area": HEATHROW_AOI,
             "dataset": "esa-lccci-glcm",
@@ -42,6 +43,21 @@ def test_lulc_change_preset_parsing() -> None:
                     "epsg": "EPSG:3857",
                 },
                 "outputs": {"results": {"name": "results", "type": "directory"}},
+            },
+            "thumbnail": {
+                "identifier": "thumbnail",
+                "inputs": {
+                    "data_dir": {
+                        "name": "results",
+                        "type": "directory",
+                    },
+                },
+                "outputs": {
+                    "results": {
+                        "name": "results",
+                        "type": "directory",
+                    },
+                },
             },
         },
     }
