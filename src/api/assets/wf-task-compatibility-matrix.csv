@@ -1,4 +1,4 @@
-index,s1-ds-query,s2-ds-query,esa-glc-ds-query,corine-lc-ds-query,water-bodies-ds-query,ndvi,evi,savi,ndwi,cya,cdom,doc,sar-water-mask,clip,reproject,summarize-class-statistics,defra-calibrate,stac-join,water-quality,thumbnail
+index,s1-ds-query,s2-ds-query,esa-glc-ds-query,corine-lc-ds-query,water-bodies-ds-query,ndvi,evi,savi,ndwi,cya_cells,cdom,doc,sar-water-mask,clip,reproject,summarize-class-statistics,defra-calibrate,stac-join,water-quality,thumbnail
 s1-ds-query,no,no,no,no,no,no,no,no,no,no,no,no,yes,yes,yes,no,no,yes,no,yes
 s2-ds-query,no,no,no,no,no,yes,yes,yes,yes,yes,yes,yes,no,yes,yes,no,no,yes,yes,yes
 esa-glc-ds-query,no,no,no,no,no,no,no,no,no,no,no,no,no,yes,yes,yes,no,yes,no,yes
@@ -8,7 +8,7 @@ ndvi,no,no,no,no,no,no,no,no,no,no,no,no,no,yes,yes,no,no,yes,no,yes
 evi,no,no,no,no,no,no,no,no,no,no,no,no,yes,yes,yes,yes,no,yes,no,yes
 savi,no,no,no,no,no,no,no,no,no,no,no,no,yes,yes,yes,yes,no,yes,no,yes
 ndwi,no,no,no,no,no,no,no,no,no,no,no,no,yes,yes,yes,yes,no,yes,no,yes
-cya,no,no,no,no,no,no,no,no,no,no,no,no,yes,yes,yes,yes,yes,yes,no,yes
+cya_cells,no,no,no,no,no,no,no,no,no,no,no,no,yes,yes,yes,yes,yes,yes,no,yes
 cdom,no,no,no,no,no,no,no,no,no,no,no,no,yes,yes,yes,yes,yes,yes,no,yes
 doc,no,no,no,no,no,no,no,no,no,no,no,no,yes,yes,yes,yes,yes,yes,no,yes
 sar-water-mask,no,no,no,no,no,no,no,no,no,no,no,no,yes,yes,yes,yes,no,yes,no,yes

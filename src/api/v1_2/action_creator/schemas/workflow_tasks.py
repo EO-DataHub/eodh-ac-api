@@ -677,7 +677,7 @@ class NDWITask(WorkflowTask):
 
 
 class CYATask(WorkflowTask):
-    identifier: Literal["cya"] = "cya"
+    identifier: Literal["cya_cells"] = "cya_cells"
     inputs: DirectoryInputs
     outputs: DirectoryOutputs
 

@@ -214,7 +214,7 @@ def check_task_collection_support(data: dict[str, Any]) -> None:
 
 
 class WorkflowSpec(BaseModel):
-    identifier: Annotated[str | None, Field(None, min_length=5, max_length=19)]
+    identifier: Annotated[str | None, Field(None, min_length=3, max_length=19)]
     description: Annotated[str | None, Field(None, min_length=1, max_length=256)]
     inputs: MainWorkflowInputs
     outputs: DirectoryOutputs
