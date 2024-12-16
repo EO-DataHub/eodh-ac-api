@@ -145,11 +145,25 @@ def visualize_workflow_graph(
     node_size: int = 2000,
     **kwargs: Any,
 ) -> plt.Figure:
+    color_map = []
+    for n_id in g:
+        if n_id.startswith("inputs.area"):
+            color_map.append("limegreen")
+        elif n_id.startswith("inputs.dataset"):
+            color_map.append("orange")
+        elif n_id.startswith("inputs.date"):
+            color_map.append("deepskyblue")
+        elif n_id.startswith("functions."):
+            color_map.append("red")
+        elif n_id.startswith("outputs."):
+            color_map.append("teal")
+        else:
+            color_map.append("gray")
     fig, ax = plt.subplots(figsize=figsize)
     ax.axis("off")
     plot_options = {"node_size": node_size, "with_labels": True}
     pos = nx.nx_agraph.graphviz_layout(g, prog="dot")
-    nx.draw_networkx(g, pos=pos, ax=ax, **plot_options, **kwargs)
+    nx.draw_networkx(g, pos=pos, ax=ax, node_color=color_map, **plot_options, **kwargs)
     return fig
 
 
@@ -200,9 +214,19 @@ def check_task_collection_support(data: dict[str, Any]) -> None:
 
 
 class WorkflowSpec(BaseModel):
+    identifier: Annotated[str | None, Field(None, min_length=5, max_length=19)]
+    description: Annotated[str | None, Field(None, min_length=1, max_length=256)]
     inputs: MainWorkflowInputs
     outputs: DirectoryOutputs
     functions: dict[str, TWorkflowTask]
+
+    @field_validator("identifier")
+    @classmethod
+    def validate_identifier(cls, v: str | None) -> str | None:
+        if v is None:
+            return None
+        v = v.lower().replace(" ", "-")
+        return "".join([c for c in v if c.isalnum() or c in {"-", "_"}])
 
     @model_validator(mode="before")
     @classmethod

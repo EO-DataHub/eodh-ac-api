@@ -26,6 +26,7 @@ LULC_THUMBNAIL = _load_base_64_thumbnail("lulc-change")
 WATER_QUALITY_THUMBNAIL = _load_base_64_thumbnail("water-quality")
 
 LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC: dict[str, Any] = {
+    "identifier": "lcc",
     "inputs": {
         "area": HEATHROW_AOI,
         "dataset": "esa-lccci-glcm",
@@ -65,11 +66,18 @@ LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC: dict[str, Any] = {
                 },
                 "epsg": {"$type": "atom", "value": "EPSG:3857"},
             },
-            "outputs": {
-                "results": {
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "thumbnail": {
+            "identifier": "thumbnail",
+            "inputs": {
+                "data_dir": {
                     "$type": "ref",
-                    "value": ["outputs", "results"],
+                    "value": ["functions", "reproject", "outputs", "results"],
                 },
+            },
+            "outputs": {
+                "results": {"$type": "ref", "value": ["outputs", "results"]},
             },
         },
     },
@@ -83,7 +91,181 @@ LULC_CHANGE_PRESET: dict[str, Any] = {
     "thumbnail_b64": _load_base_64_thumbnail("lulc-change"),
     "workflow": LAND_COVER_CHANGE_DETECTION_WORKFLOW_SPEC,
 }
+ADVANCED_WATER_QUALITY_WORKFLOW_SPEC: dict[str, Any] = {
+    "identifier": "adv-wq",
+    "inputs": {
+        "area": HEATHROW_AOI,
+        "dataset": "sentinel-2-l2a",
+        "date_start": "2024-03-01",
+        "date_end": "2024-10-10",
+    },
+    "outputs": {"results": {"name": "results", "type": "directory"}},
+    "functions": {
+        "query": {
+            "identifier": "s2-ds-query",
+            "inputs": {
+                "area": {"$type": "ref", "value": ["inputs", "area"]},
+                "stac_collection": {"$type": "ref", "value": ["inputs", "dataset"]},
+                "date_start": {"$type": "ref", "value": ["inputs", "date_start"]},
+                "date_end": {"$type": "ref", "value": ["inputs", "date_end"]},
+                "clip": {"$type": "atom", "value": True},
+                "limit": {"$type": "atom", "value": 10},
+                "cloud_cover_min": {"$type": "atom", "value": 0},
+                "cloud_cover_max": {"$type": "atom", "value": 100},
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "ndwi": {
+            "identifier": "ndwi",
+            "inputs": {
+                "data_dir": {
+                    "$type": "ref",
+                    "value": ["functions", "query", "outputs", "results"],
+                },
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "reproject_ndwi": {
+            "identifier": "reproject",
+            "inputs": {
+                "data_dir": {
+                    "$type": "ref",
+                    "value": ["functions", "ndwi", "outputs", "results"],
+                },
+                "epsg": {"$type": "atom", "value": "EPSG:3857"},
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "cya": {
+            "identifier": "cya_cells",
+            "inputs": {
+                "data_dir": {
+                    "$type": "ref",
+                    "value": ["functions", "query", "outputs", "results"],
+                },
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "reproject_cya": {
+            "identifier": "reproject",
+            "inputs": {
+                "data_dir": {
+                    "$type": "ref",
+                    "value": ["functions", "cya", "outputs", "results"],
+                },
+                "epsg": {"$type": "atom", "value": "EPSG:3857"},
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "doc": {
+            "identifier": "doc",
+            "inputs": {
+                "data_dir": {
+                    "$type": "ref",
+                    "value": ["functions", "query", "outputs", "results"],
+                },
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "reproject_doc": {
+            "identifier": "reproject",
+            "inputs": {
+                "data_dir": {
+                    "$type": "ref",
+                    "value": ["functions", "doc", "outputs", "results"],
+                },
+                "epsg": {"$type": "atom", "value": "EPSG:3857"},
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "cdom": {
+            "identifier": "cdom",
+            "inputs": {
+                "data_dir": {
+                    "$type": "ref",
+                    "value": ["functions", "query", "outputs", "results"],
+                },
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "reproject_cdom": {
+            "identifier": "reproject",
+            "inputs": {
+                "data_dir": {
+                    "$type": "ref",
+                    "value": ["functions", "cdom", "outputs", "results"],
+                },
+                "epsg": {"$type": "atom", "value": "EPSG:3857"},
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "stac_join_1": {
+            "identifier": "stac-join",
+            "inputs": {
+                "stac_catalog_dir_1": {
+                    "$type": "ref",
+                    "value": ["functions", "reproject_cya", "outputs", "results"],
+                },
+                "stac_catalog_dir_2": {
+                    "$type": "ref",
+                    "value": ["functions", "reproject_doc", "outputs", "results"],
+                },
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "stac_join_2": {
+            "identifier": "stac-join",
+            "inputs": {
+                "stac_catalog_dir_1": {
+                    "$type": "ref",
+                    "value": ["functions", "stac_join_1", "outputs", "results"],
+                },
+                "stac_catalog_dir_2": {
+                    "$type": "ref",
+                    "value": ["functions", "reproject_cdom", "outputs", "results"],
+                },
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "stac_join_3": {
+            "identifier": "stac-join",
+            "inputs": {
+                "stac_catalog_dir_1": {
+                    "$type": "ref",
+                    "value": ["functions", "stac_join_2", "outputs", "results"],
+                },
+                "stac_catalog_dir_2": {
+                    "$type": "ref",
+                    "value": ["functions", "reproject_ndwi", "outputs", "results"],
+                },
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "thumbnail": {
+            "identifier": "thumbnail",
+            "inputs": {
+                "data_dir": {
+                    "$type": "ref",
+                    "value": ["functions", "stac_join_3", "outputs", "results"],
+                },
+            },
+            "outputs": {
+                "results": {"$type": "ref", "value": ["outputs", "results"]},
+            },
+        },
+    },
+}
+WATER_QUALITY_ADVANCED_PRESET: dict[str, Any] = {
+    "identifier": "water-quality",
+    "name": "Water Quality",
+    "description": "Evaluates water quality by analysing spectral data from satellite imagery, "
+    "to assess parameters like chlorophyll concentration and turbidity.",
+    "thumbnail_b64": _load_base_64_thumbnail("water-quality"),
+    "disabled": True,
+    "workflow": ADVANCED_WATER_QUALITY_WORKFLOW_SPEC,
+}
 WATER_QUALITY_WORKFLOW_SPEC: dict[str, Any] = {
+    "identifier": "water-quality",
     "inputs": {
         "area": HEATHROW_AOI,
         "dataset": "sentinel-2-l2a",
@@ -125,177 +307,27 @@ WATER_QUALITY_WORKFLOW_SPEC: dict[str, Any] = {
                 },
                 "epsg": {"$type": "atom", "value": "EPSG:3857"},
             },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "thumbnail": {
+            "identifier": "thumbnail",
+            "inputs": {
+                "data_dir": {
+                    "$type": "ref",
+                    "value": ["functions", "reproject", "outputs", "results"],
+                },
+            },
             "outputs": {
                 "results": {"$type": "ref", "value": ["outputs", "results"]},
             },
         },
     },
 }
-ADVANCED_WATER_QUALITY_WORKFLOW_SPEC: dict[str, Any] = {
-    "inputs": {
-        "area": HEATHROW_AOI,
-        "dataset": "sentinel-2-l2a",
-        "date_start": "2024-03-01",
-        "date_end": "2024-10-10",
-    },
-    "outputs": {"results": {"name": "results", "type": "directory"}},
-    "functions": {
-        "query": {
-            "identifier": "s2-ds-query",
-            "inputs": {
-                "area": {"$type": "ref", "value": ["inputs", "area"]},
-                "stac_collection": {"$type": "ref", "value": ["inputs", "dataset"]},
-                "date_start": {"$type": "ref", "value": ["inputs", "date_start"]},
-                "date_end": {"$type": "ref", "value": ["inputs", "date_end"]},
-                "clip": {"$type": "atom", "value": True},
-                "limit": {"$type": "atom", "value": 10},
-                "cloud_cover_min": {"$type": "atom", "value": 0},
-                "cloud_cover_max": {"$type": "atom", "value": 100},
-            },
-            "outputs": {"results": {"name": "results", "type": "directory"}},
-        },
-        "cya": {
-            "identifier": "cya",
-            "inputs": {
-                "data_dir": {
-                    "$type": "ref",
-                    "value": ["functions", "query", "outputs", "results"],
-                },
-            },
-            "outputs": {"results": {"name": "results", "type": "directory"}},
-        },
-        "calibrate_cya": {
-            "identifier": "defra-calibrate",
-            "inputs": {
-                "data_dir": {
-                    "$type": "ref",
-                    "value": ["functions", "cya", "outputs", "results"],
-                },
-            },
-            "outputs": {"results": {"name": "results", "type": "directory"}},
-        },
-        "reproject_cya": {
-            "identifier": "reproject",
-            "inputs": {
-                "data_dir": {
-                    "$type": "ref",
-                    "value": ["functions", "calibrate_cya", "outputs", "results"],
-                },
-                "epsg": {"$type": "atom", "value": "EPSG:3857"},
-            },
-            "outputs": {"results": {"name": "results", "type": "directory"}},
-        },
-        "doc": {
-            "identifier": "doc",
-            "inputs": {
-                "data_dir": {
-                    "$type": "ref",
-                    "value": ["functions", "query", "outputs", "results"],
-                },
-            },
-            "outputs": {"results": {"name": "results", "type": "directory"}},
-        },
-        "calibrate_doc": {
-            "identifier": "defra-calibrate",
-            "inputs": {
-                "data_dir": {
-                    "$type": "ref",
-                    "value": ["functions", "doc", "outputs", "results"],
-                },
-            },
-            "outputs": {"results": {"name": "results", "type": "directory"}},
-        },
-        "reproject_doc": {
-            "identifier": "reproject",
-            "inputs": {
-                "data_dir": {
-                    "$type": "ref",
-                    "value": ["functions", "calibrate_doc", "outputs", "results"],
-                },
-                "epsg": {"$type": "atom", "value": "EPSG:3857"},
-            },
-            "outputs": {"results": {"name": "results", "type": "directory"}},
-        },
-        "cdom": {
-            "identifier": "cdom",
-            "inputs": {
-                "data_dir": {
-                    "$type": "ref",
-                    "value": ["functions", "query", "outputs", "results"],
-                },
-            },
-            "outputs": {"results": {"name": "results", "type": "directory"}},
-        },
-        "calibrate_cdom": {
-            "identifier": "defra-calibrate",
-            "inputs": {
-                "data_dir": {
-                    "$type": "ref",
-                    "value": ["functions", "cdom", "outputs", "results"],
-                },
-            },
-            "outputs": {"results": {"name": "results", "type": "directory"}},
-        },
-        "reproject_cdom": {
-            "identifier": "reproject",
-            "inputs": {
-                "data_dir": {
-                    "$type": "ref",
-                    "value": ["functions", "calibrate_cdom", "outputs", "results"],
-                },
-                "epsg": {"$type": "atom", "value": "EPSG:3857"},
-            },
-            "outputs": {"results": {"name": "results", "type": "directory"}},
-        },
-        "stac_join_1": {
-            "identifier": "stac-join",
-            "inputs": {
-                "stac_catalog_dir_1": {
-                    "$type": "ref",
-                    "value": ["functions", "reproject_cya", "outputs", "results"],
-                },
-                "stac_catalog_dir_2": {
-                    "$type": "ref",
-                    "value": ["functions", "reproject_doc", "outputs", "results"],
-                },
-            },
-            "outputs": {"results": {"name": "results", "type": "directory"}},
-        },
-        "stac_join_2": {
-            "identifier": "stac-join",
-            "inputs": {
-                "stac_catalog_dir_1": {
-                    "$type": "ref",
-                    "value": ["functions", "stac_join_1", "outputs", "results"],
-                },
-                "stac_catalog_dir_2": {
-                    "$type": "ref",
-                    "value": ["functions", "reproject_cdom", "outputs", "results"],
-                },
-            },
-            "outputs": {
-                "results": {
-                    "$type": "ref",
-                    "value": ["outputs", "results"],
-                },
-            },
-        },
-    },
-}
-WATER_QUALITY_ADVANCED_PRESET: dict[str, Any] = {
-    "identifier": "water-quality",
-    "name": "Water Quality",
-    "description": "Evaluates water quality by analysing spectral data from satellite imagery, calibrated with DEFRA's "
-    "in-situ measurements, to assess parameters like chlorophyll concentration and turbidity.",
-    "thumbnail_b64": _load_base_64_thumbnail("water-quality"),
-    "disabled": True,
-    "workflow": ADVANCED_WATER_QUALITY_WORKFLOW_SPEC,
-}
 WATER_QUALITY_PRESET: dict[str, Any] = {
     "identifier": "water-quality",
     "name": "Water Quality",
-    "description": "Evaluates water quality by analysing spectral data from satellite imagery, calibrated with DEFRA's "
-    "in-situ measurements, to assess parameters like chlorophyll concentration and turbidity.",
+    "description": "Evaluates water quality by analysing spectral data from satellite imagery, "
+    "to assess parameters like chlorophyll concentration and turbidity.",
     "thumbnail_b64": _load_base_64_thumbnail("water-quality"),
     "disabled": True,
     "workflow": WATER_QUALITY_WORKFLOW_SPEC,
@@ -305,6 +337,7 @@ PRESETS = [LULC_CHANGE_PRESET, WATER_QUALITY_PRESET]
 PRESET_LOOKUP = {p["identifier"]: p for p in PRESETS}
 
 SIMPLEST_NDVI_WORKFLOW_SPEC: dict[str, Any] = {
+    "identifier": "simplest-ndvi",
     "inputs": {
         "area": HEATHROW_AOI,
         "dataset": "sentinel-2-l2a",
@@ -335,6 +368,16 @@ SIMPLEST_NDVI_WORKFLOW_SPEC: dict[str, Any] = {
                     "value": ["functions", "query", "outputs", "results"],
                 },
             },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "thumbnail": {
+            "identifier": "thumbnail",
+            "inputs": {
+                "data_dir": {
+                    "$type": "ref",
+                    "value": ["functions", "ndvi", "outputs", "results"],
+                },
+            },
             "outputs": {
                 "results": {"$type": "ref", "value": ["outputs", "results"]},
             },
@@ -342,6 +385,7 @@ SIMPLEST_NDVI_WORKFLOW_SPEC: dict[str, Any] = {
     },
 }
 NDVI_WORKFLOW_SPEC: dict[str, Any] = {
+    "identifier": "ndvi-clip-repr",
     "inputs": {
         "area": HEATHROW_AOI,
         "dataset": "sentinel-2-l2a",
@@ -382,6 +426,16 @@ NDVI_WORKFLOW_SPEC: dict[str, Any] = {
                     "value": ["functions", "ndvi", "outputs", "results"],
                 },
                 "epsg": {"$type": "atom", "value": "EPSG:3857"},
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "thumbnail": {
+            "identifier": "thumbnail",
+            "inputs": {
+                "data_dir": {
+                    "$type": "ref",
+                    "value": ["functions", "reproject", "outputs", "results"],
+                },
             },
             "outputs": {
                 "results": {"$type": "ref", "value": ["outputs", "results"]},

@@ -3,12 +3,20 @@ id: ds-query
 
 requirements:
   ResourceRequirement:
-    coresMax: 1
-    ramMax: 1024
+    coresMin: 2
+    coresMax: 4
+    ramMin: 2048
+    ramMax: 8192
+  NetworkAccess:
+    networkAccess: True
+  EnvVarRequirement:
+    envDef:
+      SH_CLIENT_ID: <<SENTINEL_HUB__CLIENT_ID>>
+      SH_SECRET: <<SENTINEL_HUB__CLIENT_SECRET>>
 
 hints:
   DockerRequirement:
-    dockerPull: eopro-workflows:latest
+    dockerPull: ghcr.io/eo-datahub/eodh-workflows:latest
 
 baseCommand: [ "eopro", "ds", "query" ]
 
@@ -48,4 +56,4 @@ outputs:
   results:
     type: Directory
     outputBinding:
-      glob: ./data/stac-catalog/
+      glob: ./ds-query/

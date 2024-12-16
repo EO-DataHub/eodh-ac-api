@@ -381,7 +381,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     });
 %}
 
-### Run Water Quality with Defra Calibration - OK
+### Run Water Quality - OK
 POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
 Accept: application/json
 Content-Type: application/json

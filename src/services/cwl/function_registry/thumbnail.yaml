@@ -1,5 +1,5 @@
 class: CommandLineTool
-id: summarize-class-statistics
+id: thumbnail
 
 requirements:
   ResourceRequirement:
@@ -14,7 +14,7 @@ hints:
   DockerRequirement:
     dockerPull: ghcr.io/eo-datahub/eodh-workflows:latest
 
-baseCommand: [ "eopro", "classification", "summarize" ]
+baseCommand: [ "eopro", "raster", "thumbnail" ]
 
 inputs:
   data_dir:
@@ -27,4 +27,4 @@ outputs:
   results:
     type: Directory
     outputBinding:
-      glob: ./classification-summarize/
+      glob: ./raster-thumbnail/

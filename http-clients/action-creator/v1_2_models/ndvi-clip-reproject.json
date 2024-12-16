@@ -1,4 +1,5 @@
 {
+  "identifier": "ndvi-clip-repr",
   "inputs": {
     "area": {
       "type": "Polygon",

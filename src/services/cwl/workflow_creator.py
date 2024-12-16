@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
@@ -8,6 +9,7 @@ from typing import Any, ClassVar
 import yaml
 
 from src.api.v1_2.action_creator.schemas.workflow_tasks import SPECTRAL_INDEX_TASK_IDS
+from src.services.ades.client import replace_placeholders_in_text
 from src.utils.names import generate_random_name
 
 _BASE_APP_CWL_FP = Path(__file__).resolve().parent / "app.cwl"
@@ -39,7 +41,7 @@ class WorkflowCreator:
         "savi": "spectral-index.yaml",
         "evi": "spectral-index.yaml",
         "ndwi": "spectral-index.yaml",
-        "cya": "spectral-index.yaml",
+        "cya_cells": "spectral-index.yaml",
         "cdom": "spectral-index.yaml",
         "doc": "spectral-index.yaml",
         "sar-water-mask": "spectral-index.yaml",
@@ -49,12 +51,13 @@ class WorkflowCreator:
         "reproject": "reproject.yaml",
         "stac-join": "stac-join.yaml",
         "summarize-class-statistics": "summarize-class-statistics.yaml",
+        "thumbnail": "thumbnail.yaml",
     }
 
     @classmethod
     def _resolve_task_spec(cls, function_identifier: str, id_override: str | None = None) -> dict[str, Any]:
         fp = _FUNCTION_REGISTRY_DIR / cls._identifier_to_cwl_lookup[function_identifier]
-        spec: dict[str, Any] = yaml.safe_load(fp.open(encoding="utf-8"))
+        spec: dict[str, Any] = yaml.safe_load(replace_placeholders_in_text(fp.read_text(encoding="utf-8")))
         spec["id"] = id_override or function_identifier
         return spec
 
@@ -72,6 +75,7 @@ class WorkflowCreator:
     ) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
         # Keep copy of inputs for job execution
         user_inputs = deepcopy(wf_spec["inputs"])
+        user_inputs["area"] = json.dumps(user_inputs.pop("area"))
 
         # Resolve WF specs
         wf_inputs = {}
@@ -142,7 +146,7 @@ class WorkflowCreator:
         wf_requirements = cls._resolve_wf_requirements(tasks)
 
         # Build CWL Graph Data
-        wf_name = generate_random_name()
+        wf_name = wf_spec.get("identifier", generate_random_name())
         return CWLGraphData(
             wf_id=wf_name,
             graph=[
@@ -164,12 +168,23 @@ class WorkflowCreator:
 
     @classmethod
     def _resolve_wf_requirements(cls, tasks: list[dict[str, Any]]) -> dict[str, Any]:
+        min_ram = 1024
         max_ram = 1024
+        min_cpu = 1
         max_cpu = 1
         for task in tasks:
+            min_ram = max(min_ram, task["requirements"]["ResourceRequirement"]["ramMin"])
             max_ram = max(max_ram, task["requirements"]["ResourceRequirement"]["ramMax"])
+            min_cpu = max(min_cpu, task["requirements"]["ResourceRequirement"]["coresMin"])
             max_cpu = max(max_cpu, task["requirements"]["ResourceRequirement"]["coresMax"])
-        return {"ResourceRequirement": {"coresMax": max_cpu, "ramMax": max_ram}}
+        return {
+            "ResourceRequirement": {
+                "coresMin": min_cpu,
+                "coresMax": max_cpu,
+                "ramMin": min_ram,
+                "ramMax": max_ram,
+            },
+        }
 
     @classmethod
     def cwl_from_wf_spec(cls, wf_spec: dict[str, Any]) -> WorkflowCreatorResult:

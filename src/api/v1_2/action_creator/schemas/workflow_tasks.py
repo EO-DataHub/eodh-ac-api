@@ -685,7 +685,7 @@ class CYATask(WorkflowTask):
     def as_function_spec(cls) -> dict[str, Any]:
         return {
             "name": "CYA",
-            "identifier": "cya",
+            "identifier": "cya_cells",
             "category": FunctionCategory.spectral_indices,
             "tags": ["CYA", "Water Quality", "Spectral indices"],
             "description": "Cyanobacteria Density Index (CYA).",
@@ -917,6 +917,46 @@ class ReprojectTask(WorkflowTask):
         }
 
 
+class ThumbnailTask(WorkflowTask):
+    identifier: Literal["thumbnail"] = "thumbnail"
+    inputs: DirectoryInputs
+    outputs: DirectoryOutputs
+
+    @classmethod
+    def as_function_spec(cls) -> dict[str, Any]:
+        return {
+            "name": "Generate Thumbnail",
+            "identifier": "thumbnail",
+            "category": FunctionCategory.raster_ops,
+            "tags": ["Raster Ops", "Thumbnail", "Preview", "Visual"],
+            "description": "Generate thumbnails for items in specified STAC directory.",
+            "visible": True,
+            "compatible_input_datasets": [
+                "sentinel-1-grd",
+                "sentinel-2-l2a",
+                "sentinel-2-l2a-ard",
+                "esa-lccci-glcm",
+                "clms-corine-lc",
+                "clms-water-bodies",
+            ],
+            "inputs": {
+                "data_dir": {
+                    "name": "data_dir",
+                    "description": "Directory containing the STAC data",
+                    "type": FuncInputOutputType.directory,
+                    "required": True,
+                }
+            },
+            "outputs": {
+                "results": {
+                    "name": "results",
+                    "type": FuncInputOutputType.directory,
+                    "description": "Directory to store the STAC data with thumbnails",
+                }
+            },
+        }
+
+
 class SummarizeClassStatisticsTask(WorkflowTask):
     identifier: Literal["summarize-class-statistics"] = "summarize-class-statistics"
     inputs: DirectoryInputs
@@ -962,8 +1002,8 @@ class WaterQualityTask(WorkflowTask):
             "name": "Water Quality Analysis",
             "identifier": "water-quality",
             "category": FunctionCategory.other,
-            "tags": ["DEFRA", "Water Quality"],
-            "description": "Run water quality analysis with DEFRA in-situ data calibration.",
+            "tags": ["Water Quality"],
+            "description": "Runs water quality analysis.",
             "compatible_input_datasets": ["sentinel-2-l2a"],
             "visible": True,
             "inputs": {
@@ -998,7 +1038,7 @@ class DefraCalibrateTask(WorkflowTask):
             "tags": ["DEFRA", "Calibration", "Water Quality"],
             "description": "Calibrate input data based on DEFRA in-situ data.",
             "compatible_input_datasets": ["sentinel-2-l2a-ard", "sentinel-2-l2a"],
-            "visible": True,
+            "visible": False,
             "inputs": {
                 "data_dir": {
                     "name": "data_dir",
@@ -1095,6 +1135,7 @@ WORKFLOW_TASKS = [
     # Raster ops
     ClipTask,
     ReprojectTask,
+    ThumbnailTask,
     # Water quality
     WaterQualityTask,
     DefraCalibrateTask,

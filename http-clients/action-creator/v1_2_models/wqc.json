@@ -1,4 +1,5 @@
 {
+  "identifier": "water-quality",
   "inputs": {
     "area": {
       "type": "Polygon",

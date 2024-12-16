@@ -1,4 +1,5 @@
 {
+  "identifier": "lcc-glc",
   "inputs": {
     "area": {
       "type": "Polygon",

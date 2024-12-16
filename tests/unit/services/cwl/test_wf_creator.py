@@ -64,8 +64,8 @@ def test_generated_cwl_spec(identifier: str, wf_spec: dict[str, Any], tmp_path: 
     create_result = WorkflowCreator.cwl_from_wf_spec(wf_spec)
 
     # Assert
-    tmp_cwl_fp = tmp_path / f"{identifier}.yaml"
-    tmp_cwl_fp.write_text(yaml.safe_dump(create_result.app_spec), encoding="utf-8")
+    tmp_cwl_fp = tmp_path / f"{identifier}.cwl"
+    tmp_cwl_fp.write_text(yaml.safe_dump(create_result.app_spec, sort_keys=False), encoding="utf-8")
     sp_result = subprocess.run(  # noqa: S603
         ["cwltool", "--validate", tmp_cwl_fp.as_posix()],  # noqa: S607
         capture_output=True,
