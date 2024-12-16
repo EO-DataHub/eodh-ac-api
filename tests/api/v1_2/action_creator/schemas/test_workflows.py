@@ -130,6 +130,6 @@ def test_example_workflows(wf_spec: tuple[str, dict[str, Any]]) -> None:
 def test_wf_visualization(wf_spec_id_tuple: tuple[str, dict[str, Any]], tmp_path: Path) -> None:
     wf_id, wf_spec = wf_spec_id_tuple
     g = wf_as_networkx_graph(wf_spec, directed=True)
-    fig = visualize_workflow_graph(g)
+    fig = visualize_workflow_graph(g, figsize=(15, 9) if wf_id != "advanced-water-quality" else (15, 12))
     fig.savefig(tmp_path / f"workflow-{wf_id}.png")
     plt.close(fig)

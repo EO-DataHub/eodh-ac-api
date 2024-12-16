@@ -172,7 +172,13 @@ async def submit_workflow(
     wf_creation_result = WorkflowCreator.cwl_from_wf_spec(workflow_spec)
     with tempfile.TemporaryDirectory() as tmpdir:
         cwl_fp = Path(tmpdir) / "app.cwl"
-        yaml.safe_dump(wf_creation_result.app_spec, cwl_fp.open("w", encoding="utf-8"))
+        yaml.safe_dump(wf_creation_result.app_spec, cwl_fp.open("w", encoding="utf-8"), sort_keys=False)
+        err = await ades.unregister_process(wf_creation_result.wf_id)
+        if err is not None and err.code != status.HTTP_404_NOT_FOUND:
+            raise HTTPException(
+                status_code=err.code,
+                detail=err.detail,
+            )
         err, _ = await ades.register_process_from_local_cwl_file(cwl_fp)
 
     if err is not None:

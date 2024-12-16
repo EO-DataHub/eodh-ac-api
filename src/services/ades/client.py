@@ -30,16 +30,21 @@ if TYPE_CHECKING:
 _logger = get_logger(__name__)
 
 
-def replace_placeholders_in_cwl_file(file_path: Path) -> None:
+def replace_placeholders_in_text(content: str) -> str:
     load_dotenv(consts.directories.ROOT_DIR / ".env")
-
-    content = file_path.read_text()
     pattern = re.compile(r"<<([A-Za-z\-_ ]+)>>")
     placeholders = re.findall(pattern=pattern, string=content)
 
     for placeholder in placeholders:
         replacement = os.environ.get(placeholder.strip(), '""')
         content = content.replace(f"<<{placeholder}>>", replacement)
+
+    return content
+
+
+def replace_placeholders_in_cwl_file(file_path: Path) -> None:
+    content = file_path.read_text()
+    content = replace_placeholders_in_text(content)
 
     file_path.write_text(content)
 

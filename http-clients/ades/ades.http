@@ -115,7 +115,7 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Get Job Status
-GET {{ades_url}}/{{workspace}}/ogc-api/jobs/5be877ee-b0a9-11ef-9f24-ee3aaed8a789
+GET {{ades_url}}/{{workspace}}/ogc-api/jobs/05e23182-bb9e-11ef-8fce-6a040e2afd6f
 Accept: application/json
 Authorization: Bearer {{token}}
 
@@ -171,7 +171,7 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Cance lJob
-DELETE {{ades_url}}/{{workspace}}/ogc-api/jobs/{{execute_process_response.jobID}}
+DELETE {{ades_url}}/{{workspace}}/ogc-api/jobs/5935d008-bb9b-11ef-b0ed-6a040e2afd6f
 Accept: application/json
 Authorization: Bearer {{token}}
 

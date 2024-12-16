@@ -3,12 +3,16 @@ id: reproject
 
 requirements:
   ResourceRequirement:
-    coresMax: 1
-    ramMax: 1024
+    coresMin: 2
+    coresMax: 4
+    ramMin: 2048
+    ramMax: 8192
+  NetworkAccess:
+    networkAccess: True
 
 hints:
   DockerRequirement:
-    dockerPull: eopro-workflows:latest
+    dockerPull: ghcr.io/eo-datahub/eodh-workflows:latest
 
 baseCommand: [ "eopro", "raster", "reproject" ]
 
@@ -28,4 +32,4 @@ outputs:
   results:
     type: Directory
     outputBinding:
-      glob: ./data/stac-catalog/
+      glob: ./raster-reproject/

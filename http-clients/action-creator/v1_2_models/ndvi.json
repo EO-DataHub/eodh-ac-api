@@ -1,4 +1,5 @@
 {
+  "identifier": "ndvi-simple",
   "inputs": {
     "area": {
       "type": "Polygon",
