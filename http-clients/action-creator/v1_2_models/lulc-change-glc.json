@@ -1,5 +1,5 @@
 {
-  "identifier": "water-quality",
+  "identifier": "lcc-glc",
   "inputs": {
     "area": {
       "type": "Polygon",
@@ -28,9 +28,9 @@
         ]
       ]
     },
-    "dataset": "sentinel-2-l2a",
-    "date_start": "2024-03-01",
-    "date_end": "2024-10-10"
+    "dataset": "esa-lccci-glcm",
+    "date_start": "1994-01-01",
+    "date_end": "2015-12-31"
   },
   "outputs": {
     "results": {
@@ -40,7 +40,7 @@
   },
   "functions": {
     "query": {
-      "identifier": "s2-ds-query",
+      "identifier": "esa-glc-ds-query",
       "inputs": {
         "area": {
           "$type": "ref",
@@ -70,21 +70,13 @@
             "date_end"
           ]
         },
-        "clip": {
-          "$type": "atom",
-          "value": true
-        },
         "limit": {
           "$type": "atom",
           "value": 10
         },
-        "cloud_cover_min": {
+        "clip": {
           "$type": "atom",
-          "value": 0
-        },
-        "cloud_cover_max": {
-          "$type": "atom",
-          "value": 100
+          "value": true
         }
       },
       "outputs": {
@@ -94,8 +86,8 @@
         }
       }
     },
-    "water-quality": {
-      "identifier": "water-quality",
+    "summarize_class_stats": {
+      "identifier": "summarize-class-statistics",
       "inputs": {
         "data_dir": {
           "$type": "ref",
@@ -121,7 +113,7 @@
           "$type": "ref",
           "value": [
             "functions",
-            "water-quality",
+            "summarize_class_stats",
             "outputs",
             "results"
           ]
