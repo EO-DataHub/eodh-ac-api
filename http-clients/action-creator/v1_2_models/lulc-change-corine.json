@@ -1,5 +1,5 @@
 {
-  "identifier": "lcc-glc",
+  "identifier": "lcc-corine",
   "inputs": {
     "area": {
       "type": "Polygon",
@@ -28,9 +28,9 @@
         ]
       ]
     },
-    "dataset": "esa-lccci-glcm",
-    "date_start": "1994-01-01",
-    "date_end": "2015-12-31"
+    "dataset": "clms-corine-lc",
+    "date_start": "1992-01-01",
+    "date_end": "2018-12-31"
   },
   "outputs": {
     "results": {
@@ -40,7 +40,7 @@
   },
   "functions": {
     "query": {
-      "identifier": "esa-glc-ds-query",
+      "identifier": "corine-lc-ds-query",
       "inputs": {
         "area": {
           "$type": "ref",
@@ -121,6 +121,26 @@
         "epsg": {
           "$type": "atom",
           "value": "EPSG:3857"
+        }
+      },
+      "outputs": {
+        "results": {
+          "name": "results",
+          "type": "directory"
+        }
+      }
+    },
+    "thumbnail": {
+      "identifier": "thumbnail",
+      "inputs": {
+        "data_dir": {
+          "$type": "ref",
+          "value": [
+            "functions",
+            "reproject",
+            "outputs",
+            "results"
+          ]
         }
       },
       "outputs": {

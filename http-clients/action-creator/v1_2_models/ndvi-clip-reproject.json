@@ -133,6 +133,26 @@
       },
       "outputs": {
         "results": {
+          "name": "results",
+          "type": "directory"
+        }
+      }
+    },
+    "thumbnail": {
+      "identifier": "thumbnail",
+      "inputs": {
+        "data_dir": {
+          "$type": "ref",
+          "value": [
+            "functions",
+            "reproject",
+            "outputs",
+            "results"
+          ]
+        }
+      },
+      "outputs": {
+        "results": {
           "$type": "ref",
           "value": [
             "outputs",

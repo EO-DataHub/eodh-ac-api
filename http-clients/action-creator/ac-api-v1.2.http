@@ -367,13 +367,27 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     });
 %}
 
-### Run LULC Change - OK
+### Run LULC Change GLC - OK
 POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 
-< v1_2_models/lulc-change.json
+< v1_2_models/lulc-change-glc.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 202, "Response status is not 202");
+    });
+%}
+
+### Run LULC Change Corine - OK
+POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/lulc-change-corine.json
 
 > {%
     client.test("Request executed successfully", function() {

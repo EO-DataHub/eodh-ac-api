@@ -1,5 +1,5 @@
 {
-  "identifier": "ndvi-simple",
+  "identifier": "simplest-ndvi",
   "inputs": {
     "area": {
       "type": "Polygon",
@@ -102,6 +102,26 @@
           "value": [
             "functions",
             "query",
+            "outputs",
+            "results"
+          ]
+        }
+      },
+      "outputs": {
+        "results": {
+          "name": "results",
+          "type": "directory"
+        }
+      }
+    },
+    "thumbnail": {
+      "identifier": "thumbnail",
+      "inputs": {
+        "data_dir": {
+          "$type": "ref",
+          "value": [
+            "functions",
+            "ndvi",
             "outputs",
             "results"
           ]

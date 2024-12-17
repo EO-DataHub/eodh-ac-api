@@ -115,7 +115,7 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Get Job Status
-GET {{ades_url}}/{{workspace}}/ogc-api/jobs/05e23182-bb9e-11ef-8fce-6a040e2afd6f
+GET {{ades_url}}/{{workspace}}/ogc-api/jobs/a7310c58-bc60-11ef-8cd9-c6b72ca2741f
 Accept: application/json
 Authorization: Bearer {{token}}
 
@@ -124,6 +124,41 @@ Authorization: Bearer {{token}}
     client.global.set("job_status", response.body);
 
 %}
+
+### Get Job Results
+GET {{ades_url}}/{{workspace}}/ogc-api/jobs/{{job_status.jobID}}/results
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Get Job Logs
+GET {{job_status.links[2].href}}
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Get Job StageOut Logs
+GET {{job_status.links[-1].href}}
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Get Failed Job Logs
+GET {{job_status.links[1].href}}
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Get Failed Job Stage Out Logs
+GET {{job_status.links[-1].href}}
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Cancel Job
+DELETE {{ades_url}}/{{workspace}}/ogc-api/jobs/5935d008-bb9b-11ef-b0ed-6a040e2afd6f
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Cancel Non Existent Job
+DELETE {{ades_url}}/{{workspace}}/ogc-api/jobs/non-existent-job-id
+Accept: application/json
+Authorization: Bearer {{token}}
 
 ### Get Non Existent Job Status
 GET {{ades_url}}/{{workspace}}/ogc-api/jobs/non-existent-job-id
@@ -140,42 +175,7 @@ GET {{ades_url}}/{{workspace}}/ogc-api/jobs/cadbba82-7f1f-11ef-a100-921292eb1c22
 Accept: application/json
 Authorization: Bearer {{token}}
 
-### Get Job Results
-GET {{ades_url}}/{{workspace}}/ogc-api/jobs/{{job_status.jobID}}/results
-Accept: application/json
-Authorization: Bearer {{token}}
-
 ### Get Non Existent Job Results
 GET {{ades_url}}/{{workspace}}/ogc-api/jobs/non-existent-job-id/results
-Accept: application/json
-Authorization: Bearer {{token}}
-
-### Get Job Logs
-GET {{job_status.links[2].href}}
-Accept: application/json
-Authorization: Bearer {{token}}
-
-### Get Job StageOut Logs
-GET {{job_status.links[3].href}}
-Accept: application/json
-Authorization: Bearer {{token}}
-
-### Get Failed Job Logs
-GET {{job_status.links[1].href}}
-Accept: application/json
-Authorization: Bearer {{token}}
-
-### Get Failed Job Stage Out Logs
-GET {{job_status.links[2].href}}
-Accept: application/json
-Authorization: Bearer {{token}}
-
-### Cance lJob
-DELETE {{ades_url}}/{{workspace}}/ogc-api/jobs/5935d008-bb9b-11ef-b0ed-6a040e2afd6f
-Accept: application/json
-Authorization: Bearer {{token}}
-
-### Cancel Non Existent Job
-DELETE {{ades_url}}/{{workspace}}/ogc-api/jobs/non-existent-job-id
 Accept: application/json
 Authorization: Bearer {{token}}
