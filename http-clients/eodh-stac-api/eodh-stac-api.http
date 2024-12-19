@@ -80,3 +80,29 @@ Accept: */*
 Authorization: Bearer {{token}}
 
 >> asset.png
+
+
+### Search results catalog
+POST {{eodh_stac_api_url}}/catalogs/user-datasets/{{workspace}}/processing-results/cat_01e116ec-bdf2-11ef-a2af-8ef03814f15e/search
+Accept: application/json
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "limit": 50,
+    "sortby": [
+        {
+            "field": "properties.datetime",
+            "direction": "desc"
+        }
+    ],
+    "filter-lang": "cql-json",
+    "fields": {}
+}
+
+
+### GET
+GET https://test.eodatahub.org.uk/api/catalogue/stac/catalogs/user-datasets/eopro-spyro-test/processing-results/cat_01e116ec-bdf2-11ef-a2af-8ef03814f15e/collections/collection
+Accept: application/json
+Authorization: Bearer {{token}}
+Content-Type: application/json
