@@ -713,8 +713,40 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     });
 %}
 
+### Get data for WQ Chart
+POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_01e116ec-bdf2-11ef-a2af-8ef03814f15e/search
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+{
+    "assets": ["cdom", "doc"],
+    "stac_query": {
+        "limit": 50,
+        "sortby": [
+            {
+                "field": "properties.datetime",
+                "direction": "desc"
+            }
+        ],
+        "filter_lang": "cql-json",
+        "filter": {
+            "op": "between",
+            "args": [
+                {
+                    "property": "properties.datetime"
+                },
+                "1992-07-01T00:00:00.000Z",
+                "2025-07-02T23:59:59.999Z"
+            ]
+        },
+        "fields": {}
+    }
+}
+
+
 ### Get data for LC Chart
-POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{workspace}}/processing-results/cat_81cac12c-bd17-11ef-94d6-8ef03814f15e/search
+POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_81cac12c-bd17-11ef-94d6-8ef03814f15e/search
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
@@ -731,72 +763,13 @@ Authorization: Bearer {{$auth.token("auth-id")}}
         ],
         "filter_lang": "cql-json",
         "filter": {
-            "op": "and",
+            "op": "between",
             "args": [
                 {
-                    "op": "=",
-                    "args": [
-                        {
-                            "property": "collection"
-                        },
-                        "col_81cac12c-bd17-11ef-94d6-8ef03814f15e"
-                    ]
+                    "property": "properties.datetime"
                 },
-                {
-                    "op": "between",
-                    "args": [
-                        {
-                            "property": "properties.datetime"
-                        },
-                        "1992-07-01T00:00:00.000Z",
-                        "2015-07-02T23:59:59.999Z"
-                    ]
-                }
-            ]
-        },
-        "fields": {}
-    }
-}
-
-### Get data for WQ Chart
-POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{workspace}}/processing-results/cat_81cac12c-bd17-11ef-94d6-8ef03814f15e/search
-Accept: application/json
-Content-Type: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
-
-{
-    "assets": ["data"],
-    "stac_query": {
-        "limit": 50,
-        "sortby": [
-            {
-                "field": "properties.datetime",
-                "direction": "desc"
-            }
-        ],
-        "filter-lang": "cql-json",
-        "filter": {
-            "op": "and",
-            "args": [
-                {
-                    "op": "=",
-                    "args": [
-                        {
-                            "property": "collection"
-                        },
-                        "col_81cac12c-bd17-11ef-94d6-8ef03814f15e"
-                    ]
-                },
-                {
-                    "op": "between",
-                    "args": [
-                        {
-                            "property": "properties.datetime"
-                        },
-                        "1992-07-01T00:00:00.000Z",
-                        "2015-07-02T23:59:59.999Z"
-                    ]
-                }
+                "1992-07-01T00:00:00.000Z",
+                "2025-07-02T23:59:59.999Z"
             ]
         },
         "fields": {}
