@@ -50,11 +50,16 @@ class OAuthClientSettings(BaseModel):
     client_secret: str
 
 
+class StacApiSettings(BaseModel):
+    endpoint: str
+
+
 class Settings(BaseSettings):
     """Represents Application Settings with nested configuration sections."""
 
     environment: str = "local"
     eodh_auth: OAuth2Settings
+    eodh_stac_api: StacApiSettings
     ades: ADESSettings
     sentinel_hub: OAuthClientSettings | None = None
 

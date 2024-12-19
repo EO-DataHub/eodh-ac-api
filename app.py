@@ -8,6 +8,7 @@ from src.api.v1_0.auth.routes import auth_router_v1_0
 from src.api.v1_0.health.routes import health_router_v1_0
 from src.api.v1_1.action_creator.routes import action_creator_router_v1_1
 from src.api.v1_2.action_creator.routes import action_creator_router_v1_2
+from src.api.v1_2.visualization.routes import visualization_router_v1_2
 from src.core.settings import current_settings
 
 settings = current_settings()
@@ -51,6 +52,7 @@ def register_api_v1_2(app: FastAPI) -> FastAPI:
     sub_app.include_router(health_router_v1_0)
     sub_app.include_router(auth_router_v1_0)
     sub_app.include_router(action_creator_router_v1_2)
+    sub_app.include_router(visualization_router_v1_2)
     app.mount("/api/v1.2", sub_app)
     return sub_app
 
