@@ -228,7 +228,9 @@ module = [
     "pydantic_core.*",
     "pydantic_settings.*",
     "pyproj.*",
+    "pystac_client.*",
     "shapely.*",
+    "stac_pydantic.*",
     "starlette.*",
     "uvicorn.*",
 ]
