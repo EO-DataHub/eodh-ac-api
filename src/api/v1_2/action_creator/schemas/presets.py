@@ -265,7 +265,7 @@ WATER_QUALITY_ADVANCED_PRESET: dict[str, Any] = {
     "workflow": ADVANCED_WATER_QUALITY_WORKFLOW_SPEC,
 }
 WATER_QUALITY_WORKFLOW_SPEC: dict[str, Any] = {
-    "identifier": "water-quality",
+    "identifier": "water-quality-wf",
     "inputs": {
         "area": HEATHROW_AOI,
         "dataset": "sentinel-2-l2a",
