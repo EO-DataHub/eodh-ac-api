@@ -14,7 +14,7 @@ hints:
   DockerRequirement:
     dockerPull: ghcr.io/eo-datahub/eodh-workflows:latest
 
-baseCommand: [ "eopro", "spectral", "water_quality" ]
+baseCommand: [ "eopro", "water", "quality" ]
 
 inputs:
   data_dir:
