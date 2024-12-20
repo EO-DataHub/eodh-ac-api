@@ -713,7 +713,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     });
 %}
 
-### Get data for WQ Chart
+### Get data for WQ Chart - selected assets
 POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_01e116ec-bdf2-11ef-a2af-8ef03814f15e/search
 Accept: application/json
 Content-Type: application/json
@@ -726,7 +726,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
         "sortby": [
             {
                 "field": "properties.datetime",
-                "direction": "desc"
+                "direction": "asc"
             }
         ],
         "filter_lang": "cql-json",
@@ -744,6 +744,35 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     }
 }
 
+### Get data for WQ Chart - all assets
+POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_01e116ec-bdf2-11ef-a2af-8ef03814f15e/search
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+{
+    "stac_query": {
+        "limit": 50,
+        "sortby": [
+            {
+                "field": "properties.datetime",
+                "direction": "asc"
+            }
+        ],
+        "filter_lang": "cql-json",
+        "filter": {
+            "op": "between",
+            "args": [
+                {
+                    "property": "properties.datetime"
+                },
+                "1992-07-01T00:00:00.000Z",
+                "2025-07-02T23:59:59.999Z"
+            ]
+        },
+        "fields": {}
+    }
+}
 
 ### Get data for LC Chart
 POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_81cac12c-bd17-11ef-94d6-8ef03814f15e/search
@@ -758,7 +787,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
         "sortby": [
             {
                 "field": "properties.datetime",
-                "direction": "desc"
+                "direction": "asc"
             }
         ],
         "filter_lang": "cql-json",
