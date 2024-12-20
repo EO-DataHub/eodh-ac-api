@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from datetime import datetime  # noqa: TCH003
 from typing import Annotated, Any, Literal
 
 from pydantic import AfterValidator, BaseModel, Field, PositiveInt
 from stac_pydantic.api import Search
-from stac_pydantic.api.extensions.query import Operator  # noqa: TCH002
-from stac_pydantic.api.extensions.sort import SortExtension  # noqa: TCH002
+from stac_pydantic.api.extensions.query import Operator
+from stac_pydantic.api.extensions.sort import SortExtension
 
 
 def crop(v: PositiveInt) -> PositiveInt:
@@ -59,45 +58,3 @@ class StacSearch(Search):
 class VisualizationRequest(BaseModel):
     assets: list[str] | None = None
     stac_query: StacSearch | None = None
-
-
-class ClassificationStackedBarChartRecord(BaseModel):
-    name: str
-    area: list[float]
-    percentage: list[float]
-    color_hint: str = Field(alias="color-hint")
-
-
-class RangeAreaWithLineChartRecord(BaseModel):
-    min: float | None = None
-    max: float | None = None
-    median: float | None = None
-    x_label: datetime
-
-
-class AssetChartVisualization(BaseModel):
-    title: str
-    units: str
-
-
-class RangeAreaWithLineChartVisualization(AssetChartVisualization):
-    chart_type: Literal["range-area-with-line"] = "range-area-with-line"
-    data: list[RangeAreaWithLineChartRecord]
-    color: str = "000000"
-
-
-class ClassificationAssetChartVisualization(AssetChartVisualization):
-    chart_type: Literal["classification-stacked-bar-chart"] = "classification-stacked-bar-chart"
-    x_labels: list[datetime | str]
-    data: list[ClassificationStackedBarChartRecord]
-
-
-class JobAssetsChartVisualizationResponse(BaseModel):
-    job_id: str
-    assets: dict[
-        str,
-        Annotated[
-            RangeAreaWithLineChartVisualization | ClassificationAssetChartVisualization,
-            Field(discriminator="chart_type"),
-        ],
-    ]
