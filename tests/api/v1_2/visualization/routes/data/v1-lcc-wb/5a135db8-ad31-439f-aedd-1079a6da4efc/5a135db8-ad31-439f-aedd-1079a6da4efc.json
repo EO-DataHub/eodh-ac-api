@@ -1,0 +1,143 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.1.0/schema.json"
+  ],
+  "id": "5a135db8-ad31-439f-aedd-1079a6da4efc",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          15.052268923898112,
+          50.833598186651244
+        ],
+        [
+          15.052268923898112,
+          50.989077215056824
+        ],
+        [
+          14.763294437090849,
+          50.989077215056824
+        ],
+        [
+          14.763294437090849,
+          50.833598186651244
+        ],
+        [
+          15.052268923898112,
+          50.833598186651244
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    14.763294437090849,
+    50.833598186651244,
+    15.052268923898112,
+    50.989077215056824
+  ],
+  "properties": {
+    "lulc_classes_percentage": {
+      "251": 100.0,
+      "70": 0.0
+    },
+    "lulc_classes_m2": {
+      "251": 351533109.92141724,
+      "70": 0.0
+    },
+    "thumbnail_b64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAAA2CAYAAAB3Ep8CAAAAJElEQVR4nO3BAQ0AAADCoPdPbQ8HFAAAAAAAAAAAAAAAAAA/BjY2AAFDTZ1vAAAAAElFTkSuQmCC",
+    "workflow_metadata": {
+      "stac_collection": "clms-water-bodies",
+      "date_start": "2024-01-01T00:00:00Z",
+      "date_end": "2024-03-31T23:59:59Z",
+      "aoi": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              14.763294437090849,
+              50.833598186651244
+            ],
+            [
+              15.052268923898112,
+              50.833598186651244
+            ],
+            [
+              15.052268923898112,
+              50.989077215056824
+            ],
+            [
+              14.763294437090849,
+              50.989077215056824
+            ],
+            [
+              14.763294437090849,
+              50.833598186651244
+            ]
+          ]
+        ]
+      }
+    },
+    "proj:epsg": 4326,
+    "proj:transform": [
+      0.0011288065890908694,
+      0.0,
+      14.763294437090849,
+      0.0,
+      -0.0006073399547092961,
+      50.989077215056824,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "datetime": "2024-02-01T00:00:00Z"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "EOPro Discrete Data Summary"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "EOPro Discrete Data Summary"
+    }
+  ],
+  "assets": {
+    "thumbnail": {
+      "href": "../5a135db8-ad31-439f-aedd-1079a6da4efc.png",
+      "type": "image/png",
+      "title": "Thumbnail",
+      "size": 93,
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "data": {
+      "href": "../5a135db8-ad31-439f-aedd-1079a6da4efc.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "clms-water-bodies",
+      "classification:classes": [
+        {
+          "value": 70,
+          "description": "Water body",
+          "color-hint": "0000ff"
+        },
+        {
+          "value": 251,
+          "description": "Not water body",
+          "color-hint": "ffffff"
+        }
+      ],
+      "size": 3471,
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

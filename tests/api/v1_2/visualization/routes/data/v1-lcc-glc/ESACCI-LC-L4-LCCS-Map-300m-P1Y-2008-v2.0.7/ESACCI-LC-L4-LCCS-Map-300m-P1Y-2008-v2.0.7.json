@@ -1,0 +1,395 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.1.0/schema.json"
+  ],
+  "id": "ESACCI-LC-L4-LCCS-Map-300m-P1Y-2008-v2.0.7",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          15.052593000000002,
+          50.833233
+        ],
+        [
+          15.052593000000002,
+          50.991579
+        ],
+        [
+          14.760903,
+          50.991579
+        ],
+        [
+          14.760903,
+          50.833233
+        ],
+        [
+          15.052593000000002,
+          50.833233
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    14.760903,
+    50.833233,
+    15.052593000000002,
+    50.991579
+  ],
+  "properties": {
+    "lulc_classes_percentage": {
+      "10": 8.922305764411027,
+      "11": 33.78446115288221,
+      "30": 6.783625730994151,
+      "40": 0.6182121971595655,
+      "60": 2.556390977443609,
+      "70": 7.151211361737678,
+      "90": 5.296574770258981,
+      "100": 7.034252297410191,
+      "130": 14.319131161236424,
+      "150": 4.761904761904762,
+      "180": 0.03341687552213868,
+      "190": 7.919799498746867,
+      "200": 0.5680868838763575,
+      "210": 0.2506265664160401,
+      "0": 0.0,
+      "140": 0.0,
+      "12": 0.0,
+      "20": 0.0,
+      "151": 0.0,
+      "152": 0.0,
+      "153": 0.0,
+      "160": 0.0,
+      "170": 0.0,
+      "50": 0.0,
+      "61": 0.0,
+      "62": 0.0,
+      "71": 0.0,
+      "72": 0.0,
+      "201": 0.0,
+      "202": 0.0,
+      "80": 0.0,
+      "81": 0.0,
+      "82": 0.0,
+      "220": 0.0,
+      "110": 0.0,
+      "120": 0.0,
+      "121": 0.0,
+      "122": 0.0
+    },
+    "lulc_classes_m2": {
+      "10": 32242653.491301335,
+      "11": 122087350.86032082,
+      "30": 24514077.373536225,
+      "40": 2234041.5340414788,
+      "60": 9238063.640766116,
+      "70": 25842426.393777106,
+      "90": 19140301.79165267,
+      "100": 25419769.887336824,
+      "130": 51745232.28847425,
+      "150": 17208157.76221139,
+      "180": 120759.00184007992,
+      "190": 28619883.436098944,
+      "200": 2052903.0312813588,
+      "210": 905692.5138005995,
+      "0": 0.0,
+      "140": 0.0,
+      "12": 0.0,
+      "20": 0.0,
+      "151": 0.0,
+      "152": 0.0,
+      "153": 0.0,
+      "160": 0.0,
+      "170": 0.0,
+      "50": 0.0,
+      "61": 0.0,
+      "62": 0.0,
+      "71": 0.0,
+      "72": 0.0,
+      "201": 0.0,
+      "202": 0.0,
+      "80": 0.0,
+      "81": 0.0,
+      "82": 0.0,
+      "220": 0.0,
+      "110": 0.0,
+      "120": 0.0,
+      "121": 0.0,
+      "122": 0.0
+    },
+    "thumbnail_b64": "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",
+    "workflow_metadata": {
+      "stac_collection": "esacci-globallc",
+      "date_start": "2008-01-01T00:00:00Z",
+      "date_end": "2010-12-31T23:59:59Z",
+      "aoi": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              14.763294437090849,
+              50.833598186651244
+            ],
+            [
+              15.052268923898112,
+              50.833598186651244
+            ],
+            [
+              15.052268923898112,
+              50.989077215056824
+            ],
+            [
+              14.763294437090849,
+              50.989077215056824
+            ],
+            [
+              14.763294437090849,
+              50.833598186651244
+            ]
+          ]
+        ]
+      }
+    },
+    "proj:epsg": 4326,
+    "proj:transform": [
+      0.002778,
+      0.0,
+      14.760903,
+      0.0,
+      -0.002778,
+      50.991579,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "datetime": "2008-07-01T12:00:00Z"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "EOPro Discrete Data Summary"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "EOPro Discrete Data Summary"
+    }
+  ],
+  "assets": {
+    "thumbnail": {
+      "href": "../ESACCI-LC-L4-LCCS-Map-300m-P1Y-2008-v2.0.7.png",
+      "type": "image/png",
+      "title": "Thumbnail",
+      "size": 2250,
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "data": {
+      "href": "../ESACCI-LC-L4-LCCS-Map-300m-P1Y-2008-v2.0.7.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "esacci-globallc",
+      "classification:classes": [
+        {
+          "value": 0,
+          "description": "No data",
+          "color-hint": "000000"
+        },
+        {
+          "value": 10,
+          "description": "Cropland, rainfed",
+          "color-hint": "ffff64"
+        },
+        {
+          "value": 11,
+          "description": "Herbaceous cover",
+          "color-hint": "ffff64"
+        },
+        {
+          "value": 12,
+          "description": "Tree or shrub cover",
+          "color-hint": "ffff00"
+        },
+        {
+          "value": 20,
+          "description": "Cropland, irrigated or post-flooding",
+          "color-hint": "aaf0f0"
+        },
+        {
+          "value": 30,
+          "description": "Mosaic cropland (>50%) / natural vegetation (tree, shrub, herbaceous cover) (<50%)",
+          "color-hint": "dbf064"
+        },
+        {
+          "value": 40,
+          "description": "Mosaic natural vegetation (tree, shrub, herbaceous cover) (>50%) / cropland (<50%) ",
+          "color-hint": "c8c864"
+        },
+        {
+          "value": 50,
+          "description": "Tree cover, broadleaved, evergreen, closed to open (>15%)",
+          "color-hint": "006400"
+        },
+        {
+          "value": 60,
+          "description": "Tree cover, broadleaved, deciduous, closed to open (>15%)",
+          "color-hint": "00a000"
+        },
+        {
+          "value": 61,
+          "description": "Tree cover, broadleaved, deciduous, closed (>40%)",
+          "color-hint": "00a000"
+        },
+        {
+          "value": 62,
+          "description": "Tree cover, broadleaved, deciduous, open (15-40%)",
+          "color-hint": "aac800"
+        },
+        {
+          "value": 70,
+          "description": "Tree cover, needleleaved, evergreen, closed to open (>15%)",
+          "color-hint": "003c00"
+        },
+        {
+          "value": 71,
+          "description": "Tree cover, needleleaved, evergreen, closed (>40%)",
+          "color-hint": "003c00"
+        },
+        {
+          "value": 72,
+          "description": "Tree cover, needleleaved, evergreen, open (15-40%)",
+          "color-hint": "005000"
+        },
+        {
+          "value": 80,
+          "description": "Tree cover, needleleaved, deciduous, closed to open (>15%)",
+          "color-hint": "4005000"
+        },
+        {
+          "value": 81,
+          "description": "Tree cover, needleleaved, deciduous, closed (>40%)",
+          "color-hint": "4005000"
+        },
+        {
+          "value": 82,
+          "description": "Tree cover, needleleaved, deciduous, open (15-40%)",
+          "color-hint": "4006400"
+        },
+        {
+          "value": 90,
+          "description": "Tree cover, mixed leaf type (broadleaved and needleleaved)",
+          "color-hint": "788200"
+        },
+        {
+          "value": 100,
+          "description": "Mosaic tree and shrub (>50%) / herbaceous cover (<50%)",
+          "color-hint": "1400a000"
+        },
+        {
+          "value": 110,
+          "description": "Mosaic herbaceous cover (>50%) / tree and shrub (<50%)",
+          "color-hint": "be9500"
+        },
+        {
+          "value": 120,
+          "description": "Shrubland",
+          "color-hint": "15006400"
+        },
+        {
+          "value": 121,
+          "description": "Shrubland evergreen",
+          "color-hint": "784c00"
+        },
+        {
+          "value": 122,
+          "description": "Shrubland deciduous",
+          "color-hint": "15006400"
+        },
+        {
+          "value": 130,
+          "description": "Grassland",
+          "color-hint": "ffb432"
+        },
+        {
+          "value": 140,
+          "description": "Lichens and mosses",
+          "color-hint": "ffdcd2"
+        },
+        {
+          "value": 150,
+          "description": "Sparse vegetation (tree, shrub, herbaceous cover) (<15%)",
+          "color-hint": "ffebaf"
+        },
+        {
+          "value": 151,
+          "description": "Sparse tree (<15%)",
+          "color-hint": "ffc964"
+        },
+        {
+          "value": 152,
+          "description": "Sparse shrub (<15%)",
+          "color-hint": "ffd278"
+        },
+        {
+          "value": 153,
+          "description": "Sparse herbaceous cover (<15%)",
+          "color-hint": "ffebaf"
+        },
+        {
+          "value": 160,
+          "description": "Tree cover, flooded, fresh or brakish water",
+          "color-hint": "00785a"
+        },
+        {
+          "value": 170,
+          "description": "Tree cover, flooded, saline water",
+          "color-hint": "009678"
+        },
+        {
+          "value": 180,
+          "description": "Shrub or herbaceous cover, flooded, fresh/saline/brakish water",
+          "color-hint": "00dc80"
+        },
+        {
+          "value": 190,
+          "description": "Urban areas",
+          "color-hint": "c31300"
+        },
+        {
+          "value": 200,
+          "description": "Bare areas",
+          "color-hint": "fff5d7"
+        },
+        {
+          "value": 201,
+          "description": "Consolidated bare areas",
+          "color-hint": "dcdcdc"
+        },
+        {
+          "value": 202,
+          "description": "Unconsolidated bare areas",
+          "color-hint": "fff5d7"
+        },
+        {
+          "value": 210,
+          "description": "Water bodies",
+          "color-hint": "0046c8"
+        },
+        {
+          "value": 220,
+          "description": "Permanent snow and ice",
+          "color-hint": "ffffff"
+        }
+      ],
+      "size": 10183,
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

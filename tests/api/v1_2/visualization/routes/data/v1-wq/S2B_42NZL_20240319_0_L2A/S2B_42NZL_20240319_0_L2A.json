@@ -1,0 +1,314 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.1.0/schema.json"
+  ],
+  "id": "S2B_42NZL_20240319_0_L2A",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          71.96195691287532,
+          4.276756686982586
+        ],
+        [
+          71.96195691287532,
+          4.625034015832402
+        ],
+        [
+          71.57553320647412,
+          4.625034015832402
+        ],
+        [
+          71.57553320647412,
+          4.276756686982586
+        ],
+        [
+          71.96195691287532,
+          4.276756686982586
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    71.57553320647412,
+    4.276756686982586,
+    71.96195691287532,
+    4.625034015832402
+  ],
+  "properties": {
+    "workflow_metadata": {
+      "stac_collection": "sentinel-2-l2a",
+      "date_start": "2024-01-01T00:00:00Z",
+      "date_end": "2024-12-31T23:59:59Z",
+      "aoi": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              71.57683969558222,
+              4.278154706539496
+            ],
+            [
+              71.96061157730237,
+              4.278154706539496
+            ],
+            [
+              71.96061157730237,
+              4.62344048537264
+            ],
+            [
+              71.57683969558222,
+              4.62344048537264
+            ],
+            [
+              71.57683969558222,
+              4.278154706539496
+            ]
+          ]
+        ]
+      }
+    },
+    "proj:epsg": 32642,
+    "proj:transform": [
+      10.0,
+      0.0,
+      785895.0,
+      0.0,
+      -10.0,
+      511735.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "thumbnail_b64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAAA6CAYAAAAA0F95AAAAb0lEQVR4nO3QQQ3AMBADwaYsC65YExSnfWQGgGXtegZ8+98TuxPe+kBNgPpATYD6QE2A+kBNgPpATYD6QE2A+kBNgPpATYD6QE2A+kBNgPpATYD6QE2A+kBNgPpATYD6QE2A+kDt+gAAAAAAAADXONx9AzbdDjrcAAAAAElFTkSuQmCC",
+    "datetime": "2024-03-19T05:47:38.590000Z"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "EOPro Water Quality calculation"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "EOPro Water Quality calculation"
+    }
+  ],
+  "assets": {
+    "cdom": {
+      "href": "../S2B_42NZL_20240319_0_L2A_cdom.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Colored Dissolved Organic Matter (CDOM)",
+      "colormap": {
+        "name": "jet",
+        "reversed": false,
+        "min": 0.03,
+        "max": 5.3,
+        "steps": 20,
+        "units": "ug / L",
+        "mpl_equivalent_cmap": "jet"
+      },
+      "statistics": {
+        "minimum": 2.4780564281070543,
+        "maximum": 2.4781991773639946,
+        "mean": 2.4781372934947874,
+        "median": 2.4781373112156944,
+        "q01": 2.478112517173384,
+        "q99": 2.478160901130771,
+        "stddev": 0.00001032622603523692,
+        "valid_percent": 0.6282484332577785
+      },
+      "raster:bands": [
+        {
+          "nodata": null,
+          "unit": "ug / L"
+        }
+      ],
+      "proj:shape": [
+        3862,
+        4285
+      ],
+      "proj:transform": [
+        0.00009018056158721297,
+        0.0,
+        71.57553320647412,
+        0.0,
+        -0.00009018056158721297,
+        4.625034015832402,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "proj:epsg": 4326,
+      "size": 54091381,
+      "roles": [
+        "data"
+      ]
+    },
+    "thumbnail": {
+      "href": "../S2B_42NZL_20240319_0_L2A.png",
+      "type": "image/png",
+      "title": "Thumbnail",
+      "size": 168,
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "doc": {
+      "href": "../S2B_42NZL_20240319_0_L2A_doc.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Dissolved Organic Carbon (DOC)",
+      "colormap": {
+        "name": "jet",
+        "reversed": false,
+        "min": 0.0,
+        "max": 100.0,
+        "steps": 20,
+        "units": "mg / m3",
+        "mpl_equivalent_cmap": "jet"
+      },
+      "statistics": {
+        "minimum": 45.988055299322,
+        "maximum": 45.99289703116764,
+        "mean": 45.99035886250955,
+        "median": 45.99036279246647,
+        "q01": 45.98962109039383,
+        "q99": 45.99106329861347,
+        "stddev": 0.0003060310908984766,
+        "valid_percent": 0.6282484332577785
+      },
+      "raster:bands": [
+        {
+          "nodata": null,
+          "unit": "mg / m3"
+        }
+      ],
+      "proj:shape": [
+        3862,
+        4285
+      ],
+      "proj:transform": [
+        0.00009018056158721297,
+        0.0,
+        71.57553320647412,
+        0.0,
+        -0.00009018056158721297,
+        4.625034015832402,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "proj:epsg": 4326,
+      "size": 52673679,
+      "roles": [
+        "data"
+      ]
+    },
+    "cya_cells": {
+      "href": "../S2B_42NZL_20240319_0_L2A_cya_cells.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Cyanobacteria Density (CYA)",
+      "colormap": {
+        "name": "jet",
+        "reversed": false,
+        "min": 0.1,
+        "max": 300.0,
+        "steps": 20,
+        "units": "1e6 cells / mL",
+        "mpl_equivalent_cmap": "jet"
+      },
+      "statistics": {
+        "minimum": null,
+        "maximum": null,
+        "mean": null,
+        "median": null,
+        "q01": null,
+        "q99": null,
+        "stddev": null,
+        "valid_percent": 1.0
+      },
+      "raster:bands": [
+        {
+          "nodata": null,
+          "unit": "1e6 cells / mL"
+        }
+      ],
+      "proj:shape": [
+        3862,
+        4285
+      ],
+      "proj:transform": [
+        0.00009018056158721297,
+        0.0,
+        71.57553320647412,
+        0.0,
+        -0.00009018056158721297,
+        4.625034015832402,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "proj:epsg": 4326,
+      "size": 1255166,
+      "roles": [
+        "data"
+      ]
+    },
+    "turb": {
+      "href": "../S2B_42NZL_20240319_0_L2A_turb.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Turbidity (TURB)",
+      "colormap": {
+        "name": "jet",
+        "reversed": false,
+        "min": 15,
+        "max": 1000,
+        "steps": 20,
+        "units": "NTU",
+        "mpl_equivalent_cmap": "jet"
+      },
+      "statistics": {
+        "minimum": -18.57489077203861,
+        "maximum": -18.56863608740903,
+        "mean": -18.573681412477285,
+        "median": -18.573688900974336,
+        "q01": -18.574175879244514,
+        "q99": -18.57313959202744,
+        "stddev": 0.00022581896719301643,
+        "valid_percent": 0.6282484332577785
+      },
+      "raster:bands": [
+        {
+          "nodata": null,
+          "unit": "NTU"
+        }
+      ],
+      "proj:shape": [
+        3862,
+        4285
+      ],
+      "proj:transform": [
+        0.00009018056158721297,
+        0.0,
+        71.57553320647412,
+        0.0,
+        -0.00009018056158721297,
+        4.625034015832402,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "proj:epsg": 4326,
+      "size": 54225304,
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

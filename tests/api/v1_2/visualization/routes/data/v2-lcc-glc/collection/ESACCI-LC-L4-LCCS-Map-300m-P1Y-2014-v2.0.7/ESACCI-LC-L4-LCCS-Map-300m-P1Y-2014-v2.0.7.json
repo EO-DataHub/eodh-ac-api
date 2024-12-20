@@ -1,0 +1,419 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.1.0/schema.json",
+    "https://stac-extensions.github.io/classification/v2.0.0/schema.json"
+  ],
+  "id": "ESACCI-LC-L4-LCCS-Map-300m-P1Y-2014-v2.0.7",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -0.511790994620525,
+          51.496989653093614
+        ],
+        [
+          -0.408954489023431,
+          51.496989653093614
+        ],
+        [
+          -0.408954489023431,
+          51.44563991163383
+        ],
+        [
+          -0.511790994620525,
+          51.44563991163383
+        ],
+        [
+          -0.511790994620525,
+          51.496989653093614
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    -0.511790994620525,
+    51.44563991163383,
+    -0.408954489023431,
+    51.496989653093614
+  ],
+  "properties": {
+    "datetime": "2014-07-02T00:00:00Z",
+    "updated": "2024-09-07T13:52:49.934129Z",
+    "start_datetime": "2014-01-01T00:00:00Z",
+    "end_datetime": "2014-12-31T00:00:00Z",
+    "license": "ESA CCI Data Policy: free and open access",
+    "proj:code": "EPSG:4326",
+    "TileSize": "2048:2048",
+    "version": "2.0.7",
+    "date_created": "2017-06-15T19:30:02Z",
+    "spatial_resolution": "300m",
+    "geospatial_lat_resolution": "0.002778",
+    "geospatial_lon_resolution": "0.002778",
+    "created": "2024-09-07T13:52:49.934129Z",
+    "proj:epsg": 3857,
+    "thumbnail_b64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAAA0CAYAAAA62j4JAAADJ0lEQVR4nO1arXcUMRD/5V7PYBBUU409RBGLOIWo6l+AOVWBRlXga3ivVTUVaAwVGBA9wQnOIOqrz1QjgtidZTPJNB+729y75mfusskmM7PzlUmU/jbT6OJohhgs9y8BANVmYbTHAK0h0ZCCidGKZB7XawBAdRX5XgLGYB4A1I9zaACYnpoLqXf1r/5+aSzUEtIwb0EQovW+o49jem2OPTx8eM5QYXTHTzxjdx5FAAAwP6lVgqvnze83APqrP0Gy4xSk2v7fT+b7SuuFdg3kC/iYX75fm+MiEOoDCOQLHvIrLvy8MNeZngaagHeB5ssP+YVDme+LPd+A6mpWf3Wu3qwteeIUodA7q5X5vBsFqs0iWghk6q0Wb2bFCRYBuB6m2leK+seuReMH8wHJEzV2RN6f0MfmOXM8xV7ur43+vvBmglaOz0IgZz6FANd/59iea/F1aL42D7DUl5gnb9+T+Ry7xZC1JkEDB/ryYzKfupa6eQFnJkga0GZ4rL0rKGEwNwG54RQA9/67qv6AwweI5a0mGlgx+ojH6qb/7rZuv3xltDmofwj4Io2rP8oE+MRcIyTmxfkGZJ7TENpva4Cw7w9Vfx/zocIZE6Um2EERwJCTSY5uG9HWBMVMcLPw1v+M8Yx5l41vg/1zKDoas7a1iamwJAgpLOYWRm0CvL4nMB+LHGEwFntWRZcVOnzlcOlLhjJf3d16tcJnXrHb4O74EgVyE5Ab7qJo7Kbn2RmAToYlqL/rearpiP0R6g8EHI1ZPmD+xSBkrHP7GIi+I4C2oLI4LyT2/QpjgNMkHa1xWBoQS3zroRszyME8p2X158zZ7zpXLE4wNwG5YQpAuvgggDufnOpPkPyTdKz+3wcw5tXnC6OtP5yYM7JosI0IyRCdJsCZl/rV8X0qbY8OSTstDfAxL4HuE/nAC5PdvUAO1BoQaft9YRyKZjah9qLk/KDeFaZqgP76HEA8Q92rLo+VVZaiaAdFAENOlqL+rv/GnCPlFjTvYAJQx/d4+/pX8PhtYB6gq7IH419331YoVHUU0B/7RQGO0LzABV8GF3oRK/iKzFPGkxfAP+GrtgMxDptOAAAAAElFTkSuQmCC"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../../catalog.json",
+      "type": "application/json",
+      "title": "EOPro Reprojected Data"
+    },
+    {
+      "rel": "collection",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "Downloaded esa-lccci-glcm Collection"
+    },
+    {
+      "rel": "parent",
+      "href": "../collection.json",
+      "type": "application/json",
+      "title": "Downloaded esa-lccci-glcm Collection"
+    }
+  ],
+  "assets": {
+    "data": {
+      "href": "../../source_data/ESACCI-LC-L4-LCCS-Map-300m-P1Y-2014-v2.0.7/GeoTIFF.tif",
+      "role": [
+        "data"
+      ],
+      "classification:classes": [
+        {
+          "value": 0,
+          "description": "No data",
+          "color-hint": "000000",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 10,
+          "description": "Cropland, rainfed",
+          "color-hint": "ffff64",
+          "percentage": 0.9695290858725761,
+          "area_m2": 417552.75760998286,
+          "area_km2": 0.41755275760998284
+        },
+        {
+          "value": 11,
+          "description": "Herbaceous cover",
+          "color-hint": "ffff64",
+          "percentage": 20.083102493074794,
+          "area_m2": 8649307.121921076,
+          "area_km2": 8.649307121921076
+        },
+        {
+          "value": 12,
+          "description": "Tree or shrub cover",
+          "color-hint": "ffff00",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 20,
+          "description": "Cropland, irrigated or post-flooding",
+          "color-hint": "aaf0f0",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 30,
+          "description": "Mosaic cropland (>50%) / natural vegetation (tree, shrub, herbaceous cover) (<50%)",
+          "color-hint": "dbf064",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 40,
+          "description": "Mosaic natural vegetation (tree, shrub, herbaceous cover) (>50%) / cropland (<50%) ",
+          "color-hint": "c8c864",
+          "percentage": 1.3850415512465373,
+          "area_m2": 596503.9394428327,
+          "area_km2": 0.5965039394428328
+        },
+        {
+          "value": 50,
+          "description": "Tree cover, broadleaved, evergreen, closed to open (>15%)",
+          "color-hint": "006400",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 60,
+          "description": "Tree cover, broadleaved, deciduous, closed to open (>15%)",
+          "color-hint": "00a000",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 61,
+          "description": "Tree cover, broadleaved, deciduous, closed (>40%)",
+          "color-hint": "00a000",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 62,
+          "description": "Tree cover, broadleaved, deciduous, open (15-40%)",
+          "color-hint": "aac800",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 70,
+          "description": "Tree cover, needleleaved, evergreen, closed to open (>15%)",
+          "color-hint": "003c00",
+          "percentage": 0.13850415512465375,
+          "area_m2": 59650.39394428327,
+          "area_km2": 0.05965039394428327
+        },
+        {
+          "value": 71,
+          "description": "Tree cover, needleleaved, evergreen, closed (>40%)",
+          "color-hint": "003c00",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 72,
+          "description": "Tree cover, needleleaved, evergreen, open (15-40%)",
+          "color-hint": "005000",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 80,
+          "description": "Tree cover, needleleaved, deciduous, closed to open (>15%)",
+          "color-hint": "4005000",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 81,
+          "description": "Tree cover, needleleaved, deciduous, closed (>40%)",
+          "color-hint": "4005000",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 82,
+          "description": "Tree cover, needleleaved, deciduous, open (15-40%)",
+          "color-hint": "4006400",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 90,
+          "description": "Tree cover, mixed leaf type (broadleaved and needleleaved)",
+          "color-hint": "788200",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 100,
+          "description": "Mosaic tree and shrub (>50%) / herbaceous cover (<50%)",
+          "color-hint": "1400a000",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 110,
+          "description": "Mosaic herbaceous cover (>50%) / tree and shrub (<50%)",
+          "color-hint": "be9500",
+          "percentage": 0.8310249307479225,
+          "area_m2": 357902.36366569967,
+          "area_km2": 0.35790236366569966
+        },
+        {
+          "value": 120,
+          "description": "Shrubland",
+          "color-hint": "15006400",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 121,
+          "description": "Shrubland evergreen",
+          "color-hint": "784c00",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 122,
+          "description": "Shrubland deciduous",
+          "color-hint": "15006400",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 130,
+          "description": "Grassland",
+          "color-hint": "ffb432",
+          "percentage": 6.9252077562326875,
+          "area_m2": 2982519.697214164,
+          "area_km2": 2.9825196972141637
+        },
+        {
+          "value": 140,
+          "description": "Lichens and mosses",
+          "color-hint": "ffdcd2",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 150,
+          "description": "Sparse vegetation (tree, shrub, herbaceous cover) (<15%)",
+          "color-hint": "ffebaf",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 151,
+          "description": "Sparse tree (<15%)",
+          "color-hint": "ffc964",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 152,
+          "description": "Sparse shrub (<15%)",
+          "color-hint": "ffd278",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 153,
+          "description": "Sparse herbaceous cover (<15%)",
+          "color-hint": "ffebaf",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 160,
+          "description": "Tree cover, flooded, fresh or brakish water",
+          "color-hint": "00785a",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 170,
+          "description": "Tree cover, flooded, saline water",
+          "color-hint": "009678",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 180,
+          "description": "Shrub or herbaceous cover, flooded, fresh/saline/brakish water",
+          "color-hint": "00dc80",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 190,
+          "description": "Urban areas",
+          "color-hint": "c31300",
+          "percentage": 59.83379501385041,
+          "area_m2": 25768970.18393037,
+          "area_km2": 25.76897018393037
+        },
+        {
+          "value": 200,
+          "description": "Bare areas",
+          "color-hint": "fff5d7",
+          "percentage": 4.016620498614958,
+          "area_m2": 1729861.4243842144,
+          "area_km2": 1.7298614243842145
+        },
+        {
+          "value": 201,
+          "description": "Consolidated bare areas",
+          "color-hint": "dcdcdc",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 202,
+          "description": "Unconsolidated bare areas",
+          "color-hint": "fff5d7",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        },
+        {
+          "value": 210,
+          "description": "Water bodies",
+          "color-hint": "0046c8",
+          "percentage": 5.8171745152354575,
+          "area_m2": 2505316.545659898,
+          "area_km2": 2.505316545659898
+        },
+        {
+          "value": 220,
+          "description": "Permanent snow and ice",
+          "color-hint": "ffffff",
+          "percentage": 0.0,
+          "area_m2": 0.0,
+          "area_km2": 0.0
+        }
+      ],
+      "proj:shape": [
+        27,
+        33
+      ],
+      "proj:transform": [
+        354.6530519168882,
+        0.0,
+        -57205.84943383414,
+        0.0,
+        -354.6530519169039,
+        6709722.36978303,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "proj:epsg": 3857
+    },
+    "thumbnail": {
+      "href": "../../source_data/ESACCI-LC-L4-LCCS-Map-300m-P1Y-2014-v2.0.7/GeoTIFF_thumbnail.png",
+      "type": "image/png",
+      "title": "Thumbnail",
+      "size": 864,
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  },
+  "collection": "collection"
+}

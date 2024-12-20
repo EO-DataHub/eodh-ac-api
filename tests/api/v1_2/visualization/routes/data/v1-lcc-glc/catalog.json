@@ -1,0 +1,30 @@
+{
+  "type": "Catalog",
+  "id": "catalog",
+  "stac_version": "1.0.0",
+  "description": "Discrete Data Summary using esacci-globallc dataset",
+  "links": [
+    {
+      "rel": "root",
+      "href": "./catalog.json",
+      "type": "application/json",
+      "title": "EOPro Discrete Data Summary"
+    },
+    {
+      "rel": "item",
+      "href": "./ESACCI-LC-L4-LCCS-Map-300m-P1Y-2008-v2.0.7/ESACCI-LC-L4-LCCS-Map-300m-P1Y-2008-v2.0.7.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./ESACCI-LC-L4-LCCS-Map-300m-P1Y-2009-v2.0.7/ESACCI-LC-L4-LCCS-Map-300m-P1Y-2009-v2.0.7.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./ESACCI-LC-L4-LCCS-Map-300m-P1Y-2010-v2.0.7/ESACCI-LC-L4-LCCS-Map-300m-P1Y-2010-v2.0.7.json",
+      "type": "application/json"
+    }
+  ],
+  "title": "EOPro Discrete Data Summary"
+}

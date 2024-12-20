@@ -1,0 +1,444 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.1.0/schema.json"
+  ],
+  "id": "3724aac8-a069-4c0a-b19e-c844b0fb5c6e",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          15.052268923898112,
+          50.833598186651244
+        ],
+        [
+          15.052268923898112,
+          50.989077215056824
+        ],
+        [
+          14.763294437090849,
+          50.989077215056824
+        ],
+        [
+          14.763294437090849,
+          50.833598186651244
+        ],
+        [
+          15.052268923898112,
+          50.833598186651244
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    14.763294437090849,
+    50.833598186651244,
+    15.052268923898112,
+    50.989077215056824
+  ],
+  "properties": {
+    "lulc_classes_percentage": {
+      "1": 0.1800537109375,
+      "2": 8.3648681640625,
+      "3": 1.5289306640625,
+      "4": 0.33111572265625,
+      "7": 7.15789794921875,
+      "8": 0.5523681640625,
+      "10": 0.09002685546875,
+      "11": 0.4974365234375,
+      "12": 31.19049072265625,
+      "18": 15.34423828125,
+      "20": 0.3143310546875,
+      "21": 7.03887939453125,
+      "23": 6.76116943359375,
+      "24": 8.86993408203125,
+      "25": 7.0953369140625,
+      "26": 0.0762939453125,
+      "29": 4.3701171875,
+      "41": 0.23651123046875,
+      "5": 0.0,
+      "6": 0.0,
+      "9": 0.0,
+      "13": 0.0,
+      "14": 0.0,
+      "15": 0.0,
+      "16": 0.0,
+      "17": 0.0,
+      "19": 0.0,
+      "22": 0.0,
+      "27": 0.0,
+      "28": 0.0,
+      "30": 0.0,
+      "31": 0.0,
+      "32": 0.0,
+      "33": 0.0,
+      "34": 0.0,
+      "35": 0.0,
+      "36": 0.0,
+      "37": 0.0,
+      "38": 0.0,
+      "39": 0.0,
+      "40": 0.0,
+      "42": 0.0,
+      "43": 0.0,
+      "44": 0.0,
+      "48": 0.0
+    },
+    "lulc_classes_m2": {
+      "1": 632948.4095875127,
+      "2": 29405281.197955463,
+      "3": 5374697.511921083,
+      "4": 1163981.3972922903,
+      "7": 25162381.265890017,
+      "8": 1941756.9853447424,
+      "10": 316474.20479375636,
+      "11": 1748654.0807248233,
+      "12": 109644902.03710464,
+      "18": 53940078.02383074,
+      "20": 1104977.7319917595,
+      "21": 24743991.63921353,
+      "23": 23767749.17696838,
+      "24": 31180755.126544166,
+      "25": 24942458.51340622,
+      "26": 268198.4786387766,
+      "29": 15362408.856429122,
+      "41": 831415.2837802074,
+      "5": 0.0,
+      "6": 0.0,
+      "9": 0.0,
+      "13": 0.0,
+      "14": 0.0,
+      "15": 0.0,
+      "16": 0.0,
+      "17": 0.0,
+      "19": 0.0,
+      "22": 0.0,
+      "27": 0.0,
+      "28": 0.0,
+      "30": 0.0,
+      "31": 0.0,
+      "32": 0.0,
+      "33": 0.0,
+      "34": 0.0,
+      "35": 0.0,
+      "36": 0.0,
+      "37": 0.0,
+      "38": 0.0,
+      "39": 0.0,
+      "40": 0.0,
+      "42": 0.0,
+      "43": 0.0,
+      "44": 0.0,
+      "48": 0.0
+    },
+    "thumbnail_b64": "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",
+    "workflow_metadata": {
+      "stac_collection": "clms-corinelc",
+      "date_start": "2006-01-01T00:00:00Z",
+      "date_end": "2018-12-31T23:59:59Z",
+      "aoi": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              14.763294437090849,
+              50.833598186651244
+            ],
+            [
+              15.052268923898112,
+              50.833598186651244
+            ],
+            [
+              15.052268923898112,
+              50.989077215056824
+            ],
+            [
+              14.763294437090849,
+              50.989077215056824
+            ],
+            [
+              14.763294437090849,
+              50.833598186651244
+            ]
+          ]
+        ]
+      }
+    },
+    "proj:epsg": 4326,
+    "proj:transform": [
+      0.0011288065890908694,
+      0.0,
+      14.763294437090849,
+      0.0,
+      -0.0006073399547092961,
+      50.989077215056824,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "datetime": "2018-01-01T00:00:00Z"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "EOPro Discrete Data Summary"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "EOPro Discrete Data Summary"
+    }
+  ],
+  "assets": {
+    "thumbnail": {
+      "href": "../3724aac8-a069-4c0a-b19e-c844b0fb5c6e.png",
+      "type": "image/png",
+      "title": "Thumbnail",
+      "size": 2575,
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "data": {
+      "href": "../3724aac8-a069-4c0a-b19e-c844b0fb5c6e.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "clms-corinelc",
+      "classification:classes": [
+        {
+          "value": 1,
+          "description": "Continuous urban fabric",
+          "color-hint": "e6004d"
+        },
+        {
+          "value": 2,
+          "description": "Discontinuous urban fabric",
+          "color-hint": "ff0000"
+        },
+        {
+          "value": 3,
+          "description": "Industrial or commercial units",
+          "color-hint": "cc4df2"
+        },
+        {
+          "value": 4,
+          "description": "Road and rail networks and associated land",
+          "color-hint": "cc0000"
+        },
+        {
+          "value": 5,
+          "description": "Port areas",
+          "color-hint": "e6cccc"
+        },
+        {
+          "value": 6,
+          "description": "Airports",
+          "color-hint": "e6cce6"
+        },
+        {
+          "value": 7,
+          "description": "Mineral extraction sites",
+          "color-hint": "600ccc"
+        },
+        {
+          "value": 8,
+          "description": "Dump sites",
+          "color-hint": "a64d00"
+        },
+        {
+          "value": 9,
+          "description": "Construction sites",
+          "color-hint": "ff4dff"
+        },
+        {
+          "value": 10,
+          "description": "Green urban areas",
+          "color-hint": "ffa6ff"
+        },
+        {
+          "value": 11,
+          "description": "Sport and leisure facilities",
+          "color-hint": "ffe6ff"
+        },
+        {
+          "value": 12,
+          "description": "Non-irrigated arable land",
+          "color-hint": "ffffa8"
+        },
+        {
+          "value": 13,
+          "description": "Permanently irrigated land",
+          "color-hint": "ffff00"
+        },
+        {
+          "value": 14,
+          "description": "Rice fields",
+          "color-hint": "e6e600"
+        },
+        {
+          "value": 15,
+          "description": "Vineyards",
+          "color-hint": "e68000"
+        },
+        {
+          "value": 16,
+          "description": "Fruit trees and berry plantations",
+          "color-hint": "f2a64d"
+        },
+        {
+          "value": 17,
+          "description": "Olive groves",
+          "color-hint": "e6a600"
+        },
+        {
+          "value": 18,
+          "description": "Pastures",
+          "color-hint": "e6e64d"
+        },
+        {
+          "value": 19,
+          "description": "Annual crops associated with permanent crops",
+          "color-hint": "ffe6a6"
+        },
+        {
+          "value": 20,
+          "description": "Complex cultivation patterns",
+          "color-hint": "ffe64d"
+        },
+        {
+          "value": 21,
+          "description": "Land principally occupied by agriculture with significant areas of natural vegetation",
+          "color-hint": "e6cc4d"
+        },
+        {
+          "value": 22,
+          "description": "Agro-forestry areas",
+          "color-hint": "f2cca6"
+        },
+        {
+          "value": 23,
+          "description": "Broad-leaved forest",
+          "color-hint": "80ff00"
+        },
+        {
+          "value": 24,
+          "description": "Coniferous forest",
+          "color-hint": "00a600"
+        },
+        {
+          "value": 25,
+          "description": "Mixed forest",
+          "color-hint": "4dff00"
+        },
+        {
+          "value": 26,
+          "description": "Natural grasslands",
+          "color-hint": "ccf24d"
+        },
+        {
+          "value": 27,
+          "description": "Moors and heathland",
+          "color-hint": "a6ff80"
+        },
+        {
+          "value": 28,
+          "description": "Sclerophyllous vegetation",
+          "color-hint": "a6e64d"
+        },
+        {
+          "value": 29,
+          "description": "Transitional woodland-shrub",
+          "color-hint": "a6f200"
+        },
+        {
+          "value": 30,
+          "description": "Beaches - dunes - sands",
+          "color-hint": "e6e6e6"
+        },
+        {
+          "value": 31,
+          "description": "Bare rocks",
+          "color-hint": "cccccc"
+        },
+        {
+          "value": 32,
+          "description": "Sparsely vegetated areas",
+          "color-hint": "ccffcc"
+        },
+        {
+          "value": 33,
+          "description": "Burnt areas",
+          "color-hint": "000000"
+        },
+        {
+          "value": 34,
+          "description": "Glaciers and perpetual snow",
+          "color-hint": "a6e6cc"
+        },
+        {
+          "value": 35,
+          "description": "Inland marshes",
+          "color-hint": "a6a6ff"
+        },
+        {
+          "value": 36,
+          "description": "Peat bogs",
+          "color-hint": "4d4dff"
+        },
+        {
+          "value": 37,
+          "description": "Salt marshes",
+          "color-hint": "ccccff"
+        },
+        {
+          "value": 38,
+          "description": "Salines",
+          "color-hint": "e6e6ff"
+        },
+        {
+          "value": 39,
+          "description": "Intertidal flats",
+          "color-hint": "a6a6e6"
+        },
+        {
+          "value": 40,
+          "description": "Water courses",
+          "color-hint": "00ccf2"
+        },
+        {
+          "value": 41,
+          "description": "Water bodies",
+          "color-hint": "80f2e6"
+        },
+        {
+          "value": 42,
+          "description": "Coastal lagoons",
+          "color-hint": "00ffa6"
+        },
+        {
+          "value": 43,
+          "description": "Estuaries",
+          "color-hint": "a6ffe6"
+        },
+        {
+          "value": 44,
+          "description": "Sea and ocean",
+          "color-hint": "e6f2ff"
+        },
+        {
+          "value": 48,
+          "description": "NODATA",
+          "color-hint": "ffffff"
+        }
+      ],
+      "size": 18666,
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

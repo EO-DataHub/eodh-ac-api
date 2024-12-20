@@ -1,0 +1,164 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.1.0/schema.json"
+  ],
+  "id": "S2B_42NYK_20240319_0_L2A",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          828675.0,
+          473355.0
+        ],
+        [
+          828675.0,
+          511735.0
+        ],
+        [
+          785895.0,
+          511735.0
+        ],
+        [
+          785895.0,
+          473355.0
+        ],
+        [
+          828675.0,
+          473355.0
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    785895.0,
+    473355.0,
+    828675.0,
+    511735.0
+  ],
+  "properties": {
+    "thumbnail_b64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAAA6CAYAAAAA0F95AAAAhUlEQVR4nO3Q0Q1AUAAEQbSlMEqgMHXxq4I3EjsN3GWnKUmSJEmS5Gfm7dpvfeLtXI955N4ycuyLCqAPaAXQB7QC6ANaAfQBrQD6gFYAfUArgD6gFUAf0AqgD2gF0Ae0AugDWgH0Aa0A+oBWAH1AK4A+oBVAH9AKoA9oBdAHtALoA9rvAzy6cQRSz+JcJwAAAABJRU5ErkJggg==",
+    "workflow_metadata": {
+      "stac_collection": "sentinel-2-l2a",
+      "date_start": "2024-01-01T00:00:00Z",
+      "date_end": "2024-12-31T23:59:59Z",
+      "aoi": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              71.57683969558222,
+              4.278154706539496
+            ],
+            [
+              71.96061157730237,
+              4.278154706539496
+            ],
+            [
+              71.96061157730237,
+              4.62344048537264
+            ],
+            [
+              71.57683969558222,
+              4.62344048537264
+            ],
+            [
+              71.57683969558222,
+              4.278154706539496
+            ]
+          ]
+        ]
+      }
+    },
+    "proj:epsg": 32642,
+    "proj:transform": [
+      10.0,
+      0.0,
+      785895.0,
+      0.0,
+      -10.0,
+      511735.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "datetime": "2024-03-19T05:47:56.763000Z"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "EOPro NDVI calculation"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "EOPro NDVI calculation"
+    }
+  ],
+  "assets": {
+    "thumbnail": {
+      "href": "../S2B_42NYK_20240319_0_L2A.png",
+      "type": "image/png",
+      "title": "Thumbnail",
+      "size": 190,
+      "roles": [
+        "thumbnail"
+      ]
+    },
+    "data": {
+      "href": "../S2B_42NYK_20240319_0_L2A.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Normalized Difference Vegetation Index (NDVI)",
+      "colormap": {
+        "name": "velocity-green",
+        "reversed": true,
+        "min": -1.0,
+        "max": 1.0,
+        "steps": 20,
+        "units": "NDVI",
+        "mpl_equivalent_cmap": "YlGn"
+      },
+      "statistics": {
+        "minimum": -0.000013823495464748703,
+        "maximum": 0.000013672031855094247,
+        "mean": 1.0922836963800364e-6,
+        "median": 1.1175367262694635e-6,
+        "q01": -3.054606395380688e-6,
+        "q99": 5.103469447931275e-6,
+        "stddev": 1.7316202729489305e-6,
+        "valid_percent": 0.6121415455932543
+      },
+      "raster:bands": [
+        {
+          "nodata": null,
+          "unit": "NDVI"
+        }
+      ],
+      "proj:shape": [
+        3838,
+        4278
+      ],
+      "proj:transform": [
+        10.0,
+        0.0,
+        785895.0,
+        0.0,
+        -10.0,
+        511735.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "proj:epsg": 32642,
+      "size": 30411595,
+      "roles": [
+        "data"
+      ]
+    }
+  }
+}

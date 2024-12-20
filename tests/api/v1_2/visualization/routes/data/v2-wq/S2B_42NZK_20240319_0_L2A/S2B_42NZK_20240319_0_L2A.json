@@ -1,0 +1,271 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.1.0/schema.json"
+  ],
+  "id": "S2B_42NZK_20240319_0_L2A",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          71.96154469549772,
+          4.276704031557711
+        ],
+        [
+          71.96154469549772,
+          4.51892305069949
+        ],
+        [
+          71.70228197024359,
+          4.51892305069949
+        ],
+        [
+          71.70228197024359,
+          4.276704031557711
+        ],
+        [
+          71.96154469549772,
+          4.276704031557711
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    71.70228197024359,
+    4.276704031557711,
+    71.96154469549772,
+    4.51892305069949
+  ],
+  "properties": {
+    "proj:epsg": 3857,
+    "datetime": "2024-03-19T05:47:53.056000Z",
+    "thumbnail_b64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAAA8CAYAAADWibxkAAANv0lEQVR4nLWbbYhVxxnHf7s1lWDRsiFKNQYFJygkZZsqBjag2CaQLQYUDNi1cAJCP6RkSy0JuCFeS65gaIpC0iZE8JZ4kzYBA5VYmkpQyIUsmxdpA8qOREliYC2RGiqpTcLph2fmzDNz5txdQ/vAZc68nTP/med1Zu7ANJQApg12glnp2+W3uPnIv7A/mb3t16HPgRv71HeB1n7gKNjJev0FoAeMNfTV5WYDDPrMXMAD/HMgD94Uc+tf63d7nM+B77qf2ewAvCLgu4Ax8Xs8+G76nVEpN5tDmT0FA9NQmp8Ct859EqIXrwX7dr38GOC/dRR4dCXY89f37mUL4OLVfN2S+TBzLS77M3Df9X1COMA+F8C/e50vyIGHAB5gKzH4Jm5ZNQRmxLXZXwdvxuUHMHkNzHpVNyrgu8iiQIYLDrj6/aFswOsA/wF7MD+4/xc1cdB1v2d9EAsvAnPRA4O68n8N3mzpUzcKZmpu4M2OfPmS+XFeg+sHvovoihMkEwBiDfpRRvFGfT9TeftqUr9c0pOAPQ52XZ93jar3HMm30TqgNZkH7UmLwxhiLX5IZgJmU4TrqctWT/VdmJSbzaG+dDK9kVgPeJmNxnE8zpup8DwPOOPLt4DZ3h88SL1vo81kbQJmI9N25qQd8iMNbUcAeyzUn7sc6mzH9S+gNQcxsOuC0vsSMZdml3CZfSm0u5j0O5nku4ivAXCZZAJms+VmdeCQNM2Jjl/5b5Y3cxtPhPdsCt+znfrqmQJmMt/Xjs89D4F9SkROi8syYg7diLA7BB0w456HSJVgJwwgS3c3lJMXnRHA7Ib/DPwjbvtG+J4ppE06jjsXBGCa/as2z8hKLgQ+/YuU9chr/xXqWU/O0DcaRMBPRI2uhEe/iimZIqw8AJ9IUhaPYVbLs9cTZli+Zfe5vAc8Lj6A1wNNyvKoSy9/JekIwRHy3uNFlQdoLZYJau2QfoNmKlFIt/fhgE9dm7VhFVOynUQnPBTKuVWel7j329NBHkEpPmX2cqvvaZlLLxIADyET2xqWuo37xdx5JWgvSXnriLSvHCEzVZ9pMwK2FwdKTUFTWm6GBaBpAxY4DQw3c1f2++4d10M3Aofo7wxpijzB7MDcJGTr+kSQ5jDYB/N1KxbBhSv5urmQGYFWL4BLgebyntIJia3AlPjLPrIyBbBSmbwi7pyCN0udUiuAU+55WMJOTTd8J/j8AGanevbR3Xgfp2yNAPlbA6jcqusyr4MiEYA8G1Z102BvS8rawJ/EPJkp4Dmwh2QC7fsCnuf7e3xfh7xovAw84MqOIkGXX+0xJDp8eIfIezopvl1sBtVAzYiKzF6sgwfhADvpRGEd8IGruMOlwxm5Tkye2Z4BuL5eFn33tKQPqLKtLm3tCvJ/H+JG76TuvXqaXQdMAa/3d5GPAo+2gTVg3UhMAZgGhXmdUafZHnt7F4hte9Vus3ieKeWUYY0DvLmpmZ03+oM3hYv3JwgOOk7bXxGFl65yP/Dm8TCGZQtc+5fEafG0cVEAoVe2lQHv9VnKAStcOggSbnpWteuCsjMHwD4qLN7oGxhXrxSW2e3yH4m2ty9J/y51EQDZCPFkfwVYcYouXhVrYtYHZwdiC6K3vzZmhmffr5d1Ce7xPADWJJ06Lv15XGbWA/erhpegPQFfuIEY7/TsE6CabW0HWluAZFts1RAM3AUG5Qj1lBfYYEpz5OOAPUMSeJ0gxBQ5kzmJ3xKbcCZr3JlCLw4H3CC8CNyvnp2CfEC9EBXW2n0uYtuhVngNkTsNMlB7PAA2u8XPnwtNLIrB+WH5qHOGOAzWdBtPsB4YKEcpc7G3XVe3w3aCausJwDwN9meh/kaCa3sBkTMf8WlFZkaBf8fudA8oloP9KBnLYZh8UFzcqDzZAvOUU3gnkM0PTT03xsFq5kcCC/N6AFw+5cyd4oKK3Gp6jrlF7RGs8G2WunSl6ufAm93Sd9WQ2zv4KH7fsgUiAil4cOZ3NIBOwZtNoTwFjwM/BgyUU5Q1W+054GXEj78378yYNnAX2B9IXL4QMG4VzShwqXnPz4zWd32ayGzKB19N5i3nBue4pAcMsi/j4nqwK93qrwPzGpijsZm0E8Bb8vx9t/p+Fe1xYIviqpQ+ERGqQLqtarOy3rQp8mzy99M26SQtcekF+jhCfQOdNhVXNEaHbrt71VC8FQaiGHl/bpFexNarwZ4N+uUkEgprgCfJm8N0HP69g+aRZHBFkm/n08pvmHCWY7tzeg64jr8DylsYuL9u++0RFyoX8TtTMqPQOuyeFwt4v6VtpvJAdZl3qbsIeL2J4ydNjsaczOdkKrfC/ULkqk0Rtrwad5jSPtsAG3PGUQSUV4Rmd9hBivoO1zkqJ/8gQdQX7nnQFGE1dcNqpSfU6i925qcXt/NybvaG8gq0rQ+26qtcZPMa2FccZxwWD+1GxM3WVsDuCy6w1v4p+M/jLF3k2K9LcNygyQqcRLyxdOV3EsxZxjKYDVJvO/1D66hPH12jBz+GrH5rX/Muj2/n02UL4Mmr/f2EwSgEdvJGD1gUa3xTAEMy2He8ZXhW1QH2FLDGTcQeok0PAPPrANpTE/guYJYKCD9g68BfzLTtAqtc3k/Cxav1o/JKoRaZDRENNpVb04a/TsA9yhOs6rYDtweFWOOMUeAMteNxLWZR+VKwn6SjCmAjUVVjbZL5tH/UppyiLAvKcopyGsqyHVL9PA1lOSzpNJTlSukX1Reqvh2e9a9cTlk+ovLbKcsNcZs9SVoW8bunib+3J/edeymvzK+/N20rVkBp9drubkPe++JmCjhIdYBpNsPMMdn6/rhTV0ZNtGoIBnY1+BTbREH2yB/DaRZfA9yZ1F9A/IZUFFYNwUC5ibLJ06oGMAWcpXY1xmyCj9+IQfrdHh0o5UyXacP5CTnnmwvlTG/K/lsRy3EZsRwp4JT9u8BA2abkXleyBOytzpzNC6vR6O29CbbPcVkWyItw5MdyyqzpGBJPjDlgfjutC7QK1+g8lZWp3rceOpOzc4amMeAcojQrR8hHgJ7sBOi7Q1WA5MLaShQed7s4KVC36nNxmqA+yfMQ7vBK7wIhwrxIfAj6i/nwm2thlVsFcBN89jTMmyemMJ2AM4hfMOiBpae9APY51cuHyC+pCWrnwYMDX8CbGbaN8u/5DnH5lwgr40CtUHUn3Xt8oLNQh+gIh9in5AKFN4VpUPSuy2fPBSo39hGwT+YBVn2axGMODk7VdhcwA+ePwKsEUVjonrXpS52dJsWIag8SAep9gTOIwownwEV5vI745J25AYBYIflDClMAN8lqmMVgL/UXCX3kNVsM4Q9fcvGLJn2drotM6mYaDka45pyYZxNFc5gsaSXjAx8IhxSeFXsA7nqb7cX7ANU3RgCjvD71/Rn3e1l99+OG3d6UNPgxwvW9PS7AGNQ3uSp5vjUOYfXOrJZhvf2kBx0dt7ehKJRFKYj2EStvsBdPom9rCtnTW4gEMcZNUs6/GIPoDmAXmTQtNl3kjGHvZTd+7wF+kPOmlDdXjue9sHJtkr9XPY+4dHfdM2zy7t5ydXuS7/T7pZ5jzvOr3jcc8uVy5wmmM3k9Cqxa1U5D3S6nAwrAwB8nxFMzmZhiLuTNI+QvRdZihcwxnBeVncBgdjcm3SZP2nRRuzlFHrwZAfO8gAenDzz47VSHMTWW35Hkt8SD/j11WR/Dn/CECXkZsSD2INXVHN2+tVt2satYgAPAM9B0oJmC9WYk226HxAa5qM48AnwVJsYUMvrWobBylxFHx8t5uqp+Am4AJsbh/EGZGA/OGGjZkE/fYRbDO5fE+xyYhtLf2Ki8u1xIOw58yaynNn6Sog8WiFnNmL9qL6ETDzQ96c1NQmr+/KJonz/n/2sKd4QKYFEsL5Xt3gBsBvvLZPDvgf1eHdT10Ls4sdiBxB+dfDuzBVqvuslRz+mVerMT7KGk7zi0DuadqfCHiY6Aj+76XnLccCoGX61aA/h+Fy69PPo2Veg6L+aC9B0ecBfg7QDGg/f3kO2hYO5OuDR3HG+mYC9P1O8JLkzyX+d6i+3EitOf8wPYs2oQI4RtMxULjKn6tAyoDl/8jc+uK1s1FLP8jOqXbo211sE0j2Vui0/lQfnTYw+wqQ24SHAi5NM/PnjlZnuACc/e8TEFEvqqsz+zPwbQRfx7HeScuxzyqWnUbL9nSIlAdLHBB0Nr66bPi0gTaADccbXf/MhN1ELgu6uBnhykpO+xHfc7BVhV/qiEuVtDlwqYvmXmSXt+qbLcq06IBso2pTZ7XSRq8udn/e77pZT7H4+P6DyZAlhQtyapNdDjgTqIGcIN0LR91vRlrApoK7BN9t2iQe0Fu4e+NNeTH/+Hpur0uHAVn0Dr9RjIJLJjVIXlypszBbQ6zhqsBu6ua/10K6yp3GxwImBeyIBvzw4+pcaTYODhYffguMmzOkvVNphLzxHagJiwriqrIsazdfAg9TfQHCZ78bCnYNBOAB8qEG0wrxEuNvjyp+umybSpToGgztbRRejTrv+H1MiDy3GTVlpHVVu9mmZcxEHTF/XPRAqyotkirXKEsjys8i82tEuitnKbpL/NRZAqLQs5F0jr/O8PSXRXjlO+kIn+miLCtF5HhNW5ALhNj/2A2/rW8Xu/+ADAvAlcAfujsDpN7KeVoOYo23EbJW+LjPsVy5E2aSnl3N8zwN8Jh6J/RuKNO4D/Ar1Mma0HOF9iAAAAAElFTkSuQmCC"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "EOPro Reprojected Data"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "EOPro Reprojected Data"
+    }
+  ],
+  "assets": {
+    "cdom": {
+      "href": "../source_data/S2B_42NZK_20240319_0_L2A/cdom.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Colored Dissolved Organic Matter (CDOM)",
+      "colormap": {
+        "name": "jet",
+        "reversed": false,
+        "min": 0.03,
+        "max": 5.3,
+        "steps": 20,
+        "units": "ug / L",
+        "mpl_equivalent_cmap": "jet"
+      },
+      "statistics": {
+        "minimum": -8641847.9291,
+        "maximum": 703.043597269707,
+        "mean": -527.8182812115912,
+        "median": 4.70214599524239,
+        "q01": 2.9157740884565015,
+        "q99": 14.514145135141069,
+        "stddev": 51384.72630888068,
+        "valid_percent": 0.00602696107217894
+      },
+      "raster:bands": [
+        {
+          "nodata": null,
+          "unit": "ug / L"
+        }
+      ],
+      "proj:shape": [
+        2690,
+        2871
+      ],
+      "proj:transform": [
+        10.05254166948703,
+        0.0,
+        7981861.517643237,
+        0.0,
+        -10.052541669486985,
+        503566.55573654996,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "proj:epsg": 3857,
+      "size": 61800585,
+      "roles": [
+        "data"
+      ]
+    },
+    "doc": {
+      "href": "../source_data/S2B_42NZK_20240319_0_L2A/doc.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Dissolved Organic Carbon (DOC)",
+      "colormap": {
+        "name": "jet",
+        "reversed": false,
+        "min": 0.0,
+        "max": 100.0,
+        "steps": 20,
+        "units": "mg / m3",
+        "mpl_equivalent_cmap": "jet"
+      },
+      "statistics": {
+        "minimum": 0.0,
+        "maximum": 1.8689690626229112e51,
+        "mean": 2.4538151007786614e44,
+        "median": 55.19635565710562,
+        "q01": 28.046923867501867,
+        "q99": 94.64173982646474,
+        "stddev": 6.772031545304775e47,
+        "valid_percent": 0.006030484542405617
+      },
+      "raster:bands": [
+        {
+          "nodata": null,
+          "unit": "mg / m3"
+        }
+      ],
+      "proj:shape": [
+        2690,
+        2871
+      ],
+      "proj:transform": [
+        10.05254166948703,
+        0.0,
+        7981861.517643237,
+        0.0,
+        -10.052541669486985,
+        503566.55573654996,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "proj:epsg": 3857,
+      "size": 61800583,
+      "roles": [
+        "data"
+      ]
+    },
+    "cya_cells": {
+      "href": "../source_data/S2B_42NZK_20240319_0_L2A/cya_cells.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Cyanobacteria Density (CYA)",
+      "colormap": {
+        "name": "jet",
+        "reversed": false,
+        "min": 0.1,
+        "max": 300.0,
+        "steps": 20,
+        "units": "1e6 cells / mL",
+        "mpl_equivalent_cmap": "jet"
+      },
+      "statistics": {
+        "minimum": 0.0,
+        "maximum": 6.5016155824519176e16,
+        "mean": 226379722656153.03,
+        "median": 32.14530742297172,
+        "q01": 1.168417064605852e-6,
+        "q99": 8018170867283210.0,
+        "stddev": 1838292063246125.5,
+        "valid_percent": 0.99628495739211
+      },
+      "raster:bands": [
+        {
+          "nodata": null,
+          "unit": "1e6 cells / mL"
+        }
+      ],
+      "proj:shape": [
+        2690,
+        2871
+      ],
+      "proj:transform": [
+        10.05254166948703,
+        0.0,
+        7981861.517643237,
+        0.0,
+        -10.052541669486985,
+        503566.55573654996,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "proj:epsg": 3857,
+      "size": 61800583,
+      "roles": [
+        "data"
+      ]
+    },
+    "turb": {
+      "href": "../source_data/S2B_42NZK_20240319_0_L2A/turb.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Turbidity (TURB)",
+      "colormap": {
+        "name": "jet",
+        "reversed": false,
+        "min": 15,
+        "max": 1000,
+        "steps": 20,
+        "units": "NTU",
+        "mpl_equivalent_cmap": "jet"
+      },
+      "statistics": {
+        "minimum": -1346.5715987698388,
+        "maximum": 13886385.216099998,
+        "mean": 522.1293278273711,
+        "median": -7.497905880491391,
+        "q01": -18.421967950106165,
+        "q99": -2.358870471287274,
+        "stddev": 56955.161178139075,
+        "valid_percent": 0.00602696107217894
+      },
+      "raster:bands": [
+        {
+          "nodata": null,
+          "unit": "NTU"
+        }
+      ],
+      "proj:shape": [
+        2690,
+        2871
+      ],
+      "proj:transform": [
+        10.05254166948703,
+        0.0,
+        7981861.517643237,
+        0.0,
+        -10.052541669486985,
+        503566.55573654996,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "proj:epsg": 3857,
+      "size": 61800585,
+      "roles": [
+        "data"
+      ]
+    },
+    "thumbnail": {
+      "href": "../source_data/S2B_42NZK_20240319_0_L2A/cdom_thumbnail.png",
+      "type": "image/png",
+      "title": "Thumbnail",
+      "size": 3576,
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}

@@ -1,0 +1,132 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "stac_extensions": [
+    "https://stac-extensions.github.io/projection/v1.1.0/schema.json"
+  ],
+  "id": "S2B_42NZK_20240319_0_L2A",
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          71.70320603989859,
+          4.518868629307224
+        ],
+        [
+          71.96061157730237,
+          4.517749119357712
+        ],
+        [
+          71.96061157730237,
+          4.278154706539496
+        ],
+        [
+          71.70241244879634,
+          4.278154706539496
+        ],
+        [
+          71.70320603989859,
+          4.518868629307224
+        ]
+      ]
+    ]
+  },
+  "bbox": [
+    71.70241244879634,
+    4.278154706539496,
+    71.96061157730237,
+    4.518868629307224
+  ],
+  "properties": {
+    "proj:epsg": 32642,
+    "proj:transform": [
+      10.0,
+      0.0,
+      799975.0,
+      0.0,
+      -10.0,
+      500045.0,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "datetime": "2024-03-19T05:47:53.056000Z",
+    "thumbnail_b64": "iVBORw0KGgoAAAANSUhEUgAAAEAAAAA8CAYAAADWibxkAAAAkElEQVR4nO3QQRHAIADAMMA0GETXkJHHGgW9zn3PN35s6QCtATpAa4AO0BqgA7QG6ACtATpAa4AO0BqgA7QG6ACtATpAa4AO0BqgA7QG6ACtATpAa4AO0BqgA7QG6ACtATpAa4AO0BqgA7QG6ACtATpAa4AO0BqgA7QG6ACtATpAa4AO0BqgA7QG6ACtATpAe/MrAysM4HDRAAAAAElFTkSuQmCC"
+  },
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "EOPro NDVI calculation"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "EOPro NDVI calculation"
+    }
+  ],
+  "assets": {
+    "ndvi": {
+      "href": "../source_data/S2B_42NZK_20240319_0_L2A/ndvi.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Normalized Difference Vegetation Index (NDVI)",
+      "colormap": {
+        "name": "velocity-green",
+        "reversed": true,
+        "min": -1.0,
+        "max": 1.0,
+        "steps": 20,
+        "units": "NDVI",
+        "mpl_equivalent_cmap": "YlGn"
+      },
+      "statistics": {
+        "minimum": -49.000083923339844,
+        "maximum": 68.99996185302734,
+        "mean": 0.032333120703697205,
+        "median": 0.032755278050899506,
+        "q01": -0.1265117593109608,
+        "q99": 0.18804919719696045,
+        "stddev": 0.10218746960163116,
+        "valid_percent": 0.005585356715313125
+      },
+      "raster:bands": [
+        {
+          "nodata": null,
+          "unit": "NDVI"
+        }
+      ],
+      "proj:shape": [
+        2669,
+        2870
+      ],
+      "proj:transform": [
+        10.0,
+        0.0,
+        799975.0,
+        0.0,
+        -10.0,
+        500045.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "proj:epsg": 32642,
+      "size": 46291490,
+      "roles": [
+        "data"
+      ]
+    },
+    "thumbnail": {
+      "href": "../source_data/S2B_42NZK_20240319_0_L2A/ndvi_thumbnail.png",
+      "type": "image/png",
+      "title": "Thumbnail",
+      "size": 201,
+      "roles": [
+        "thumbnail"
+      ]
+    }
+  }
+}
