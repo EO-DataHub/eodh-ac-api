@@ -5,7 +5,6 @@ from typing import Annotated, Any, Literal
 
 from pydantic import AfterValidator, BaseModel, Field, PositiveInt
 from stac_pydantic.api import Search
-from stac_pydantic.api.extensions.fields import FieldsExtension  # noqa: TCH002
 from stac_pydantic.api.extensions.query import Operator  # noqa: TCH002
 from stac_pydantic.api.extensions.sort import SortExtension  # noqa: TCH002
 
@@ -16,6 +15,11 @@ def crop(v: PositiveInt) -> PositiveInt:
 
 
 Limit = Annotated[PositiveInt, AfterValidator(crop)]
+
+
+class FieldsExtension(BaseModel):
+    include: set[str] = Field(None)
+    exclude: set[str] = Field(None)
 
 
 class StacSearch(Search):
@@ -54,7 +58,7 @@ class StacSearch(Search):
 
 class VisualizationRequest(BaseModel):
     assets: list[str] | None = None
-    stac_query: dict[str, Any] | None = None
+    stac_query: StacSearch | None = None
 
 
 class ClassificationStackedBarChartRecord(BaseModel):
@@ -65,9 +69,9 @@ class ClassificationStackedBarChartRecord(BaseModel):
 
 
 class RangeAreaWithLineChartRecord(BaseModel):
-    min: float
-    max: float
-    median: float
+    min: float | None = None
+    max: float | None = None
+    median: float | None = None
     x_label: datetime
 
 
@@ -76,15 +80,10 @@ class AssetChartVisualization(BaseModel):
     units: str
 
 
-class RangeAreaWithLineChartColors(BaseModel):
-    line: str
-    range_area: str
-
-
 class RangeAreaWithLineChartVisualization(AssetChartVisualization):
     chart_type: Literal["range-area-with-line"] = "range-area-with-line"
     data: list[RangeAreaWithLineChartRecord]
-    colors: RangeAreaWithLineChartColors
+    color: str = "000000"
 
 
 class ClassificationAssetChartVisualization(AssetChartVisualization):

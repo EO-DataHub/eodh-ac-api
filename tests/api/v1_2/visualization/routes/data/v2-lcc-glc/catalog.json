@@ -1,0 +1,21 @@
+{
+  "type": "Catalog",
+  "id": "catalog",
+  "stac_version": "1.0.0",
+  "description": "EOPro Reprojected Data",
+  "links": [
+    {
+      "rel": "root",
+      "href": "./catalog.json",
+      "type": "application/json",
+      "title": "EOPro Reprojected Data"
+    },
+    {
+      "rel": "child",
+      "href": "./collection/collection.json",
+      "type": "application/json",
+      "title": "Downloaded esa-lccci-glcm Collection"
+    }
+  ],
+  "title": "EOPro Reprojected Data"
+}

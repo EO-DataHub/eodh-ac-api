@@ -1,0 +1,21 @@
+{
+  "type": "Catalog",
+  "id": "catalog",
+  "stac_version": "1.0.0",
+  "description": "Query for 2024-03-01 - 2024-10-10",
+  "links": [
+    {
+      "rel": "root",
+      "href": "./catalog.json",
+      "type": "application/json",
+      "title": "Downloaded sentinel-2-l2a Catalog"
+    },
+    {
+      "rel": "child",
+      "href": "./collection/collection.json",
+      "type": "application/json",
+      "title": "Downloaded sentinel-2-l2a Collection"
+    }
+  ],
+  "title": "Downloaded sentinel-2-l2a Catalog"
+}

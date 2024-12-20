@@ -1,0 +1,52 @@
+{
+  "type": "Collection",
+  "id": "collection",
+  "stac_version": "1.0.0",
+  "description": "Query for 2024-03-01 - 2024-10-10",
+  "links": [
+    {
+      "rel": "root",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Downloaded sentinel-2-l2a Catalog"
+    },
+    {
+      "rel": "item",
+      "href": "./S2B_42NZK_20240319_0_L2A/S2B_42NZK_20240319_0_L2A.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "item",
+      "href": "./S2B_42NYK_20240319_0_L2A/S2B_42NYK_20240319_0_L2A.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../catalog.json",
+      "type": "application/json",
+      "title": "Downloaded sentinel-2-l2a Catalog"
+    }
+  ],
+  "title": "Downloaded sentinel-2-l2a Collection",
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [
+          71.57683969558222,
+          4.278154706539496,
+          71.96061157730237,
+          4.62344048537264
+        ]
+      ]
+    },
+    "temporal": {
+      "interval": [
+        [
+          "2024-03-01T00:00:00Z",
+          "2024-10-10T00:00:00Z"
+        ]
+      ]
+    }
+  },
+  "license": "proprietary"
+}
