@@ -8,7 +8,7 @@ import pytest
 from pystac import Catalog, Item
 from starlette import status
 
-from src.api.v1_2.visualization.schemas import JobAssetsChartVisualizationResponse
+from src.api.v1_2.visualization.schemas.response import JobAssetsChartVisualizationResponse
 
 if TYPE_CHECKING:
     from httpx import Response

@@ -12,12 +12,12 @@ from stac_pydantic.api.extensions.sort import SortDirections, SortExtension
 from starlette import status
 
 from src.api.v1_0.auth.routes import validate_access_token
-from src.api.v1_2.visualization.schemas import (
+from src.api.v1_2.visualization.schemas.request import (
     FieldsExtension,
-    JobAssetsChartVisualizationResponse,
     StacSearch,
     VisualizationRequest,
 )
+from src.api.v1_2.visualization.schemas.response import JobAssetsChartVisualizationResponse
 from src.core.settings import current_settings
 from src.utils.logging import get_logger
 
