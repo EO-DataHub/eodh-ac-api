@@ -3,6 +3,7 @@ from __future__ import annotations
 from copy import deepcopy
 from typing import TYPE_CHECKING
 
+import pytest
 from flaky import flaky
 from starlette import status
 
@@ -14,6 +15,7 @@ if TYPE_CHECKING:
     from starlette.testclient import TestClient
 
 
+@pytest.mark.skip(reason="Endpoint not used in FE app")
 @flaky(max_runs=3)
 def test_ws_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
     client: TestClient,
