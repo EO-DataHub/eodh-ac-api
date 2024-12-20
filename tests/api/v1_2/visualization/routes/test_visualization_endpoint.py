@@ -142,7 +142,7 @@ def test_returns_404_when_asset_does_not_exist(
     _prepare_stac_client_mock(client_mock, stac_catalog)
 
     # Act
-    response = _send_request(client, token=auth_token_module_scoped)
+    response = _send_request(client, token=auth_token_module_scoped, assets=["i-dont-exist"])
 
     # Assert
     assert response.status_code == status.HTTP_404_NOT_FOUND
