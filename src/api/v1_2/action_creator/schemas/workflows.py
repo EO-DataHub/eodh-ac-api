@@ -21,6 +21,7 @@ from src.api.v1_2.action_creator.schemas.errors import (
     InvalidTaskOrderError,
     MaximumNumberOfTasksExceededError,
     TaskOutputWithoutMappingError,
+    WorkflowIdentifierCollisionError,
 )
 from src.api.v1_2.action_creator.schemas.workflow_tasks import (
     FUNCTIONS_REGISTRY,
@@ -190,6 +191,11 @@ def check_task_outputs_mapped_to_wf_outputs(g: nx.DiGraph) -> None:
         raise TaskOutputWithoutMappingError.make(dangling_outputs=dangling_outputs)
 
 
+def check_wf_id_collision(wf_spec: dict[str, Any]) -> None:
+    if wf_spec.get("identifier") and wf_spec["identifier"] in wf_spec["functions"]:
+        raise WorkflowIdentifierCollisionError.make(identifier=wf_spec["identifier"])
+
+
 def check_task_order(g: nx.DiGraph) -> None:
     # TODO extend this to incorporate all possible vertex paris
     for src_id, target_id in g.edges():
@@ -231,6 +237,7 @@ class WorkflowSpec(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def validate_workflow_before_instantiation(cls, v: dict[str, Any]) -> dict[str, Any]:
+        check_wf_id_collision(v)
         check_for_max_tasks(v)
         check_task_collection_support(v)
         resolved = resolve_references_and_atom_values(v)
