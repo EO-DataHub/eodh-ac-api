@@ -24,20 +24,20 @@ from src.utils.logging import get_logger
 _logger = get_logger(__name__)
 
 _COLOR_WHEEL = {
-    "ndvi": "008000",
-    "evi": "15b01a",
-    "savi": "9acd32",
-    "data": "d4526e",
-    "doc": "13eac9",
-    "cdom": "7bc8f6",
-    "cya_cells": "00008b",
-    "cya_mg": "da70d6",
-    "chl_a_coastal": "ffa500",
-    "chl_a_low": "f97306",
-    "chl_a_high": "daa520",
-    "ndwi": "9a0eea",
-    "turb": "6e750e",
-    "unknown": "000000",
+    "ndvi": "#008000",
+    "evi": "#15b01a",
+    "savi": "#9acd32",
+    "data": "#d4526e",
+    "doc": "#13eac9",
+    "cdom": "#7bc8f6",
+    "cya_cells": "#00008b",
+    "cya_mg": "#da70d6",
+    "chl_a_coastal": "#ffa500",
+    "chl_a_low": "#f97306",
+    "chl_a_high": "#daa520",
+    "ndwi": "#9a0eea",
+    "turb": "#6e750e",
+    "unknown": "#000000",
 }
 
 visualization_router_v1_2 = APIRouter(
@@ -169,7 +169,7 @@ def _handle_stacked_bar_chart(asset: Asset, asset_key: str, assets_dict: dict[st
                     "name": c["description"],
                     "area": [],
                     "percentage": [],
-                    "color-hint": c["color-hint"],
+                    "color-hint": c["color-hint"] if c["color-hint"].startswith("#") else f"#{c['color-hint']}",
                 }
                 for c in asset.extra_fields["classification:classes"]
             },
