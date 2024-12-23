@@ -20,6 +20,7 @@ from src.api.v1_2.action_creator.schemas.presets import (
     SELF_LOOP_DETECTED_PRESET,
     TASKS_HAVE_NO_OUTPUTS_MAPPING_PRESET,
     TOO_MANY_TASKS_PRESET,
+    WF_ID_COLLISION_PRESET,
     WF_OUTPUT_NOT_MAPPED_TO_TASK_RESULT_PRESET,
 )
 from src.api.v1_2.action_creator.schemas.workflows import WorkflowSpec, visualize_workflow_graph, wf_as_networkx_graph
@@ -111,6 +112,15 @@ def test_should_raise_ex_if_disjoined_subgraph_exist() -> None:
         "Subgraphs found: 2.",
     ):
         WorkflowSpec(**DISJOINED_SUBGRAPH_EXIST_PRESET)
+
+
+def test_should_raise_ex_if_wf_id_collides_with_func_id() -> None:
+    # Act & Assert
+    with pytest.raises(
+        ValidationError,
+        match="The workflow identifier 'ndvi' collides with a function with the same identifier.",
+    ):
+        WorkflowSpec(**WF_ID_COLLISION_PRESET)
 
 
 @pytest.mark.parametrize(

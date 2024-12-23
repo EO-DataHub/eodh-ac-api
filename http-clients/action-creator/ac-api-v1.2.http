@@ -367,6 +367,27 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     });
 %}
 
+### Validation Error - WF ID collision
+POST {{api_url}}/{{api_version}}/action-creator/workflow-validation
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-wf-id-collision.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        let actual_err_type = response.body.detail[0].type;
+        let expected_err_type = "workflow_identifier_collision_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
 ### Run LULC Change GLC - OK
 POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
 Accept: application/json
@@ -659,8 +680,29 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     client.test("Request executed successfully", function() {
         client.assert(response.status === 422, "Response status is not 422");
 
-        actual_err_type = response.body.detail[0].type;
-        expected_err_type = "task_output_without_mapping_detected_error";
+        let actual_err_type = response.body.detail[0].type;
+        let expected_err_type = "task_output_without_mapping_detected_error";
+        client.assert(
+            response.body.detail[0].type === expected_err_type,
+            `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`
+        );
+    });
+%}
+
+### Run Error - WF ID collision
+POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/err-wf-id-collision.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 422, "Response status is not 422");
+
+        let actual_err_type = response.body.detail[0].type;
+        let expected_err_type = "workflow_identifier_collision_error";
         client.assert(
             response.body.detail[0].type === expected_err_type,
             `Error type does not match! Found: ${actual_err_type} expected: ${expected_err_type}`

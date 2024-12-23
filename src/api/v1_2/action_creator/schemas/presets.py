@@ -572,6 +572,12 @@ def disjoined_subgraph_exist_preset() -> dict[str, Any]:
     return wf
 
 
+def wf_id_collision_preset() -> dict[str, Any]:
+    wf = deepcopy(NDVI_WORKFLOW_SPEC)
+    wf["identifier"] = "ndvi"
+    return wf
+
+
 AREA_TOO_BIG_PRESET = area_too_big_preset()
 COLLECTION_NOT_SUPPORTED_PRESET = collection_not_supported_preset()
 INVALID_DATE_RANGE_PRESET = invalid_date_range_preset()
@@ -583,6 +589,7 @@ INVALID_PATH_REFERENCE_PRESET = invalid_path_reference_preset()
 SELF_LOOP_DETECTED_PRESET = self_loop_detected_preset()
 CYCLE_DETECTED_PRESET = cycle_detected_preset()
 DISJOINED_SUBGRAPH_EXIST_PRESET = disjoined_subgraph_exist_preset()
+WF_ID_COLLISION_PRESET = wf_id_collision_preset()
 
 ERROR_WF_PRESETS = {
     "err-area-too-big": {
@@ -628,6 +635,10 @@ ERROR_WF_PRESETS = {
     "err-disjoined-subgraph-exist": {
         "summary": "Error - Disjoined subgraph exist",
         "value": DISJOINED_SUBGRAPH_EXIST_PRESET,
+    },
+    "err-wf-id-collision": {
+        "summary": "Error - WF ID collision",
+        "value": WF_ID_COLLISION_PRESET,
     },
 }
 

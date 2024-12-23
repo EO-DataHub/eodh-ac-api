@@ -113,3 +113,13 @@ class MaximumNumberOfTasksExceededError:
             "Maximum number of tasks exceeded. Currently we only support maximum of {max_tasks_num} tasks.",
             {"max_tasks_num": max_tasks_num},
         )
+
+
+class WorkflowIdentifierCollisionError:
+    @classmethod
+    def make(cls, identifier: str) -> PydanticCustomError:
+        return PydanticCustomError(
+            "workflow_identifier_collision_error",
+            "The workflow identifier '{identifier}' collides with a function with the same identifier.",
+            {"identifier": identifier},
+        )

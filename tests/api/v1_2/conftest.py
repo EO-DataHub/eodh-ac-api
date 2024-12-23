@@ -20,6 +20,7 @@ from src.api.v1_2.action_creator.schemas.presets import (
     SIMPLEST_NDVI_WORKFLOW_SPEC,
     TOO_MANY_TASKS_PRESET,
     WATER_QUALITY_WORKFLOW_SPEC,
+    WF_ID_COLLISION_PRESET,
     WF_OUTPUT_NOT_MAPPED_TO_TASK_RESULT_PRESET,
 )
 from src.services.ades.factory import fake_ades_client_factory
@@ -112,5 +113,10 @@ TEST_WORKFLOWS = {
         "error": "disjoined_subgraphs_detected_error",
         "should_raise": True,
         "value": DISJOINED_SUBGRAPH_EXIST_PRESET,
+    },
+    "err-wf-id-collision": {
+        "error": "workflow_identifier_collision_error",
+        "should_raise": True,
+        "value": WF_ID_COLLISION_PRESET,
     },
 }
