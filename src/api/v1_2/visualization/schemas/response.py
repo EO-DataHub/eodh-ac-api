@@ -28,7 +28,7 @@ class AssetChartVisualization(BaseModel):
 class RangeAreaWithLineChartVisualization(AssetChartVisualization):
     chart_type: Literal["range-area-with-line"] = "range-area-with-line"
     data: list[RangeAreaWithLineChartRecord]
-    color: str = "000000"
+    color: str = "#000000"
 
 
 class ClassificationAssetChartVisualization(AssetChartVisualization):

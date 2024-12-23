@@ -208,7 +208,7 @@ WATER_QUALITY_FUNCTION_SPEC = {
     "identifier": "water-quality",
     "name": "Water Quality Analysis",
     "description": "Performs Water Quality Analysis by computing various spectral indices.",
-    "visible": True,
+    "visible": False,
     "standalone": True,
     "compatible_input_datasets": ["sentinel-2-l2a"],
     "inputs": {

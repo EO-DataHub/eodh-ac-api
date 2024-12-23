@@ -23,8 +23,12 @@ class FieldsExtension(BaseModel):
 
 class StacSearch(Search):
     limit: Limit = Field(
-        50,
+        100,
         description="Limits the number of results that are included in each page of the response (capped to 10_000).",
+    )
+    max_items: int | None = Field(
+        None,
+        description="The maximum number of items to return from the search, even if there are more matching results.",
     )
     fields: FieldsExtension | None = Field(None)
     query: dict[str, dict[Operator, Any]] | None = None
