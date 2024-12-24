@@ -80,7 +80,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     });
 %}
 
-### Validate LULC Change - OK
+### Validation OK -  LULC Change
 POST {{api_url}}/{{api_version}}/action-creator/workflow-validation
 Accept: application/json
 Content-Type: application/json
@@ -94,7 +94,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     });
 %}
 
-### Validate Water Quality with Defra Calibration - OK
+### Validation OK -  Water Quality with Defra Calibration
 POST {{api_url}}/{{api_version}}/action-creator/workflow-validation
 Accept: application/json
 Content-Type: application/json
@@ -108,7 +108,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     });
 %}
 
-### Validate NDVI - OK
+### Validation OK -  NDVI
 POST {{api_url}}/{{api_version}}/action-creator/workflow-validation
 Accept: application/json
 Content-Type: application/json
@@ -122,7 +122,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     });
 %}
 
-### Validate NDVI + Clip + Reproject - OK
+### Validation OK -  NDVI + Clip + Reproject
 POST {{api_url}}/{{api_version}}/action-creator/workflow-validation
 Accept: application/json
 Content-Type: application/json
@@ -388,7 +388,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     });
 %}
 
-### Run LULC Change GLC - OK
+### Run OK - LULC Change GLC
 POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
 Accept: application/json
 Content-Type: application/json
@@ -402,7 +402,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     });
 %}
 
-### Run LULC Change Corine - OK
+### Run OK - LULC Change Corine
 POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
 Accept: application/json
 Content-Type: application/json
@@ -416,7 +416,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     });
 %}
 
-### Run Water Quality - OK
+### Run OK - Water Quality
 POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
 Accept: application/json
 Content-Type: application/json
@@ -430,7 +430,35 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     });
 %}
 
-### Run NDVI - OK
+### Run OK - S2ARD Water Quality
+POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/s2-ard-wqc.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 202, "Response status is not 202");
+    });
+%}
+
+### Run OK - S2ARD Advanced Water Quality
+POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/s2-ard-wqc-adv.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 202, "Response status is not 202");
+    });
+%}
+
+### Run OK - NDVI
 POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
 Accept: application/json
 Content-Type: application/json
@@ -444,13 +472,41 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     });
 %}
 
-### Run NDVI + Clip + Reproject - OK
+### Run OK - NDVI + Clip + Reproject
 POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 
 < v1_2_models/ndvi-clip-reproject.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 202, "Response status is not 202");
+    });
+%}
+
+### Run OK - S2ARD NDVI + Clip + Reproject
+POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/s2-ard-ndvi-clip-reproject.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 202, "Response status is not 202");
+    });
+%}
+
+### Run OK - S2ARD DOC + Clip + Reproject
+POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/s2-ard-doc-clip-reproject.json
 
 > {%
     client.test("Request executed successfully", function() {

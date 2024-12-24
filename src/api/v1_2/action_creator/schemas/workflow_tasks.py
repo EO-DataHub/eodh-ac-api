@@ -1004,7 +1004,7 @@ class WaterQualityTask(WorkflowTask):
             "category": FunctionCategory.other,
             "tags": ["Water Quality"],
             "description": "Runs water quality analysis.",
-            "compatible_input_datasets": ["sentinel-2-l2a"],
+            "compatible_input_datasets": ["sentinel-2-l2a-ard", "sentinel-2-l2a"],
             "visible": True,
             "inputs": {
                 "data_dir": {

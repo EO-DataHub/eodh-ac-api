@@ -115,7 +115,7 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Get Job Status
-GET {{ades_url}}/{{workspace}}/ogc-api/jobs/1df99a90-bc74-11ef-8f32-3e60f80131fd
+GET {{ades_url}}/{{workspace}}/ogc-api/jobs/e0c94d76-c1e3-11ef-9da4-8ef03814f15e
 Accept: application/json
 Authorization: Bearer {{token}}
 
@@ -131,7 +131,7 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Get Job Logs
-GET {{job_status.links[2].href}}
+GET {{job_status.links[-1].href}}
 Accept: application/json
 Authorization: Bearer {{token}}
 
@@ -139,6 +139,8 @@ Authorization: Bearer {{token}}
 GET {{job_status.links[-1].href}}
 Accept: application/json
 Authorization: Bearer {{token}}
+
+# Failed job handling
 
 ### Get Failed Job Logs
 GET {{job_status.links[1].href}}

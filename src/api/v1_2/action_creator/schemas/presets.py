@@ -13,7 +13,7 @@ from src.api.v1_2.action_creator.schemas.workflow_tasks import (
 )
 from src.api.v1_2.action_creator.schemas.workflows import MainWorkflowInputs
 from src.consts.directories import ASSETS_DIR
-from src.consts.geometries import HEATHROW_AOI, UK_AOI
+from src.consts.geometries import HEATHROW_AOI, KIELDER_WATER_AOI, UK_AOI
 
 
 @functools.lru_cache
@@ -94,7 +94,7 @@ LULC_CHANGE_PRESET: dict[str, Any] = {
 ADVANCED_WATER_QUALITY_WORKFLOW_SPEC: dict[str, Any] = {
     "identifier": "adv-wq",
     "inputs": {
-        "area": HEATHROW_AOI,
+        "area": KIELDER_WATER_AOI,
         "dataset": "sentinel-2-l2a",
         "date_start": "2024-03-01",
         "date_end": "2024-10-10",
@@ -267,7 +267,7 @@ WATER_QUALITY_ADVANCED_PRESET: dict[str, Any] = {
 WATER_QUALITY_WORKFLOW_SPEC: dict[str, Any] = {
     "identifier": "water-quality-wf",
     "inputs": {
-        "area": HEATHROW_AOI,
+        "area": KIELDER_WATER_AOI,
         "dataset": "sentinel-2-l2a",
         "date_start": "2024-03-01",
         "date_end": "2024-10-10",
