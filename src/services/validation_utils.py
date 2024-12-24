@@ -8,8 +8,8 @@ from geojson_pydantic.geometries import parse_geometry_obj
 from pydantic_core import PydanticCustomError
 from shapely.geometry import shape
 
+from src.api.v1_1.action_creator.functions import FUNCTIONS_REGISTRY as NEW_FUNCTIONS_REGISTRY
 from src.consts.action_creator import FUNCTIONS_REGISTRY
-from src.consts.functions import FUNCTIONS_REGISTRY as NEW_FUNCTIONS_REGISTRY
 
 if TYPE_CHECKING:
     from datetime import datetime

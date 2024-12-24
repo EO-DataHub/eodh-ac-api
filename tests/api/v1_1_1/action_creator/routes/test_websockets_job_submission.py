@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 import pytest
 from starlette import status
 
-from src.api.v1_1.action_creator.presets import LAND_COVER_CHANGE_DETECTION_PRESET_SPEC, NDVI_CLIP_PRESET, NDVI_PRESET
+from src.api.v1_1_1.action_creator.presets import LAND_COVER_CHANGE_DETECTION_PRESET_SPEC, NDVI_CLIP_PRESET, NDVI_PRESET
 from src.services.ades.schemas import StatusCode
 
 if TYPE_CHECKING:
@@ -34,7 +34,7 @@ def test_ws_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
 ) -> None:
     # Act
     with client.websocket_connect(
-        url="/api/v1.1/action-creator/ws/submissions",
+        url="/api/v1.1.1/action-creator/ws/submissions",
         headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
     ) as websocket:
         # Send the request body (job submission)
@@ -67,7 +67,7 @@ def test_ws_job_submissions_endpoint_returns_422_when_invalid_stac_collection_wa
     preset_request_body["workflow"]["ndvi"]["inputs"]["stac_collection"] = "dummy-collection"  # type: ignore[index]
 
     with pytest.raises(RuntimeError), client.websocket_connect(  # noqa: PT012
-        url="/api/v1.1/action-creator/ws/submissions",
+        url="/api/v1.1.1/action-creator/ws/submissions",
         headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
     ) as websocket:
         # Send the request body (job submission)
@@ -98,7 +98,7 @@ def test_ws_job_submissions_endpoint_returns_422_when_missing_geometry(
 
     # Act
     with pytest.raises(RuntimeError), client.websocket_connect(  # noqa: PT012
-        url="/api/v1.1/action-creator/ws/submissions",
+        url="/api/v1.1.1/action-creator/ws/submissions",
         headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
     ) as websocket:
         # Send the request body (job submission)
@@ -126,7 +126,7 @@ def test_ws_job_submissions_endpoint_returns_422_when_invalid_date_range_was_pro
 
     # Act
     with pytest.raises(RuntimeError), client.websocket_connect(  # noqa: PT012
-        url="/api/v1.1/action-creator/ws/submissions",
+        url="/api/v1.1.1/action-creator/ws/submissions",
         headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
     ) as websocket:
         # Send the request body (job submission)

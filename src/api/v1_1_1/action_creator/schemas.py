@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Annotated, Any, Generic, Literal, Sequence, Ty
 from geojson_pydantic.geometries import Polygon
 from pydantic import BaseModel, Field, field_validator, model_validator
 
-from src.api.v1_1.action_creator.functions import FUNCTIONS_REGISTRY
+from src.api.v1_1_1.action_creator.functions import FUNCTIONS_REGISTRY
 from src.services.validation_utils import (
     aoi_must_be_present,
     ensure_area_smaller_than,

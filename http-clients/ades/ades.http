@@ -115,7 +115,7 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Get Job Status
-GET {{ades_url}}/{{workspace}}/ogc-api/jobs/e0c94d76-c1e3-11ef-9da4-8ef03814f15e
+GET {{ades_url}}/{{workspace}}/ogc-api/jobs/712e3df0-c1ed-11ef-8f49-8ef03814f15e
 Accept: application/json
 Authorization: Bearer {{token}}
 

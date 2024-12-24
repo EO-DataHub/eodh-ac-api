@@ -9,15 +9,15 @@ from fastapi.security import HTTPAuthorizationCredentials
 from starlette import status
 
 from src.api.v1_0.auth.routes import decode_token, validate_access_token
-from src.api.v1_1.action_creator.functions import FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING, FUNCTIONS
-from src.api.v1_1.action_creator.presets import (
+from src.api.v1_1_1.action_creator.functions import FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING, FUNCTIONS
+from src.api.v1_1_1.action_creator.presets import (
     LAND_COVER_CHANGE_DETECTION_PRESET_SPEC,
     NDVI_CLIP_PRESET,
     NDVI_PRESET,
     PRESETS,
     WATER_QUALITY_PRESET,
 )
-from src.api.v1_1.action_creator.schemas import (
+from src.api.v1_1_1.action_creator.schemas import (
     ActionCreatorJob,
     ActionCreatorJobSummary,
     ActionCreatorSubmissionRequest,
@@ -61,13 +61,13 @@ TWorkflowCreationSpec = Annotated[
     ),
 ]
 
-action_creator_router_v1_1 = APIRouter(
+action_creator_router_v1_1_1 = APIRouter(
     prefix="/action-creator",
     tags=["Action Creator"],
 )
 
 
-@action_creator_router_v1_1.get(
+@action_creator_router_v1_1_1.get(
     "/functions",
     response_model=FunctionsResponse,
     response_model_exclude_unset=False,
@@ -89,7 +89,7 @@ async def get_available_functions(
     return FunctionsResponse(functions=funcs, total=len(funcs))
 
 
-@action_creator_router_v1_1.get(
+@action_creator_router_v1_1_1.get(
     "/presets",
     response_model=PresetsResponse,
     response_model_exclude_unset=False,
@@ -108,7 +108,7 @@ async def get_available_presets(
     return PresetsResponse(presets=presets, total=len(presets))
 
 
-@action_creator_router_v1_1.post(
+@action_creator_router_v1_1_1.post(
     "/submissions",
     response_model=ActionCreatorJob,
     status_code=status.HTTP_202_ACCEPTED,
@@ -167,7 +167,7 @@ async def submit_workflow(
     )
 
 
-@action_creator_router_v1_1.get(
+@action_creator_router_v1_1_1.get(
     "/submissions",
     response_model=PaginationResults[ActionCreatorJobSummary],
     response_model_exclude_unset=False,
@@ -233,7 +233,7 @@ async def get_job_history(
     }
 
 
-@action_creator_router_v1_1.get(
+@action_creator_router_v1_1_1.get(
     "/submissions/{submission_id}",
     response_model=ActionCreatorJobSummary,
     response_model_exclude_unset=False,
@@ -265,7 +265,7 @@ async def get_job_status(
     )
 
 
-@action_creator_router_v1_1.delete(
+@action_creator_router_v1_1_1.delete(
     "/submissions/{submission_id}",
     status_code=204,
     response_model=None,

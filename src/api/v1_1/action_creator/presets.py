@@ -45,8 +45,8 @@ LAND_COVER_CHANGE_DETECTION_PRESET_SPEC = {
 WATER_QUALITY_PRESET_SPEC = {
     "identifier": "water-quality",
     "name": "Water Quality",
-    "description": "Evaluates water quality by analysing spectral data from satellite imagery, calibrated with DEFRA's "
-    "in-situ measurements, to assess parameters like chlorophyll concentration and turbidity.",
+    "description": "Evaluates water quality by analysing spectral data from satellite imagery, "
+    "to assess parameters like chlorophyll concentration and turbidity.",
     "thumbnail_b64": _load_base_64_thumbnail("water-quality"),
     "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/water-quality-app.cwl",
     "visible": True,

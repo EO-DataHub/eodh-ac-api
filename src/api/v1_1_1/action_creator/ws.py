@@ -8,8 +8,8 @@ from starlette import status
 from starlette.websockets import WebSocket, WebSocketDisconnect
 
 from src.api.v1_0.auth.routes import validate_token_from_websocket
-from src.api.v1_1.action_creator.functions import FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING
-from src.api.v1_1.action_creator.schemas import (
+from src.api.v1_1_1.action_creator.functions import FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING
+from src.api.v1_1_1.action_creator.schemas import (
     ActionCreatorJob,
     ActionCreatorJobStatusRequest,
     ActionCreatorJobSummary,
@@ -22,13 +22,13 @@ from src.utils.logging import get_logger
 _logger = get_logger(__name__)
 
 
-action_creator_ws_router_v1_1 = APIRouter(
+action_creator_ws_router_v1_1_1 = APIRouter(
     prefix="/action-creator/ws",
     tags=["Action Creator"],
 )
 
 
-@action_creator_ws_router_v1_1.websocket("/submissions")
+@action_creator_ws_router_v1_1_1.websocket("/submissions")
 async def submit_function_websocket(  # noqa: C901
     websocket: WebSocket,
 ) -> None:
@@ -148,7 +148,7 @@ async def submit_function_websocket(  # noqa: C901
         await websocket.close()
 
 
-@action_creator_ws_router_v1_1.websocket("/submission-status")
+@action_creator_ws_router_v1_1_1.websocket("/submission-status")
 async def get_job_status_websocket(
     websocket: WebSocket,
 ) -> None:
