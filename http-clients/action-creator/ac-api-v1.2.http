@@ -812,7 +812,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 %}
 
 ### Get data for WQ Chart - selected assets
-POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_01e116ec-bdf2-11ef-a2af-8ef03814f15e/search
+POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_01e116ec-bdf2-11ef-a2af-8ef03814f15e/charts
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
@@ -843,7 +843,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 }
 
 ### Get data for WQ Chart - all assets
-POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_01e116ec-bdf2-11ef-a2af-8ef03814f15e/search
+POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_01e116ec-bdf2-11ef-a2af-8ef03814f15e/charts
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
@@ -873,7 +873,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 }
 
 ### Get data for LC Chart
-POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_81cac12c-bd17-11ef-94d6-8ef03814f15e/search
+POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_81cac12c-bd17-11ef-94d6-8ef03814f15e/charts
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}

@@ -47,7 +47,7 @@ visualization_router_v1_2 = APIRouter(
 
 
 @visualization_router_v1_2.post(
-    "/stac/catalogs/user-datasets/{workspace}/processing-results/cat_{job_id}/search",
+    "/stac/catalogs/user-datasets/{workspace}/processing-results/cat_{job_id}/charts",
     response_model=JobAssetsChartVisualizationResponse,
 )
 async def get_visualization_data_for_job_results(  # noqa: C901, PLR0912
