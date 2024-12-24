@@ -28,7 +28,7 @@ _STAC_CATALOGS: dict[str, dict[str, list[str]]] = {
     "v2-lcc-corine": {"assets": ["data"], "assets_to_keep": ["data"]},
     "v2-s2": {"assets": [], "assets_to_keep": []},
 }
-_ENDPOINT_TEMPLATE = "/api/v1.2/catalogue/stac/catalogs/user-datasets/{username}/processing-results/cat_{job_id}/search"
+_ENDPOINT_TEMPLATE = "/api/v1.2/catalogue/stac/catalogs/user-datasets/{username}/processing-results/cat_{job_id}/charts"
 
 
 def _load_stac_items(catalog_dir: Path) -> Generator[Item]:

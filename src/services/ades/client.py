@@ -15,8 +15,8 @@ from dotenv import load_dotenv
 from starlette import status
 
 from src import consts
+from src.api.v1_1.action_creator.functions import WORKFLOW_ID_OVERRIDE_LOOKUP, WORKFLOW_REGISTRY
 from src.consts.action_creator import FUNCTIONS_REGISTRY
-from src.consts.functions import WORKFLOW_ID_OVERRIDE_LOOKUP, WORKFLOW_REGISTRY
 from src.services.ades.base_client import ADESClientBase, ErrorResponse
 from src.services.ades.schemas import JobList, Process, ProcessList, ProcessSummary, StatusInfo
 from src.utils.logging import get_logger

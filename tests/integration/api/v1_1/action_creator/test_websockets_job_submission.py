@@ -7,8 +7,8 @@ import pytest
 from flaky import flaky
 from starlette import status
 
+from src.api.v1_1.action_creator.presets import LAND_COVER_CHANGE_DETECTION_PRESET_SPEC
 from src.api.v1_1.action_creator.schemas import ActionCreatorJob
-from src.consts.presets import LAND_COVER_CHANGE_DETECTION_PRESET_SPEC
 from src.services.ades.schemas import StatusCode
 
 if TYPE_CHECKING:
