@@ -1,0 +1,165 @@
+{
+  "identifier": "s2ard-ndvi-clip-rep",
+  "inputs": {
+    "area": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -0.511790994620525,
+            51.445639911633833
+          ],
+          [
+            -0.511790994620525,
+            51.496989653093614
+          ],
+          [
+            -0.408954489023431,
+            51.496989653093614
+          ],
+          [
+            -0.408954489023431,
+            51.445639911633833
+          ],
+          [
+            -0.511790994620525,
+            51.445639911633833
+          ]
+        ]
+      ]
+    },
+    "dataset": "sentinel-2-l2a-ard",
+    "date_start": "2023-01-01",
+    "date_end": "2023-10-10"
+  },
+  "outputs": {
+    "results": {
+      "name": "results",
+      "type": "directory"
+    }
+  },
+  "functions": {
+    "query": {
+      "identifier": "s2-ds-query",
+      "inputs": {
+        "area": {
+          "$type": "ref",
+          "value": [
+            "inputs",
+            "area"
+          ]
+        },
+        "stac_collection": {
+          "$type": "ref",
+          "value": [
+            "inputs",
+            "dataset"
+          ]
+        },
+        "date_start": {
+          "$type": "ref",
+          "value": [
+            "inputs",
+            "date_start"
+          ]
+        },
+        "date_end": {
+          "$type": "ref",
+          "value": [
+            "inputs",
+            "date_end"
+          ]
+        },
+        "clip": {
+          "$type": "atom",
+          "value": true
+        },
+        "limit": {
+          "$type": "atom",
+          "value": 2
+        },
+        "cloud_cover_min": {
+          "$type": "atom",
+          "value": 0
+        },
+        "cloud_cover_max": {
+          "$type": "atom",
+          "value": 30
+        }
+      },
+      "outputs": {
+        "results": {
+          "name": "results",
+          "type": "directory"
+        }
+      }
+    },
+    "ndvi": {
+      "identifier": "ndvi",
+      "inputs": {
+        "data_dir": {
+          "$type": "ref",
+          "value": [
+            "functions",
+            "query",
+            "outputs",
+            "results"
+          ]
+        }
+      },
+      "outputs": {
+        "results": {
+          "name": "results",
+          "type": "directory"
+        }
+      }
+    },
+    "reproject": {
+      "identifier": "reproject",
+      "inputs": {
+        "data_dir": {
+          "$type": "ref",
+          "value": [
+            "functions",
+            "ndvi",
+            "outputs",
+            "results"
+          ]
+        },
+        "epsg": {
+          "$type": "atom",
+          "value": "EPSG:3857"
+        }
+      },
+      "outputs": {
+        "results": {
+          "name": "results",
+          "type": "directory"
+        }
+      }
+    },
+    "thumbnail": {
+      "identifier": "thumbnail",
+      "inputs": {
+        "data_dir": {
+          "$type": "ref",
+          "value": [
+            "functions",
+            "reproject",
+            "outputs",
+            "results"
+          ]
+        }
+      },
+      "outputs": {
+        "results": {
+          "$type": "ref",
+          "value": [
+            "outputs",
+            "results"
+          ]
+        }
+      }
+    }
+  }
+}
