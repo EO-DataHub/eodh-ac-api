@@ -108,7 +108,7 @@ Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 
-< v1_1_models/lulc-change.json
+< v1_1_1_models/lulc-change.json
 
 > {%
     client.test("Request executed successfully", function() {
@@ -122,7 +122,7 @@ Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 
-< v1_1_models/ndvi.json
+< v1_1_1_models/ndvi.json
 
 > {%
     client.test("Request executed successfully", function() {
@@ -136,7 +136,21 @@ Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 
-< v1_1_models/ndvi-clip.json
+< v1_1_1_models/ndvi-clip.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 202, "Response status is not 202");
+    });
+%}
+
+### Run CYA + Clip
+POST {{api_url}}/{{api_version}}/action-creator/submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_1_1_models/cya-clip.json
 
 > {%
     client.test("Request executed successfully", function() {
@@ -150,7 +164,7 @@ Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 
-< v1_1_models/water-quality.json
+< v1_1_1_models/water-quality.json
 
 > {%
     client.test("Request executed successfully", function() {
