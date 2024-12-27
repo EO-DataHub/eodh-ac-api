@@ -775,6 +775,39 @@ class DOCTask(WorkflowTask):
         }
 
 
+class TURBTask(WorkflowTask):
+    identifier: Literal["turb"] = "turb"
+    inputs: DirectoryInputs
+    outputs: DirectoryOutputs
+
+    @classmethod
+    def as_function_spec(cls) -> dict[str, Any]:
+        return {
+            "name": "TURB",
+            "identifier": "turb",
+            "category": FunctionCategory.spectral_indices,
+            "tags": ["TURB", "Water Quality"],
+            "description": "Turbidity Index (DOC).",
+            "visible": True,
+            "compatible_input_datasets": ["sentinel-2-l2a-ard", "sentinel-2-l2a"],
+            "inputs": {
+                "data_dir": {
+                    "name": "data_dir",
+                    "description": "Directory containing the input data",
+                    "type": FuncInputOutputType.directory,
+                    "required": True,
+                }
+            },
+            "outputs": {
+                "results": {
+                    "name": "results",
+                    "type": FuncInputOutputType.directory,
+                    "description": "Directory to store index calculation results",
+                }
+            },
+        }
+
+
 class SARWaterMask(WorkflowTask):
     identifier: Literal["sar-water-mask"] = "sar-water-mask"
     inputs: DirectoryInputs
@@ -1120,6 +1153,7 @@ SPECTRAL_INDEX_TASKS = [
     CYATask,
     CDOMTask,
     DOCTask,
+    TURBTask,
     SARWaterMask,
 ]
 

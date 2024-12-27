@@ -43,6 +43,7 @@ class WorkflowCreator:
         "ndwi": "spectral-index.yaml",
         "cya_cells": "spectral-index.yaml",
         "cdom": "spectral-index.yaml",
+        "turb": "spectral-index.yaml",
         "doc": "spectral-index.yaml",
         "sar-water-mask": "spectral-index.yaml",
         "defra-calibrate": "defra-calibrate.yaml",
