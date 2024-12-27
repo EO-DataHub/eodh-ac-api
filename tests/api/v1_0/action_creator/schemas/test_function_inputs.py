@@ -16,7 +16,7 @@ from src.api.v1_0.action_creator.schemas import (
     WaterQualityIndex,
 )
 from src.consts.action_creator import FUNCTIONS_REGISTRY
-from src.consts.aoi import UK_AOI
+from src.consts.geometries import UK_AOI
 
 if TYPE_CHECKING:
     from _pytest.fixtures import FixtureRequest
