@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
     from src.services.ades.client import ADESClient
 
-from src.consts.aoi import INDIAN_OCEAN_AOI
+from src.consts.geometries import INDIAN_OCEAN_AOI
 
 RASTER_CALCULATOR_PROCESS_IDENTIFIER = "raster-calculate"
 RASTER_CALCULATOR_CWL_HREF = (

@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import functools
 
-from src.consts.aoi import HEATHROW_AOI, INDIAN_OCEAN_AOI
 from src.consts.directories import ASSETS_DIR
+from src.consts.geometries import HEATHROW_AOI, INDIAN_OCEAN_AOI
 
 
 @functools.lru_cache
@@ -53,7 +53,6 @@ WATER_QUALITY_PRESET_SPEC = {
     "disabled": True,
     "workflow": None,
 }
-
 
 NDVI_PRESET = {
     "workflow": {

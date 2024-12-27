@@ -13,7 +13,7 @@ from src.services.validation_utils import (
     aoi_must_be_present,
     ensure_area_smaller_than,
     validate_date_range,
-    validate_stac_collection_v1_1,
+    validate_stac_collection_v1_1_1,
 )
 
 if TYPE_CHECKING:
@@ -105,7 +105,7 @@ class CommonFunctionInputs(OGCProcessInputs, abc.ABC):
         if v is None:
             return FUNCTIONS_REGISTRY[info.data["identifier"]]["inputs"]["stac_collection"]["default"]  # type: ignore[no-any-return]
         # Validate STAC collection
-        validate_stac_collection_v1_1(
+        validate_stac_collection_v1_1_1(
             specified_collection=v,
             function_identifier=info.data["identifier"],
         )
@@ -145,7 +145,7 @@ class CommonFunctionInputs(OGCProcessInputs, abc.ABC):
 
 
 class RasterCalculatorFunctionInputs(CommonFunctionInputs):
-    limit: Annotated[int, Field(10, validate_default=True, ge=1, le=100)]
+    limit: Annotated[int, Field(1000, validate_default=True, ge=1, le=10_000)]
 
     def as_ogc_process_inputs(self) -> dict[str, Any]:
         outputs = super().as_ogc_process_inputs()
@@ -156,7 +156,7 @@ class RasterCalculatorFunctionInputs(CommonFunctionInputs):
 
 class WaterQualityFunctionInputs(CommonFunctionInputs):
     identifier: Literal["water-quality"] = "water-quality"
-    limit: Annotated[int, Field(10, validate_default=True, ge=1, le=100)]
+    limit: Annotated[int, Field(1000, validate_default=True, ge=1, le=10_000)]
 
     def as_ogc_process_inputs(self) -> dict[str, Any]:
         outputs = super().as_ogc_process_inputs()
@@ -224,7 +224,7 @@ class EVIFunctionInputs(RasterCalculatorFunctionInputs):
 
 class EVIWorkflowStep(WorkflowStepBase):
     identifier: Literal["evi"] = "evi"
-    inputs: RasterCalculatorFunctionInputs
+    inputs: EVIFunctionInputs
 
 
 class SAVIFunctionInputs(RasterCalculatorFunctionInputs):
@@ -233,7 +233,7 @@ class SAVIFunctionInputs(RasterCalculatorFunctionInputs):
 
 class SAVIWorkflowStep(WorkflowStepBase):
     identifier: Literal["savi"] = "savi"
-    inputs: RasterCalculatorFunctionInputs
+    inputs: SAVIFunctionInputs
 
 
 class NDWIFunctionInputs(RasterCalculatorFunctionInputs):
@@ -242,7 +242,43 @@ class NDWIFunctionInputs(RasterCalculatorFunctionInputs):
 
 class NDWIWorkflowStep(WorkflowStepBase):
     identifier: Literal["ndwi"] = "ndwi"
-    inputs: RasterCalculatorFunctionInputs
+    inputs: NDWIFunctionInputs
+
+
+class CYAFunctionInputs(RasterCalculatorFunctionInputs):
+    identifier: Literal["cya_cells"] = "cya_cells"
+
+
+class CYAWorkflowStep(WorkflowStepBase):
+    identifier: Literal["cya_cells"] = "cya_cells"
+    inputs: CYAFunctionInputs
+
+
+class DOCFunctionInputs(RasterCalculatorFunctionInputs):
+    identifier: Literal["doc"] = "doc"
+
+
+class DOCWorkflowStep(WorkflowStepBase):
+    identifier: Literal["doc"] = "doc"
+    inputs: DOCFunctionInputs
+
+
+class CDOMFunctionInputs(RasterCalculatorFunctionInputs):
+    identifier: Literal["cdom"] = "cdom"
+
+
+class CDOMWorkflowStep(WorkflowStepBase):
+    identifier: Literal["cdom"] = "cdom"
+    inputs: CDOMFunctionInputs
+
+
+class TURBFunctionInputs(RasterCalculatorFunctionInputs):
+    identifier: Literal["turb"] = "turb"
+
+
+class TURBWorkflowStep(WorkflowStepBase):
+    identifier: Literal["turb"] = "turb"
+    inputs: TURBFunctionInputs
 
 
 class WaterQualityWorkflowStep(WorkflowStepBase):
@@ -261,6 +297,10 @@ TWorkflowStep = Annotated[
         NDWIWorkflowStep,
         SAVIWorkflowStep,
         EVIWorkflowStep,
+        CYAWorkflowStep,
+        DOCWorkflowStep,
+        CDOMWorkflowStep,
+        TURBWorkflowStep,
         ClipWorkflowStep,
         LandCoverChangeDetectionWorkflowStep,
         WaterQualityWorkflowStep,

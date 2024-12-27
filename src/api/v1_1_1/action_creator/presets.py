@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import functools
 
-from src.consts.aoi import HEATHROW_AOI, INDIAN_OCEAN_AOI
 from src.consts.directories import ASSETS_DIR
+from src.consts.geometries import HEATHROW_AOI, KIELDER_WATER_AOI
 
 
 @functools.lru_cache
@@ -56,22 +56,21 @@ WATER_QUALITY_PRESET_SPEC = {
             "identifier": "water-quality",
             "order": 0,
             "inputs": {
-                "stac_collection": "sentinel-2-l2a",
+                "stac_collection": "sentinel-2-l2a-ard",
                 "date_start": "2023-01-01T00:00:00Z",
                 "date_end": "2024-12-31T23:59:59Z",
-                "aoi": INDIAN_OCEAN_AOI,
+                "aoi": KIELDER_WATER_AOI,
             },
         },
         "clip": {
             "identifier": "clip",
             "order": 1,
             "inputs": {
-                "aoi": INDIAN_OCEAN_AOI,
+                "aoi": KIELDER_WATER_AOI,
             },
         },
     },
 }
-
 
 NDVI_PRESET = {
     "workflow": {
@@ -79,10 +78,10 @@ NDVI_PRESET = {
             "identifier": "ndvi",
             "order": 0,
             "inputs": {
-                "stac_collection": "sentinel-2-l2a",
+                "stac_collection": "sentinel-2-l2a-ard",
                 "date_start": "2024-01-01T00:00:00Z",
                 "date_end": "2024-12-31T23:59:59Z",
-                "aoi": INDIAN_OCEAN_AOI,
+                "aoi": HEATHROW_AOI,
             },
         }
     }
@@ -94,17 +93,17 @@ NDVI_CLIP_PRESET = {
             "identifier": "ndvi",
             "order": 0,
             "inputs": {
-                "stac_collection": "sentinel-2-l2a",
+                "stac_collection": "sentinel-2-l2a-ard",
                 "date_start": "2024-01-01T00:00:00Z",
                 "date_end": "2024-12-31T23:59:59Z",
-                "aoi": INDIAN_OCEAN_AOI,
+                "aoi": HEATHROW_AOI,
             },
         },
         "clip": {
             "identifier": "clip",
             "order": 1,
             "inputs": {
-                "aoi": INDIAN_OCEAN_AOI,
+                "aoi": HEATHROW_AOI,
             },
         },
     }
