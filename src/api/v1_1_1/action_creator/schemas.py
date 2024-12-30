@@ -14,6 +14,7 @@ from src.services.validation_utils import (
     ensure_area_smaller_than,
     validate_date_range,
     validate_stac_collection_v1_1_1,
+    validate_stac_date_range,
 )
 
 if TYPE_CHECKING:
@@ -108,6 +109,11 @@ class CommonFunctionInputs(OGCProcessInputs, abc.ABC):
         validate_stac_collection_v1_1_1(
             specified_collection=v,
             function_identifier=info.data["identifier"],
+        )
+        validate_stac_date_range(
+            stac_collection=v,
+            date_start=info.data.get("date_start"),
+            date_end=info.data.get("date_end"),
         )
         return v
 
