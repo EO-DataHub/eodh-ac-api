@@ -13,7 +13,7 @@ NDVI_FUNCTION_SPEC = {
         "stac_collection": {
             "type": "string",
             "required": False,
-            "default": "sentinel-2-l2a-ard",
+            "default": "sentinel-2-l2a",
             "description": "The STAC collection to use.",
             "options": [
                 {
@@ -60,7 +60,7 @@ EVI_FUNCTION_SPEC = {
         "stac_collection": {
             "type": "string",
             "required": False,
-            "default": "sentinel-2-l2a-ard",
+            "default": "sentinel-2-l2a",
             "description": "The STAC collection to use.",
             "options": [
                 {
@@ -107,7 +107,7 @@ SAVI_FUNCTION_SPEC = {
         "stac_collection": {
             "type": "string",
             "required": False,
-            "default": "sentinel-2-l2a-ard",
+            "default": "sentinel-2-l2a",
             "description": "The STAC collection to use.",
             "options": [
                 {
@@ -154,7 +154,7 @@ NDWI_FUNCTION_SPEC = {
         "stac_collection": {
             "type": "string",
             "required": False,
-            "default": "sentinel-2-l2a-ard",
+            "default": "sentinel-2-l2a",
             "description": "The STAC collection to use.",
             "options": [
                 {
@@ -201,7 +201,7 @@ DOC_FUNCTION_SPEC = {
         "stac_collection": {
             "type": "string",
             "required": False,
-            "default": "sentinel-2-l2a-ard",
+            "default": "sentinel-2-l2a",
             "description": "The STAC collection to use.",
             "options": [
                 {
@@ -248,7 +248,7 @@ CDOM_FUNCTION_SPEC = {
         "stac_collection": {
             "type": "string",
             "required": False,
-            "default": "sentinel-2-l2a-ard",
+            "default": "sentinel-2-l2a",
             "description": "The STAC collection to use.",
             "options": [
                 {
@@ -295,7 +295,7 @@ TURB_FUNCTION_SPEC = {
         "stac_collection": {
             "type": "string",
             "required": False,
-            "default": "sentinel-2-l2a-ard",
+            "default": "sentinel-2-l2a",
             "description": "The STAC collection to use.",
             "options": [
                 {
@@ -342,7 +342,7 @@ CYA_FUNCTION_SPEC = {
         "stac_collection": {
             "type": "string",
             "required": False,
-            "default": "sentinel-2-l2a-ard",
+            "default": "sentinel-2-l2a",
             "description": "The STAC collection to use.",
             "options": [
                 {

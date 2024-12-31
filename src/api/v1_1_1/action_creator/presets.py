@@ -3,7 +3,7 @@ from __future__ import annotations
 import functools
 
 from src.consts.directories import ASSETS_DIR
-from src.consts.geometries import HEATHROW_AOI, KIELDER_WATER_AOI
+from src.consts.geometries import HEATHROW_AOI, INDIAN_OCEAN_AOI, KIELDER_WATER_AOI
 
 
 @functools.lru_cache
@@ -43,6 +43,36 @@ LAND_COVER_CHANGE_DETECTION_PRESET_SPEC = {
 }
 
 WATER_QUALITY_PRESET_SPEC = {
+    "identifier": "water-quality",
+    "name": "Water Quality",
+    "description": "Evaluates water quality by analysing spectral data from satellite imagery, "
+    "to assess parameters like chlorophyll concentration and turbidity.",
+    "thumbnail_b64": _load_base_64_thumbnail("water-quality"),
+    "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/water-quality-app.cwl",
+    "visible": True,
+    "disabled": False,
+    "workflow": {
+        "water-quality": {
+            "identifier": "water-quality",
+            "order": 0,
+            "inputs": {
+                "stac_collection": "sentinel-2-l2a",
+                "date_start": "2023-01-01T00:00:00Z",
+                "date_end": "2024-12-31T23:59:59Z",
+                "aoi": INDIAN_OCEAN_AOI,
+            },
+        },
+        "clip": {
+            "identifier": "clip",
+            "order": 1,
+            "inputs": {
+                "aoi": INDIAN_OCEAN_AOI,
+            },
+        },
+    },
+}
+
+WATER_QUALITY_PRESET_SPEC_ARD = {
     "identifier": "water-quality",
     "name": "Water Quality",
     "description": "Evaluates water quality by analysing spectral data from satellite imagery, "
