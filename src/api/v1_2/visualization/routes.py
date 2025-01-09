@@ -79,10 +79,12 @@ async def get_visualization_data_for_job_results(  # noqa: C901, PLR0912
     if search_params.fields.include is None:
         search_params.fields.include = set()
 
-    search_params.fields.include = search_params.fields.include.union({
-        "properties.lulc_classes_percentage",
-        "properties.lulc_classes_m2",
-    })
+    search_params.fields.include = search_params.fields.include.union(
+        {
+            "properties.lulc_classes_percentage",
+            "properties.lulc_classes_m2",
+        }
+    )
 
     if search_params.sortby is None:
         search_params.sortby = [SortExtension(field="properties.datetime", direction=SortDirections.asc)]
@@ -151,12 +153,14 @@ def _handle_range_area_chart(asset: Asset, asset_key: str, assets_dict: dict[str
             "units": asset.extra_fields["colormap"]["units"],
             "color": _COLOR_WHEEL.get(asset_key, _COLOR_WHEEL["unknown"]),
         }
-    assets_dict[asset_key]["data"].append({
-        "min": asset.extra_fields["statistics"]["minimum"],
-        "max": asset.extra_fields["statistics"]["maximum"],
-        "median": asset.extra_fields["statistics"]["median"],
-        "x_label": item.datetime,
-    })
+    assets_dict[asset_key]["data"].append(
+        {
+            "min": asset.extra_fields["statistics"]["minimum"],
+            "max": asset.extra_fields["statistics"]["maximum"],
+            "median": asset.extra_fields["statistics"]["median"],
+            "x_label": item.datetime,
+        }
+    )
 
 
 def _handle_stacked_bar_chart(asset: Asset, asset_key: str, assets_dict: dict[str, Any], item: Item) -> None:
@@ -169,7 +173,7 @@ def _handle_stacked_bar_chart(asset: Asset, asset_key: str, assets_dict: dict[st
                     "name": c["description"],
                     "area": [],
                     "percentage": [],
-                    "color-hint": c["color-hint"] if c["color-hint"].startswith("#") else f"#{c['color-hint']}",
+                    "color-hint": c["color-hint"][:7] if c["color-hint"].startswith("#") else f"#{c['color-hint']}"[:7],
                 }
                 for c in asset.extra_fields["classification:classes"]
             },
