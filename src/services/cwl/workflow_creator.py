@@ -8,7 +8,7 @@ from typing import Any, ClassVar
 
 import yaml
 
-from src.api.v1_2.action_creator.schemas.workflow_tasks import SPECTRAL_INDEX_TASK_IDS
+from src.api.v1_3.action_creator.schemas.workflow_tasks import SPECTRAL_INDEX_TASK_IDS
 from src.services.ades.client import replace_placeholders_in_text
 from src.utils.names import generate_random_name
 

@@ -10,7 +10,7 @@ from pydantic_core import PydanticCustomError
 from shapely.geometry import shape
 
 from src.api.v1_1.action_creator.functions import FUNCTIONS_REGISTRY as NEW_FUNCTIONS_REGISTRY_V1_1
-from src.api.v1_1_1.action_creator.functions import FUNCTIONS_REGISTRY as NEW_FUNCTIONS_REGISTRY_V1_1_1
+from src.api.v1_2.action_creator.functions import FUNCTIONS_REGISTRY as NEW_FUNCTIONS_REGISTRY_v1_2  # noqa: N811
 from src.consts.action_creator import FUNCTIONS_REGISTRY
 
 if TYPE_CHECKING:
@@ -184,8 +184,8 @@ def validate_stac_collection_v1_1(specified_collection: str, function_identifier
         )
 
 
-def validate_stac_collection_v1_1_1(specified_collection: str, function_identifier: str) -> None:
-    function_spec = NEW_FUNCTIONS_REGISTRY_V1_1_1[function_identifier]
+def validate_stac_collection_v1_2(specified_collection: str, function_identifier: str) -> None:
+    function_spec = NEW_FUNCTIONS_REGISTRY_v1_2[function_identifier]
     if specified_collection not in (valid_collections := function_spec["compatible_input_datasets"]):
         raise CollectionNotSupportedError.make(
             collection=specified_collection,

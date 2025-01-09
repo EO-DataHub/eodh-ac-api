@@ -141,7 +141,7 @@ combine-as-imports = true
 "src/api/v1_0/action_creator/routes.py" = [
     "PLR0912", # see: https://pypi.org/project/Pylint - Too many branches
 ]
-"src/api/v1_2/action_creator/schemas/errors.py" = [
+"src/api/v1_3/action_creator/schemas/errors.py" = [
     "RUF027", # see: https://pypi.org/project/Pylint - Possible f-string without an `f` prefix
 ]
 "src/services/ades/fake_client.py" = [
