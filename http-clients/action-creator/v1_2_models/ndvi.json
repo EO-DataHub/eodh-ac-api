@@ -1,138 +1,37 @@
 {
-  "identifier": "simplest-ndvi",
-  "inputs": {
-    "area": {
-      "type": "Polygon",
-      "coordinates": [
-        [
-          [
-            -0.511790994620525,
-            51.44563991163383
-          ],
-          [
-            -0.511790994620525,
-            51.496989653093614
-          ],
-          [
-            -0.408954489023431,
-            51.496989653093614
-          ],
-          [
-            -0.408954489023431,
-            51.44563991163383
-          ],
-          [
-            -0.511790994620525,
-            51.44563991163383
-          ]
-        ]
-      ]
-    },
-    "dataset": "sentinel-2-l2a",
-    "date_start": "2024-03-01",
-    "date_end": "2024-10-10"
-  },
-  "outputs": {
-    "results": {
-      "name": "results",
-      "type": "directory"
-    }
-  },
-  "functions": {
-    "query": {
-      "identifier": "s2-ds-query",
-      "inputs": {
-        "area": {
-          "$type": "ref",
-          "value": [
-            "inputs",
-            "area"
-          ]
-        },
-        "stac_collection": {
-          "$type": "ref",
-          "value": [
-            "inputs",
-            "dataset"
-          ]
-        },
-        "date_start": {
-          "$type": "ref",
-          "value": [
-            "inputs",
-            "date_start"
-          ]
-        },
-        "date_end": {
-          "$type": "ref",
-          "value": [
-            "inputs",
-            "date_end"
-          ]
-        },
-        "clip": {
-          "$type": "atom",
-          "value": true
-        },
-        "limit": {
-          "$type": "atom",
-          "value": 10
-        },
-        "cloud_cover_min": {
-          "$type": "atom",
-          "value": 0
-        },
-        "cloud_cover_max": {
-          "$type": "atom",
-          "value": 100
-        }
-      },
-      "outputs": {
-        "results": {
-          "name": "results",
-          "type": "directory"
-        }
-      }
-    },
+  "workflow": {
     "ndvi": {
       "identifier": "ndvi",
+      "order": 0,
       "inputs": {
-        "data_dir": {
-          "$type": "ref",
-          "value": [
-            "functions",
-            "query",
-            "outputs",
-            "results"
-          ]
-        }
-      },
-      "outputs": {
-        "results": {
-          "name": "results",
-          "type": "directory"
-        }
-      }
-    },
-    "thumbnail": {
-      "identifier": "thumbnail",
-      "inputs": {
-        "data_dir": {
-          "$type": "ref",
-          "value": [
-            "functions",
-            "ndvi",
-            "outputs",
-            "results"
-          ]
-        }
-      },
-      "outputs": {
-        "results": {
-          "$type": "ref",
-          "value": [
-            "outputs",
-            "results"
+        "stac_collection": "sentinel-2-l2a-ard",
+        "date_start": "2023-01-01T00:00:00Z",
+        "date_end": "2024-12-31T23:59:59Z",
+        "aoi": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -2.652110837830426,
+                51.31487834129703
+              ],
+              [
+                -2.5885590161086514,
+                51.31487834129703
+              ],
+              [
+                -2.5885590161086514,
+                51.35420103894873
+              ],
+              [
+                -2.652110837830426,
+                51.35420103894873
+              ],
+              [
+                -2.652110837830426,
+                51.31487834129703
+              ]
+            ]
           ]
         }
       }

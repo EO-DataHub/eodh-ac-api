@@ -7,8 +7,8 @@ from uuid import uuid4
 import pytest
 import yaml
 
-from src.api.v1_2.action_creator.schemas.presets import EXAMPLE_WORKFLOWS
-from src.api.v1_2.action_creator.schemas.workflow_tasks import FUNCTIONS_REGISTRY
+from src.api.v1_3.action_creator.schemas.presets import EXAMPLE_WORKFLOWS
+from src.api.v1_3.action_creator.schemas.workflow_tasks import FUNCTIONS_REGISTRY
 from src.services.cwl.workflow_creator import WorkflowCreator
 
 if TYPE_CHECKING:
