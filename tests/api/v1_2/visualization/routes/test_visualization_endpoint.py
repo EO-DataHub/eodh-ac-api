@@ -199,6 +199,7 @@ def test_spectral_indices_have_unique_colors(
     auth_token_module_scoped: str,
 ) -> None:
     # Arrange
+    expected_color_hint_len = 7  # hash symbol + hex RGB color value
     _prepare_stac_client_mock(client_mock, stac_catalog)
 
     # Act
@@ -210,3 +211,4 @@ def test_spectral_indices_have_unique_colors(
 
     colors = [asset.color for asset in result.assets.values()]
     assert len(set(colors)) == len(colors)
+    assert all(len(c) == expected_color_hint_len for c in colors)
