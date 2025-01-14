@@ -60,20 +60,33 @@ def auth_token_func_scoped() -> str:
 
 
 @pytest.fixture(scope="session")
-def ws_token() -> typing.Generator[str]:
+def auth_token_session_scoped() -> str:
+    settings = current_settings()
+    client = TestClient(fast_api_app)
+    response = client.post(
+        "/api/v1.0/auth/token",
+        json={"username": settings.eodh_auth.username, "password": settings.eodh_auth.password},
+    )
+    return response.json()["access_token"]  # type: ignore[no-any-return]
+
+
+@pytest.fixture(scope="session")
+def ws_token(auth_token_session_scoped: str) -> typing.Generator[str]:
     settings = current_settings()
 
     response = requests.post(
         settings.eodh_auth.workspace_tokens_url,
-        headers={"Authorization": f"Bearer {settings.eodh_auth.api_token}"},
+        headers={"Authorization": f"Bearer {auth_token_session_scoped}"},
         timeout=30,
+        json={"name": "API Token", "scope": "offline_access", "expires": 30},
     )
 
     token_response = json.loads(response.text)
-    yield token_response["token"]
+    token = token_response["token"]
+    yield token
 
     requests.delete(
         f"{settings.eodh_auth.workspace_tokens_url}/{token_response['id']}",
-        headers={"Authorization": f"Bearer {settings.eodh_auth.api_token}"},
+        headers={"Authorization": f"Bearer {token}"},
         timeout=30,
     )
