@@ -68,7 +68,7 @@ async def get_visualization_data_for_job_results(  # noqa: C901, PLR0912
         # User not authorized to access this resource or catalog does not exist
         raise HTTPException(
             status_code=ex.status_code,
-            detail=json.loads(str(ex))["description"],
+            detail=json.loads(str(ex)),
         ) from APIError
 
     # Sanitize params

@@ -10,7 +10,7 @@ from src.utils.logging import get_logger
 
 def ades_client_factory(workspace: str, token: str) -> ADESClient:
     settings = current_settings()
-    workspace = workspace.lower().replace("-", "_")
+    workspace = workspace.lower()
     return ADESClient(
         url=settings.ades.url,
         ogc_processes_api_path=settings.ades.ogc_processes_api_path,

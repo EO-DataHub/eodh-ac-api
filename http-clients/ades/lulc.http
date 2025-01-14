@@ -9,12 +9,12 @@ GET {{app_cwl_href}}
 >> land-cover-change-app.cwl
 
 ### Unregister Process
-DELETE {{ades_url}}/{{workspace}}/ogc-api/processes/{{app_name}}
+DELETE {{ades_url}}/{{username}}/ogc-api/processes/{{app_name}}
 Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Register Process
-POST {{ades_url}}/{{workspace}}/ogc-api/processes
+POST {{ades_url}}/{{username}}/ogc-api/processes
 Accept: application/json
 Authorization: Bearer {{token}}
 Content-Type: application/cwl+yaml
@@ -22,12 +22,12 @@ Content-Type: application/cwl+yaml
 < land-cover-change-app.cwl
 
 ### Get Process details
-GET {{ades_url}}/{{workspace}}/ogc-api/processes/{{app_name}}
+GET {{ades_url}}/{{username}}/ogc-api/processes/{{app_name}}
 Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Execute Process
-POST {{ades_url}}/{{workspace}}/ogc-api/processes/{{app_name}}/execution
+POST {{ades_url}}/{{username}}/ogc-api/processes/{{app_name}}/execution
 Accept: application/json
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -39,7 +39,7 @@ Prefer: respond-async
         "date_start": "20010-01-01",
         "date_end": "2024-04-03",
         "source": "esacci-globallc",
-        "workspace": "{{workspace}}"
+        "workspace": "{{username}}"
     }
 }
 
@@ -50,7 +50,7 @@ Prefer: respond-async
 %}
 
 ### Get Job status
-GET https://test.eodatahub.org.uk/ades/{{workspace}}/ogc-api/jobs/{{execute_process_response.jobID}}
+GET https://test.eodatahub.org.uk/ades/{{username}}/ogc-api/jobs/{{execute_process_response.jobID}}
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -61,7 +61,7 @@ Content-Type: application/json
 %}
 
 ### Get results
-GET https://test.eodatahub.org.uk/ades/{{workspace}}/ogc-api/jobs/{{execute_process_response.jobID}}/results
+GET https://test.eodatahub.org.uk/ades/{{username}}/ogc-api/jobs/{{execute_process_response.jobID}}/results
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -86,6 +86,6 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Cancel Job
-DELETE {{ades_url}}/{{workspace}}/ogc-api/jobs/{{execute_process_response.jobID}}
+DELETE {{ades_url}}/{{username}}/ogc-api/jobs/{{execute_process_response.jobID}}
 Accept: application/json
 Authorization: Bearer {{token}}

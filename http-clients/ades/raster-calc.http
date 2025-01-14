@@ -9,12 +9,12 @@ GET {{app_cwl_href}}
 >> raster-calculate-app.cwl
 
 ### Unregister Process
-DELETE {{ades_url}}/{{workspace}}/ogc-api/processes/{{app_name}}
+DELETE {{ades_url}}/{{username}}/ogc-api/processes/{{app_name}}
 Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Register Process
-POST {{ades_url}}/{{workspace}}/ogc-api/processes
+POST {{ades_url}}/{{username}}/ogc-api/processes
 Accept: application/json
 Authorization: Bearer {{token}}
 Content-Type: application/cwl+yaml
@@ -22,12 +22,12 @@ Content-Type: application/cwl+yaml
 < raster-calculate-app.cwl
 
 ### Get Process details
-GET {{ades_url}}/{{workspace}}/ogc-api/processes/{{app_name}}
+GET {{ades_url}}/{{username}}/ogc-api/processes/{{app_name}}
 Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Execute Process
-POST {{ades_url}}/{{workspace}}/ogc-api/processes/{{app_name}}/execution
+POST {{ades_url}}/{{username}}/ogc-api/processes/{{app_name}}/execution
 Accept: application/json
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -35,7 +35,7 @@ Prefer: respond-async
 
 {
     "inputs": {
-        "workspace": "{{workspace}}",
+        "workspace": "{{username}}",
         "stac_collection": "sentinel-2-l2a",
         "aoi": "{\"type\":\"Polygon\",\"coordinates\":[[[71.57683969558222,4.278154706539496],[71.96061157730237,4.278154706539496],[71.96061157730237,4.62344048537264],[71.57683969558222,4.62344048537264],[71.57683969558222,4.278154706539496]]]}",
         "date_start": "2024-01-01",
@@ -53,7 +53,7 @@ Prefer: respond-async
 %}
 
 ### Get Job status
-GET https://test.eodatahub.org.uk/ades/{{workspace}}/ogc-api/jobs/524689c0-b242-11ef-b505-ee3aaed8a789
+GET https://test.eodatahub.org.uk/ades/{{username}}/ogc-api/jobs/524689c0-b242-11ef-b505-ee3aaed8a789
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -64,7 +64,7 @@ Content-Type: application/json
 %}
 
 ### Get Job results
-GET https://test.eodatahub.org.uk/ades/{{workspace}}/ogc-api/jobs/{{execute_process_response.jobID}}/results
+GET https://test.eodatahub.org.uk/ades/{{username}}/ogc-api/jobs/{{execute_process_response.jobID}}/results
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -89,6 +89,6 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Cancel Job
-DELETE {{ades_url}}/{{workspace}}/ogc-api/jobs/{{execute_process_response.jobID}}
+DELETE {{ades_url}}/{{username}}/ogc-api/jobs/{{execute_process_response.jobID}}
 Accept: application/json
 Authorization: Bearer {{token}}
