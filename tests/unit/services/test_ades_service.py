@@ -67,13 +67,13 @@ def test_ades_client_factory_function_should_normalize_workspace_name(mocked_cur
     assert result.ogc_jobs_api_path == settings.ades.ogc_jobs_api_path
     assert result.ogc_processes_api_path == settings.ades.ogc_processes_api_path
     assert result.token == "test_token"  # noqa: S105
-    assert result.workspace == "test_workspace"
+    assert result.workspace == "test-workspace"
     assert result.headers == {
         "Authorization": "Bearer test_token",
         "Accept": "application/json",
     }
-    assert result.processes_endpoint_url == "https://test.ades.com/test_workspace/ogc/processes"
-    assert result.jobs_endpoint_url == "https://test.ades.com/test_workspace/ogc/jobs"
+    assert result.processes_endpoint_url == "https://test.ades.com/test-workspace/ogc/processes"
+    assert result.jobs_endpoint_url == "https://test.ades.com/test-workspace/ogc/jobs"
 
 
 def test_placeholder_replacement(tmp_cwl_file: Path, monkeypatch: MonkeyPatch) -> None:
