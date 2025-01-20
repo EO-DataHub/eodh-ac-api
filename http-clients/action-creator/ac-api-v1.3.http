@@ -514,6 +514,20 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     });
 %}
 
+### Run OK - S2ARD NDVI on full temporal extent of S2 ARD
+POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_3_models/ndvi-full-temporal-s2-ard.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 202, "Response status is not 202");
+    });
+%}
+
 ### Run Error - Area too big
 POST {{api_url}}/{{api_version}}/action-creator/workflow-submissions
 Accept: application/json
