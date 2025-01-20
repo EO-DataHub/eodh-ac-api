@@ -4,7 +4,6 @@ import json
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any
 
-import pyproj
 from geojson_pydantic.geometries import parse_geometry_obj
 from pydantic_core import PydanticCustomError
 from shapely.geometry import shape
@@ -12,12 +11,13 @@ from shapely.geometry import shape
 from src.api.v1_1.action_creator.functions import FUNCTIONS_REGISTRY as NEW_FUNCTIONS_REGISTRY_V1_1
 from src.api.v1_2.action_creator.functions import FUNCTIONS_REGISTRY as NEW_FUNCTIONS_REGISTRY_v1_2  # noqa: N811
 from src.consts.action_creator import FUNCTIONS_REGISTRY
+from src.utils.geo import calculate_geodesic_area
 
 if TYPE_CHECKING:
     import shapely.geometry
 
 EXPECTED_BBOX_ELEMENT_COUNT = 4
-MAX_AREA_SQ_KM = 1000
+MAX_AREA_SQ_KM = 20_000
 SQ_MILES_DIVISOR = 2.59
 
 STAC_COLLECTION_DATE_RANGE_LOOKUP = {
@@ -124,20 +124,6 @@ class StacDateRangeError:
                 "collection": collection,
             },
         )
-
-
-def calculate_geodesic_area(polygon: shapely.Polygon) -> float:
-    # Define the WGS 84 ellipsoid
-    geod = pyproj.Geod(ellps="WGS84")
-
-    # Get the coordinates of the polygon
-    lon, lat = polygon.exterior.coords.xy
-
-    # Calculate the geodesic area using pyproj's Geod function
-    area, _ = geod.polygon_area_perimeter(lon, lat)
-
-    # Return the area in square meters (area will be negative, so we take the absolute value)
-    return float(abs(area))
 
 
 def ensure_area_smaller_than(geom: dict[str, Any], area_size_limit: float = MAX_AREA_SQ_KM) -> None:

@@ -219,6 +219,7 @@ module = [
     "fastapi_hypermodel.*",
     "flaky.*",
     "geojson_pydantic.*",
+    "geopandas.*",
     "httpx.*",
     "jwt.*",
     "mkdocs_gen_files.*",
