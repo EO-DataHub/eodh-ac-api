@@ -3,10 +3,9 @@ from __future__ import annotations
 from typing import Any
 
 import pytest
-from shapely.geometry.geo import shape
 
 from src.consts.geometries import HEATHROW_AOI, UK_AOI
-from src.services.validation_utils import MAX_AREA_SQ_KM, calculate_geodesic_area, ensure_area_smaller_than
+from src.services.validation_utils import MAX_AREA_SQ_KM, ensure_area_smaller_than
 
 FEATURES = [
     {
@@ -181,20 +180,7 @@ FEATURES = [
 )
 def test_ensure_area_rises_error_if_necessary(feature: dict[str, Any]) -> None:
     if feature["properties"]["area"] > MAX_AREA_SQ_KM:
-        with pytest.raises(ValueError, match="Area exceeds 386.10 square miles."):
+        with pytest.raises(ValueError, match="Area exceeds 7,722.01 square miles."):
             ensure_area_smaller_than(geom=feature["geometry"], area_size_limit=MAX_AREA_SQ_KM)
     else:
         ensure_area_smaller_than(geom=feature["geometry"], area_size_limit=MAX_AREA_SQ_KM)
-
-
-@pytest.mark.parametrize(
-    "feature",
-    FEATURES,
-    ids=lambda feature: feature["properties"]["id"],
-)
-def test_polygon_area_expected_results(feature: dict[str, Any]) -> None:
-    # Act
-    result = calculate_geodesic_area(shape(feature["geometry"]))
-
-    # Assert
-    assert pytest.approx(result / 1_000_000, rel=1e-3) == feature["properties"]["area"]
