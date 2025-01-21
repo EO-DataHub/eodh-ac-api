@@ -172,6 +172,20 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     });
 %}
 
+### Run Scatter Water Quality
+POST {{api_url}}/{{api_version}}/action-creator/submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/scatter-water-quality.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 202, "Response status is not 202");
+    });
+%}
+
 ### Get Job Status
 GET {{api_url}}/{{api_version}}/action-creator/submissions/126963dc-b6ec-11ef-94ce-6a040e2afd6f
 Accept: application/json

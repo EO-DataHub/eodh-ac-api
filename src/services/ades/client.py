@@ -15,7 +15,9 @@ from dotenv import load_dotenv
 from starlette import status
 
 from src import consts
-from src.api.v1_1.action_creator.functions import WORKFLOW_ID_OVERRIDE_LOOKUP, WORKFLOW_REGISTRY
+from src.api.v1_1.action_creator.functions import (
+    WORKFLOW_REGISTRY,
+)
 from src.consts.action_creator import FUNCTIONS_REGISTRY
 from src.services.ades.base_client import ADESClientBase, ErrorResponse
 from src.services.ades.schemas import JobList, Process, ProcessList, ProcessSummary, StatusInfo
@@ -273,8 +275,12 @@ class ADESClient(ADESClientBase):
 
         return err
 
-    async def ensure_process_exists_v1_1(self, process_identifier: str) -> ErrorResponse | None:
-        if process_identifier not in WORKFLOW_REGISTRY:
+    async def ensure_process_exists_v2(
+        self,
+        process_identifier: str,
+        wf_registry: dict[str, dict[str, str]],
+    ) -> ErrorResponse | None:
+        if process_identifier not in wf_registry:
             return ErrorResponse(
                 code=status.HTTP_404_NOT_FOUND,
                 detail=f"Process '{process_identifier}' does not exist in Action Creator Function Registry. "
@@ -287,7 +293,7 @@ class ADESClient(ADESClientBase):
         if exists:
             return None
 
-        cwl_href = WORKFLOW_REGISTRY[process_identifier]["cwl_href"]
+        cwl_href = wf_registry[process_identifier]["cwl_href"]
         err, _ = await self.register_process_from_cwl_href_with_download(cwl_href=cwl_href)
 
         return err
@@ -388,11 +394,13 @@ class ADESClient(ADESClientBase):
         cwl_href = WORKFLOW_REGISTRY[process_identifier]["cwl_href"]
         return await self.register_process_from_cwl_href_with_download(cwl_href)
 
-    async def reregister_process_v1_1(
+    async def reregister_process_v2(
         self,
         process_identifier: str,
+        wf_registry: dict[str, dict[str, str]],
+        wf_id_override_lookup: dict[str, str],
     ) -> tuple[ErrorResponse | None, ProcessSummary | None]:
-        if process_identifier not in WORKFLOW_REGISTRY:
+        if process_identifier not in wf_registry:
             return ErrorResponse(
                 code=status.HTTP_404_NOT_FOUND,
                 detail=f"Process '{process_identifier}' does not exist in Action Creator Function Registry. "
@@ -400,8 +408,8 @@ class ADESClient(ADESClientBase):
             ), None
         if await self.process_exists(process_identifier):
             await self.unregister_process(process_identifier)
-        cwl_href = WORKFLOW_REGISTRY[process_identifier]["cwl_href"]
-        id_override = WORKFLOW_ID_OVERRIDE_LOOKUP.get(process_identifier)
+        cwl_href = wf_registry[process_identifier]["cwl_href"]
+        id_override = wf_id_override_lookup.get(process_identifier)
         return await self.register_process_from_cwl_href_with_download(cwl_href, id_override=id_override)
 
     @staticmethod
