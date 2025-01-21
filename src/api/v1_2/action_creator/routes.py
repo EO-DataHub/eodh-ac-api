@@ -9,7 +9,12 @@ from fastapi.security import HTTPAuthorizationCredentials
 from starlette import status
 
 from src.api.v1_0.auth.routes import decode_token, validate_access_token
-from src.api.v1_2.action_creator.functions import FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING, FUNCTIONS
+from src.api.v1_2.action_creator.functions import (
+    FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING,
+    FUNCTIONS,
+    WORKFLOW_ID_OVERRIDE_LOOKUP,
+    WORKFLOW_REGISTRY,
+)
 from src.api.v1_2.action_creator.presets import (
     LAND_COVER_CHANGE_DETECTION_PRESET_SPEC,
     NDVI_CLIP_PRESET,
@@ -128,13 +133,23 @@ async def submit_workflow(
     ades = ades_client_factory(workspace=introspected_token["preferred_username"], token=credential.credentials)
 
     workflow_step_spec = next(iter(workflow_spec.workflow.values()))
-    wf_identifier = FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING[workflow_step_spec.identifier]
     ogc_inputs = workflow_step_spec.inputs.as_ogc_process_inputs()
     ogc_inputs["clip"] = (
         "True" if any(step.identifier == "clip" for step in workflow_spec.workflow.values()) else "False"
     )
 
-    err, _ = await ades.reregister_process_v1_1(wf_identifier)
+    wf_identifier = FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING[workflow_step_spec.identifier]
+
+    # If AOI was transformed into list of smaller chips, make sure we will run scatter enabled WF
+    if isinstance(ogc_inputs["aoi"], list):
+        wf_identifier = f"scatter-{workflow_step_spec.identifier}"
+        ogc_inputs["areas"] = ogc_inputs.pop("aoi")
+
+    err, _ = await ades.reregister_process_v2(
+        wf_identifier,
+        wf_registry=WORKFLOW_REGISTRY,
+        wf_id_override_lookup=WORKFLOW_ID_OVERRIDE_LOOKUP,
+    )
 
     if err is not None:
         raise HTTPException(

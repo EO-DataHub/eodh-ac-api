@@ -544,5 +544,17 @@ WORKFLOW_REGISTRY = {
     "water-quality": {
         "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/water-quality-app.cwl",
     },
+    "scatter-lulc-change": {
+        "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/scatter-lulc-change-app.cwl",
+    },
+    "scatter-land-cover-change": {
+        "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/scatter-lulc-change-app.cwl",
+    },
+    "scatter-raster-calculate": {
+        "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/scatter-raster-calculate-app.cwl",
+    },
+    "scatter-water-quality": {
+        "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/scatter-water-quality-app.cwl",
+    },
 }
 WORKFLOW_ID_OVERRIDE_LOOKUP = {"lulc-change": "land-cover-change", "land-cover-change": "land-cover-change"}

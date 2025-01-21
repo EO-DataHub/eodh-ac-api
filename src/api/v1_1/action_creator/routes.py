@@ -9,7 +9,12 @@ from fastapi.security import HTTPAuthorizationCredentials
 from starlette import status
 
 from src.api.v1_0.auth.routes import decode_token, validate_access_token
-from src.api.v1_1.action_creator.functions import FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING, FUNCTIONS
+from src.api.v1_1.action_creator.functions import (
+    FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING,
+    FUNCTIONS,
+    WORKFLOW_ID_OVERRIDE_LOOKUP,
+    WORKFLOW_REGISTRY,
+)
 from src.api.v1_1.action_creator.presets import (
     LAND_COVER_CHANGE_DETECTION_PRESET_SPEC,
     NDVI_CLIP_PRESET,
@@ -134,7 +139,11 @@ async def submit_workflow(
         "True" if any(step.identifier == "clip" for step in workflow_spec.workflow.values()) else "False"
     )
 
-    err, _ = await ades.reregister_process_v1_1(wf_identifier)
+    err, _ = await ades.reregister_process_v2(
+        wf_identifier,
+        wf_registry=WORKFLOW_REGISTRY,
+        wf_id_override_lookup=WORKFLOW_ID_OVERRIDE_LOOKUP,
+    )
 
     if err is not None:
         raise HTTPException(

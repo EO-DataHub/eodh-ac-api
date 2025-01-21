@@ -1,21 +1,25 @@
 from __future__ import annotations
 
 import abc
+import json
 from datetime import datetime  # noqa: TCH003
 from enum import StrEnum, auto
 from typing import TYPE_CHECKING, Annotated, Any, Generic, Literal, Sequence, TypeVar, Union
 
 from geojson_pydantic.geometries import Polygon
 from pydantic import BaseModel, Field, field_validator, model_validator
+from shapely.geometry.geo import shape
 
 from src.api.v1_2.action_creator.functions import FUNCTIONS_REGISTRY
 from src.services.validation_utils import (
+    CHIPPING_THRESHOLD_SQ_KM,
     aoi_must_be_present,
     ensure_area_smaller_than,
     validate_date_range,
     validate_stac_collection_v1_2,
     validate_stac_date_range,
 )
+from src.utils.geo import calculate_geodesic_area, chip_aoi
 
 if TYPE_CHECKING:
     from pydantic_core.core_schema import ValidationInfo
@@ -137,8 +141,14 @@ class CommonFunctionInputs(OGCProcessInputs, abc.ABC):
         return date_end
 
     def as_ogc_process_inputs(self) -> dict[str, Any]:
+        aoi = (
+            self.aoi.model_dump_json()  # type: ignore[union-attr]
+            if calculate_geodesic_area(shape(self.aoi.model_dump())) / 1e6 <= CHIPPING_THRESHOLD_SQ_KM  # type: ignore[union-attr]
+            else [json.dumps(feat) for feat in chip_aoi(shape(self.aoi.model_dump()))]  # type: ignore[union-attr]
+        )
+
         vals = {
-            "aoi": self.aoi.model_dump_json(),  # type: ignore[union-attr]
+            "aoi": aoi,
             "stac_collection": self.stac_collection,
             "date_start": self.date_start.isoformat() if self.date_start else None,
             "date_end": self.date_end.isoformat() if self.date_end else None,
