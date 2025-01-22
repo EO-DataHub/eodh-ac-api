@@ -172,6 +172,20 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     });
 %}
 
+### Run Scatter NDVI
+POST {{api_url}}/{{api_version}}/action-creator/submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/scatter-ndvi.json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 202, "Response status is not 202");
+    });
+%}
+
 ### Run Scatter Water Quality
 POST {{api_url}}/{{api_version}}/action-creator/submissions
 Accept: application/json
@@ -187,7 +201,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 %}
 
 ### Get Job Status
-GET {{api_url}}/{{api_version}}/action-creator/submissions/126963dc-b6ec-11ef-94ce-6a040e2afd6f
+GET {{api_url}}/{{api_version}}/action-creator/submissions/a78b7580-d8b7-11ef-ac87-7acca6d0ccd7
 Accept: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 
@@ -198,7 +212,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 %}
 
 ### Cancel Job
-DELETE {{api_url}}/{{api_version}}/action-creator/submissions/27e6c068-b644-11ef-ab99-ee3aaed8a789
+DELETE {{api_url}}/{{api_version}}/action-creator/submissions/bafd6490-d8b0-11ef-92bb-7acca6d0ccd7
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
