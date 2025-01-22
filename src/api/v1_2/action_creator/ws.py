@@ -8,7 +8,11 @@ from starlette import status
 from starlette.websockets import WebSocket, WebSocketDisconnect
 
 from src.api.v1_0.auth.routes import validate_token_from_websocket
-from src.api.v1_2.action_creator.functions import FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING
+from src.api.v1_2.action_creator.functions import (
+    FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING,
+    WORKFLOW_ID_OVERRIDE_LOOKUP,
+    WORKFLOW_REGISTRY,
+)
 from src.api.v1_2.action_creator.schemas import (
     ActionCreatorJob,
     ActionCreatorJobStatusRequest,
@@ -58,7 +62,11 @@ async def submit_function_websocket(  # noqa: C901
 
         ades = ades_client_factory(token=token, workspace=introspected_token["preferred_username"])
 
-        err, _ = await ades.reregister_process_v1_1(wf_identifier)
+        err, _ = await ades.reregister_process_v2(
+            wf_identifier,
+            wf_registry=WORKFLOW_REGISTRY,
+            wf_id_override_lookup=WORKFLOW_ID_OVERRIDE_LOOKUP,
+        )
 
         if err is not None:
             await websocket.send_json({
