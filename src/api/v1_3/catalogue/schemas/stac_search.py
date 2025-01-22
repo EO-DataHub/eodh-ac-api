@@ -33,25 +33,7 @@ class StacSearch(Search):
     fields: FieldsExtension | None = Field(None)
     query: dict[str, dict[Operator, Any]] | None = None
     sortby: list[SortExtension] | None = None
-    filter: dict[str, Any] | None = Field(
-        default=None,
-        description="A CQL filter expression for filtering items.",
-        json_schema_extra={
-            "example": {
-                "op": "and",
-                "args": [
-                    {
-                        "op": "=",
-                        "args": [
-                            {"property": "id"},
-                            "LC08_L1TP_060247_20180905_20180912_01_T1_L1TP",
-                        ],
-                    },
-                    {"op": "=", "args": [{"property": "collection"}, "landsat8_l1tp"]},
-                ],
-            },
-        },
-    )
+    filter: dict[str, Any] | None = Field(default=None, description="A CQL filter expression for filtering items.")
     filter_lang: Literal["cql-json", "cql2-json"] | None = Field(
         alias="filter-lang",
         default="cql2-json",
