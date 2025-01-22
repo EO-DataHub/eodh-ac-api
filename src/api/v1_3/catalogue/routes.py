@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Annotated, Any
+from typing import Annotated, Any, TypedDict
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
@@ -12,16 +12,22 @@ from stac_pydantic.api.extensions.sort import SortDirections, SortExtension
 from starlette import status
 
 from src.api.v1_0.auth.routes import validate_access_token
-from src.api.v1_3.visualization.schemas.request import (
+from src.api.v1_3.catalogue.schemas.stac_search import (
     FieldsExtension,
     StacSearch,
     VisualizationRequest,
 )
-from src.api.v1_3.visualization.schemas.response import JobAssetsChartVisualizationResponse
+from src.api.v1_3.catalogue.schemas.visualization import JobAssetsChartVisualizationResponse
 from src.core.settings import current_settings
 from src.utils.logging import get_logger
 
 _logger = get_logger(__name__)
+
+
+class DatasetLookupRecord(TypedDict):
+    catalog_path: str
+    collection_name: str
+
 
 _COLOR_WHEEL = {
     "ndvi": "#008000",
@@ -40,13 +46,81 @@ _COLOR_WHEEL = {
     "unknown": "#000000",
 }
 
-visualization_router_v1_3 = APIRouter(
+_DATASET_LOOKUP: dict[str, DatasetLookupRecord] = {
+    "sentinel-1-grd": DatasetLookupRecord(
+        catalog_path="supported-datasets/earth-search-aws",
+        collection_name="sentinel-1-grd",
+    ),
+    "sentinel-2-l1c": DatasetLookupRecord(
+        catalog_path="supported-datasets/earth-search-aws",
+        collection_name="sentinel-2-l1c",
+    ),
+    "sentinel-2-l2a": DatasetLookupRecord(
+        catalog_path="supported-datasets/earth-search-aws",
+        collection_name="sentinel-2-l2a",
+    ),
+    "sentinel-2-ard": DatasetLookupRecord(
+        catalog_path="supported-datasets/ceda-stac-catalogue",
+        collection_name="sentinel2_ard",
+    ),
+}
+
+_SUPPORTED_DATASETS = set(_DATASET_LOOKUP.keys())
+
+catalogue_router_v1_3 = APIRouter(
     prefix="/catalogue",
-    tags=["Visualization"],
+    tags=["Catalogue"],
 )
 
 
-@visualization_router_v1_3.post(
+def _handle_range_area_chart(asset: Asset, asset_key: str, assets_dict: dict[str, Any], item: Item) -> None:
+    if asset_key not in assets_dict:
+        assets_dict[asset_key] = {
+            "title": asset.title,
+            "chart_type": "range-area-with-line",
+            "data": [],
+            "units": asset.extra_fields["colormap"]["units"],
+            "color": _COLOR_WHEEL.get(asset_key, _COLOR_WHEEL["unknown"]),
+        }
+    assets_dict[asset_key]["data"].append({
+        "min": asset.extra_fields["statistics"]["minimum"],
+        "max": asset.extra_fields["statistics"]["maximum"],
+        "median": asset.extra_fields["statistics"]["median"],
+        "x_label": item.datetime,
+    })
+
+
+def _handle_stacked_bar_chart(asset: Asset, asset_key: str, assets_dict: dict[str, Any], item: Item) -> None:
+    if asset_key not in assets_dict:
+        assets_dict[asset_key] = {
+            "title": asset.title or "Land cover change",
+            "chart_type": "classification-stacked-bar-chart",
+            "data": {
+                c["description"]: {
+                    "name": c["description"],
+                    "area": [],
+                    "percentage": [],
+                    "color-hint": c["color-hint"][:7] if c["color-hint"].startswith("#") else f"#{c['color-hint']}"[:7],
+                }
+                for c in asset.extra_fields["classification:classes"]
+            },
+            "units": "sq km",
+            "x_labels": [],
+        }
+    assets_dict[asset_key]["x_labels"].append(item.datetime)
+    for class_meta in asset.extra_fields["classification:classes"]:
+        area = class_meta.get("area_km2", None)
+        if area is None:
+            area = item.properties["lulc_classes_m2"][str(class_meta["value"])] / 1e6
+        assets_dict[asset_key]["data"][class_meta["description"]]["area"].append(area)
+
+        percentage = class_meta.get("percentage", None)
+        if percentage is None:
+            percentage = item.properties["lulc_classes_percentage"][str(class_meta["value"])]
+        assets_dict[asset_key]["data"][class_meta["description"]]["percentage"].append(percentage)
+
+
+@catalogue_router_v1_3.post(
     "/stac/catalogs/user-datasets/{workspace}/processing-results/cat_{job_id}/charts",
     response_model=JobAssetsChartVisualizationResponse,
 )
@@ -142,48 +216,18 @@ async def get_visualization_data_for_job_results(  # noqa: C901, PLR0912
     return {"job_id": job_id, "assets": assets_dict}
 
 
-def _handle_range_area_chart(asset: Asset, asset_key: str, assets_dict: dict[str, Any], item: Item) -> None:
-    if asset_key not in assets_dict:
-        assets_dict[asset_key] = {
-            "title": asset.title,
-            "chart_type": "range-area-with-line",
-            "data": [],
-            "units": asset.extra_fields["colormap"]["units"],
-            "color": _COLOR_WHEEL.get(asset_key, _COLOR_WHEEL["unknown"]),
-        }
-    assets_dict[asset_key]["data"].append({
-        "min": asset.extra_fields["statistics"]["minimum"],
-        "max": asset.extra_fields["statistics"]["maximum"],
-        "median": asset.extra_fields["statistics"]["median"],
-        "x_label": item.datetime,
-    })
-
-
-def _handle_stacked_bar_chart(asset: Asset, asset_key: str, assets_dict: dict[str, Any], item: Item) -> None:
-    if asset_key not in assets_dict:
-        assets_dict[asset_key] = {
-            "title": asset.title or "Land cover change",
-            "chart_type": "classification-stacked-bar-chart",
-            "data": {
-                c["description"]: {
-                    "name": c["description"],
-                    "area": [],
-                    "percentage": [],
-                    "color-hint": c["color-hint"][:7] if c["color-hint"].startswith("#") else f"#{c['color-hint']}"[:7],
-                }
-                for c in asset.extra_fields["classification:classes"]
-            },
-            "units": "sq km",
-            "x_labels": [],
-        }
-    assets_dict[asset_key]["x_labels"].append(item.datetime)
-    for class_meta in asset.extra_fields["classification:classes"]:
-        area = class_meta.get("area_km2", None)
-        if area is None:
-            area = item.properties["lulc_classes_m2"][str(class_meta["value"])] / 1e6
-        assets_dict[asset_key]["data"][class_meta["description"]]["area"].append(area)
-
-        percentage = class_meta.get("percentage", None)
-        if percentage is None:
-            percentage = item.properties["lulc_classes_percentage"][str(class_meta["value"])]
-        assets_dict[asset_key]["data"][class_meta["description"]]["percentage"].append(percentage)
+@catalogue_router_v1_3.post("/stac/search")
+async def search(
+    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
+    stac_search: StacSearch | None = None,
+) -> dict[str, Any]:
+    if (
+        stac_search is not None
+        and stac_search.collections
+        and (diff := set(stac_search.collections).difference(_SUPPORTED_DATASETS))
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Datasets {', '.join(diff)} not supported. Supported datasets: {', '.join(_SUPPORTED_DATASETS)}",
+        )
+    return {}
