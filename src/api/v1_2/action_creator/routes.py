@@ -142,7 +142,7 @@ async def submit_workflow(
 
     # If AOI was transformed into list of smaller chips, make sure we will run scatter enabled WF
     if isinstance(ogc_inputs["aoi"], list):
-        wf_identifier = f"scatter-{workflow_step_spec.identifier}"
+        wf_identifier = f"scatter-{wf_identifier}"
         ogc_inputs["areas"] = ogc_inputs.pop("aoi")
 
     err, _ = await ades.reregister_process_v2(

@@ -1,7 +1,7 @@
 {
   "workflow": {
-    "water-quality": {
-      "identifier": "water-quality",
+    "ndvi": {
+      "identifier": "ndvi",
       "order": 0,
       "inputs": {
         "stac_collection": "sentinel-2-l2a-ard",
