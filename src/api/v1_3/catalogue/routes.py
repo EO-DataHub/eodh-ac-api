@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 from typing import Annotated, Any, TypedDict
 
@@ -15,9 +16,8 @@ from src.api.v1_0.auth.routes import validate_access_token
 from src.api.v1_3.catalogue.schemas.stac_search import (
     FieldsExtension,
     StacSearch,
-    VisualizationRequest,
 )
-from src.api.v1_3.catalogue.schemas.visualization import JobAssetsChartVisualizationResponse
+from src.api.v1_3.catalogue.schemas.visualization import JobAssetsChartVisualizationResponse, VisualizationRequest
 from src.core.settings import current_settings
 from src.utils.logging import get_logger
 
@@ -29,7 +29,7 @@ class DatasetLookupRecord(TypedDict):
     collection_name: str
 
 
-_COLOR_WHEEL = {
+COLOR_WHEEL = {
     "ndvi": "#008000",
     "evi": "#15b01a",
     "savi": "#9acd32",
@@ -46,7 +46,7 @@ _COLOR_WHEEL = {
     "unknown": "#000000",
 }
 
-_DATASET_LOOKUP: dict[str, DatasetLookupRecord] = {
+DATASET_LOOKUP: dict[str, DatasetLookupRecord] = {
     "sentinel-1-grd": DatasetLookupRecord(
         catalog_path="supported-datasets/earth-search-aws",
         collection_name="sentinel-1-grd",
@@ -59,13 +59,13 @@ _DATASET_LOOKUP: dict[str, DatasetLookupRecord] = {
         catalog_path="supported-datasets/earth-search-aws",
         collection_name="sentinel-2-l2a",
     ),
-    "sentinel-2-ard": DatasetLookupRecord(
+    "sentinel-2-l2a-ard": DatasetLookupRecord(
         catalog_path="supported-datasets/ceda-stac-catalogue",
         collection_name="sentinel2_ard",
     ),
 }
 
-_SUPPORTED_DATASETS = set(_DATASET_LOOKUP.keys())
+SUPPORTED_DATASETS = set(DATASET_LOOKUP.keys())
 
 catalogue_router_v1_3 = APIRouter(
     prefix="/catalogue",
@@ -80,7 +80,7 @@ def _handle_range_area_chart(asset: Asset, asset_key: str, assets_dict: dict[str
             "chart_type": "range-area-with-line",
             "data": [],
             "units": asset.extra_fields["colormap"]["units"],
-            "color": _COLOR_WHEEL.get(asset_key, _COLOR_WHEEL["unknown"]),
+            "color": COLOR_WHEEL.get(asset_key, COLOR_WHEEL["unknown"]),
         }
     assets_dict[asset_key]["data"].append({
         "min": asset.extra_fields["statistics"]["minimum"],
@@ -217,17 +217,74 @@ async def get_visualization_data_for_job_results(  # noqa: C901, PLR0912
 
 
 @catalogue_router_v1_3.post("/stac/search")
-async def search(
+async def stac_search(
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
-    stac_search: StacSearch | None = None,
+    stac_search_query: dict[str, StacSearch],
 ) -> dict[str, Any]:
-    if (
-        stac_search is not None
-        and stac_search.collections
-        and (diff := set(stac_search.collections).difference(_SUPPORTED_DATASETS))
-    ):
+    if diff := set(stac_search_query.keys()).difference(SUPPORTED_DATASETS):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Datasets {', '.join(diff)} not supported. Supported datasets: {', '.join(_SUPPORTED_DATASETS)}",
+            detail=f"Collections: {list(diff)} are not supported. "
+            f"Supported collections: {', '.join(SUPPORTED_DATASETS)}",
         )
-    return {}
+
+    loop = asyncio.get_running_loop()
+    tasks = [
+        loop.run_in_executor(None, fetch_items, collection, search_params)
+        for collection, search_params in stac_search_query.items()
+    ]
+
+    # Gather results from all endpoints
+    _logger.debug("Gathering items from STAC endpoints...")
+    results = await asyncio.gather(*tasks)
+
+    # Flatten the item lists
+    all_items: list[dict[str, Any]] = []
+    for items in results:
+        all_items.extend(items)
+
+    # Sort items by datetime property if present
+    # We'll skip items without a valid datetime to avoid errors
+    all_items.sort(key=lambda x: x["properties"].get("datetime", ""), reverse=True)
+
+    return {"type": "FeatureCollection", "features": all_items}
+
+
+def fetch_items(collection: str, search_params: StacSearch) -> list[dict[str, Any]]:
+    settings = current_settings()
+    lookup = DATASET_LOOKUP[collection]
+    stac_client = Client.open(f"{settings.eodh_stac_api.endpoint}/catalogs/{lookup['catalog_path']}")
+
+    if search_params.fields is None:
+        search_params.fields = FieldsExtension(include=set())
+
+    if search_params.fields.include is None:
+        search_params.fields.include = set()
+
+    search_params.fields.include = search_params.fields.include.union({
+        "properties.lulc_classes_percentage",
+        "properties.lulc_classes_m2",
+    })
+
+    if search_params.sortby is None:
+        search_params.sortby = [SortExtension(field="properties.datetime", direction=SortDirections.asc)]
+
+    # Perform STAC search
+    search = stac_client.search(
+        limit=search_params.limit,
+        collections=[lookup["collection_name"]],
+        intersects=search_params.intersects,
+        datetime=search_params.datetime,
+        query=search_params.query,
+        filter=search_params.filter,
+        filter_lang=search_params.filter_lang,
+        sortby=[s.model_dump(mode="json") for s in search_params.sortby],
+        fields=search_params.fields.model_dump(mode="json"),
+    )
+    items = []
+    for i, item in enumerate(search.items_as_dicts()):
+        if i >= search_params.limit:
+            break
+        items.append(item)
+
+    return items
