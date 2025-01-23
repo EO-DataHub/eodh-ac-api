@@ -5,6 +5,8 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field
 
+from src.api.v1_3.catalogue.schemas.stac_search import StacSearch
+
 
 class ClassificationStackedBarChartRecord(BaseModel):
     name: str
@@ -46,3 +48,8 @@ class JobAssetsChartVisualizationResponse(BaseModel):
             Field(discriminator="chart_type"),
         ],
     ]
+
+
+class VisualizationRequest(BaseModel):
+    assets: list[str] | None = None
+    stac_query: StacSearch | None = None
