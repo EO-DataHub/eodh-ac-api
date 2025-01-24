@@ -4,7 +4,7 @@ import asyncio
 import json
 from typing import Annotated, Any, TypedDict
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
 from pystac import Asset, Item
 from pystac_client import Client
@@ -14,6 +14,7 @@ from starlette import status
 
 from src.api.v1_0.auth.routes import validate_access_token
 from src.api.v1_3.catalogue.schemas.stac_search import (
+    EXAMPLE_SEARCH_MODEL,
     FieldsExtension,
     StacSearch,
 )
@@ -219,7 +220,41 @@ async def get_visualization_data_for_job_results(  # noqa: C901, PLR0912
 @catalogue_router_v1_3.post("/stac/search")
 async def stac_search(
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
-    stac_search_query: dict[str, StacSearch],
+    stac_search_query: Annotated[
+        dict[str, StacSearch],
+        Body(
+            openapi_examples={
+                "sentinel-1-grd": {
+                    "summary": "Query S1 GRD",
+                    "description": "S1 GRD search.",
+                    "value": {"sentinel-1-grd": EXAMPLE_SEARCH_MODEL["sentinel-1-grd"]},
+                },
+                "sentinel-2-l2a": {
+                    "summary": "Query S2 L2A",
+                    "description": "S2 L2A search.",
+                    "value": {"sentinel-2-l2a": EXAMPLE_SEARCH_MODEL["sentinel-2-l2a"]},
+                },
+                "sentinel-2-l2a-ard": {
+                    "summary": "Query S2 L2A ARD",
+                    "description": "S2 L2A ARD search.",
+                    "value": {"sentinel-2-l2a-ard": EXAMPLE_SEARCH_MODEL["sentinel-2-l2a-ard"]},
+                },
+                "sentinel-2": {
+                    "summary": "Query S2 L2A + S2 L1C",
+                    "description": "S2 L2A search.",
+                    "value": {
+                        "sentinel-2-l2a": EXAMPLE_SEARCH_MODEL["sentinel-2-l2a"],
+                        "sentinel-2-l1c": EXAMPLE_SEARCH_MODEL["sentinel-2-l1c"],
+                    },
+                },
+                "multi-ds-query": {
+                    "summary": "Query S1 GRD + S2 L1C + S2 L2A + S2 ARD",
+                    "description": "Multi-dataset search.",
+                    "value": EXAMPLE_SEARCH_MODEL,
+                },
+            },
+        ),
+    ],
 ) -> dict[str, Any]:
     if diff := set(stac_search_query.keys()).difference(SUPPORTED_DATASETS):
         raise HTTPException(
@@ -261,10 +296,15 @@ def fetch_items(collection: str, search_params: StacSearch) -> list[dict[str, An
     if search_params.fields.include is None:
         search_params.fields.include = set()
 
-    search_params.fields.include = search_params.fields.include.union({
-        "properties.lulc_classes_percentage",
-        "properties.lulc_classes_m2",
-    })
+    search_params.fields.include = search_params.fields.include.union(
+        {
+            "properties.eo:cloud_cover",
+            "properties.grid:code",
+            "properties.sar:instrument_mode",
+            "properties.sar:polarizations",
+            "properties.sat:orbit_state",
+        },
+    )
 
     if search_params.sortby is None:
         search_params.sortby = [SortExtension(field="properties.datetime", direction=SortDirections.asc)]
