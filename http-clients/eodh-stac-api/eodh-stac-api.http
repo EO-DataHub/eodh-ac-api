@@ -106,3 +106,8 @@ GET https://test.eodatahub.org.uk/api/catalogue/stac/catalogs/user-datasets/eopr
 Accept: application/json
 Authorization: Bearer {{token}}
 Content-Type: application/json
+
+### GET #2
+GET https://test.eodatahub.org.uk/api/catalogue/stac/catalogs/supported-datasets/ceda-stac-catalogue/collections/sentinel2_ard/items
+Accept: application/json
+Content-Type: application/json

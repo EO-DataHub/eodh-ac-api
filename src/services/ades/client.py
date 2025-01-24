@@ -92,17 +92,22 @@ class ADESClient(ADESClientBase):
     def jobs_endpoint_url(self) -> str:
         return f"{self.url.strip('/')}/{self.workspace}/{self.ogc_jobs_api_path}"
 
-    def _get_retry_client(self) -> tuple[ClientSession, RetryClient]:
+    def _get_retry_client(
+        self,
+        attempts: int = 3,
+        max_timeout: float = 10,
+        start_timeout: float = 2,
+    ) -> tuple[ClientSession, RetryClient]:
         client_session = ClientSession()
         exp_retry = ExponentialRetry(
-            attempts=5,
-            max_timeout=10,
+            attempts=attempts,
+            max_timeout=max_timeout,
             statuses={
                 status.HTTP_429_TOO_MANY_REQUESTS,
                 status.HTTP_502_BAD_GATEWAY,
                 status.HTTP_503_SERVICE_UNAVAILABLE,
             },
-            start_timeout=2,
+            start_timeout=start_timeout,
         )
         retry_client = RetryClient(
             client_session=client_session,
@@ -167,7 +172,7 @@ class ADESClient(ADESClientBase):
         *,
         raw_output: bool = False,
     ) -> tuple[ErrorResponse | None, JobList | dict[str, Any] | None]:
-        client_session, retry_client = self._get_retry_client()
+        client_session, retry_client = self._get_retry_client(max_timeout=120)
         try:
             async with retry_client.get(
                 url=self.jobs_endpoint_url,

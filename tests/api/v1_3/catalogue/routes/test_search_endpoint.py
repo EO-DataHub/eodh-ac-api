@@ -1,16 +1,19 @@
 from __future__ import annotations
 
+import json
 from typing import TYPE_CHECKING, Any
 
 from starlette import status
 
 from src.api.v1_3.catalogue.routes import SUPPORTED_DATASETS
+from tests.api.v1_3.catalogue.conftest import DATA_DIR
 
 if TYPE_CHECKING:
     from httpx import Response
     from starlette.testclient import TestClient
 
-_SEARCH_ENDPOINT_PATH = "/api/v1.3/catalogue/stac/search"
+SEARCH_ENDPOINT_PATH = "/api/v1.3/catalogue/stac/search"
+STAC_SEARCH_PAYLOAD = json.loads((DATA_DIR / "stac-search" / "search.json").read_text())
 
 
 def _send_search_request(
@@ -19,7 +22,7 @@ def _send_search_request(
     stac_query: dict[str, Any] | None = None,
 ) -> Response:
     return client.post(
-        url=_SEARCH_ENDPOINT_PATH,
+        url=SEARCH_ENDPOINT_PATH,
         headers={
             "Content-Type": "application/json",
             "Accept": "application/json",
@@ -43,9 +46,7 @@ def test_should_return_404_when_collection_is_not_found(
     auth_token_module_scoped: str,
 ) -> None:
     # Act
-    response = _send_search_request(
-        client, token=auth_token_module_scoped, stac_query={"collections": ["dummy-collection"]}
-    )
+    response = _send_search_request(client, token=auth_token_module_scoped, stac_query={"dummy-collection": {}})
 
     # Assert
     assert response.status_code == status.HTTP_404_NOT_FOUND
@@ -55,15 +56,34 @@ def test_should_return_404_when_collection_is_not_found(
     }
 
 
-def test_should_return_limited_results(
-    client: TestClient,
-    auth_token_module_scoped: str,
-) -> None:
-    pass
-
-
 def test_should_merge_results_from_multiple_datasets(
     client: TestClient,
     auth_token_module_scoped: str,
 ) -> None:
-    pass
+    # Act
+    response = client.post(
+        SEARCH_ENDPOINT_PATH,
+        json=STAC_SEARCH_PAYLOAD,
+        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
+    )
+
+    # Assert
+    assert response.status_code == status.HTTP_200_OK, "Expected HTTP 200 OK"
+    json_resp = response.json()
+    assert json_resp["type"] == "FeatureCollection", "Response must be a FeatureCollection"
+    assert "features" in json_resp, "FeatureCollection must contain 'features'"
+
+    features: list[dict[str, Any]] = json_resp["features"]
+    assert len(features) > 0, "Expected at least one feature in response"
+
+    # Validate sorting - datetime should be descending
+    # We'll skip any feature that doesn't have 'properties.datetime'
+    # to avoid raising KeyError. The endpoint already handles that gracefully.
+    datetimes = [f["properties"]["datetime"] for f in features if "datetime" in f["properties"]]
+    # Check if the list is sorted descending
+    # A quick approach is to compare it with its sorted copy.
+    sorted_desc = sorted(datetimes, reverse=True)
+    assert datetimes == sorted_desc, "Features must be sorted by datetime descending"
+
+    returned_collections = {feat["collection"] for feat in features}
+    assert returned_collections == {"sentinel-1-grd", "sentinel-2-l1c", "sentinel-2-l2a", "sentinel2_ard"}
