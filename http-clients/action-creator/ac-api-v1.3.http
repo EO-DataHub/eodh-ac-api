@@ -792,7 +792,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 %}
 
 ### List WF Submissions Pagination
-GET {{api_url}}/{{api_version}}/action-creator/workflow-submissions?page=1&order_by=submitted_at&order_direction=desc&per_page=5&status=running
+GET {{api_url}}/{{api_version}}/action-creator/workflow-submissions?page=1&order_by=submitted_at&order_direction=desc&per_page=5&status=successful
 Accept: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 

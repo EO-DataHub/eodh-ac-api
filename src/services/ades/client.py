@@ -170,12 +170,14 @@ class ADESClient(ADESClientBase):
     async def list_job_submissions(
         self,
         *,
+        limit: int = 100,
+        skip: int = 0,
         raw_output: bool = False,
     ) -> tuple[ErrorResponse | None, JobList | dict[str, Any] | None]:
         client_session, retry_client = self._get_retry_client(max_timeout=120)
         try:
             async with retry_client.get(
-                url=self.jobs_endpoint_url,
+                url=f"{self.jobs_endpoint_url}?limit={limit}&skip={skip}",
                 headers=self.headers,
                 raise_for_status=True,
             ) as response:
