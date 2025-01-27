@@ -110,7 +110,7 @@ Prefer: respond-async
 }
 
 ### List Jobs
-GET {{ades_url}}/{{username}}/ogc-api/jobs
+GET {{ades_url}}/{{username}}/ogc-api/jobs?limit=100&skip=0
 Accept: application/json
 Authorization: Bearer {{token}}
 

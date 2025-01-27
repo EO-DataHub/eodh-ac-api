@@ -1080,6 +1080,8 @@ class FakeADESClient(ADESClientBase):
     async def list_job_submissions(
         self,
         *,
+        limit: int = 100,
+        skip: int = 0,
         raw_output: bool = False,
     ) -> tuple[ErrorResponse | None, JobList | dict[str, Any] | None]:
         return None, GET_JOB_LIST_RESPONSE if raw_output else JobList(**GET_JOB_LIST_RESPONSE)

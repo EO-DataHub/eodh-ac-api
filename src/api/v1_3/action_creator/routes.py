@@ -229,7 +229,8 @@ async def get_job_history(
 
     # Get the jobs
     ades_jobs: dict[str, Any]
-    err, ades_jobs = await ades.list_job_submissions(raw_output=True)  # type: ignore[assignment]
+    # FIXME: hardcoding limit and skip since ADES does not sort results... Pass user defined values once possible.
+    err, ades_jobs = await ades.list_job_submissions(limit=10000, skip=0, raw_output=True)  # type: ignore[assignment]
 
     if err is not None:
         raise HTTPException(status_code=err.code, detail=err.detail)
