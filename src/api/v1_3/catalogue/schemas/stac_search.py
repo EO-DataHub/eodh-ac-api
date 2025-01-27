@@ -322,3 +322,8 @@ class StacSearch(BaseModel):
         if self.intersects:
             return self.intersects
         return None
+
+
+class ExtendedStacSearch(StacSearch):
+    ids: list[str] | None = None
+    collections: list[str] | None = None

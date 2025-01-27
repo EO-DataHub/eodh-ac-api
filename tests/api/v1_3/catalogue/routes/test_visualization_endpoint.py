@@ -47,7 +47,7 @@ def test_should_return_401_when_invalid_user_credentials(client: TestClient) -> 
     assert response.json() == {"detail": "Invalid authentication credentials"}
 
 
-@patch("src.api.v1_3.visualization.routes.Client")
+@patch("src.api.v1_3.catalogue.routes.Client")
 @pytest.mark.parametrize("stac_catalog", STAC_CATALOGS)
 def test_should_return_200_no_params(
     client_mock: MagicMock,
@@ -91,7 +91,7 @@ def test_should_return_404_when_catalog_path_does_not_exist(
     }
 
 
-@patch("src.api.v1_3.visualization.routes.Client")
+@patch("src.api.v1_3.catalogue.routes.Client")
 def test_returns_no_data_when_no_assets_to_visualize(
     client_mock: MagicMock,
     client: TestClient,
@@ -109,7 +109,7 @@ def test_returns_no_data_when_no_assets_to_visualize(
     assert result.assets == {}
 
 
-@patch("src.api.v1_3.visualization.routes.Client")
+@patch("src.api.v1_3.catalogue.routes.Client")
 @pytest.mark.parametrize("stac_catalog", STAC_CATALOGS)
 def test_returns_404_when_asset_does_not_exist(
     client_mock: MagicMock,
@@ -127,7 +127,7 @@ def test_returns_404_when_asset_does_not_exist(
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-@patch("src.api.v1_3.visualization.routes.Client")
+@patch("src.api.v1_3.catalogue.routes.Client")
 @pytest.mark.parametrize("stac_catalog", STAC_CATALOGS)
 def test_skips_non_data_assets(
     client_mock: MagicMock,
@@ -148,7 +148,7 @@ def test_skips_non_data_assets(
     assert set(result.assets.keys()).difference(expected_assets) == set()
 
 
-@patch("src.api.v1_3.visualization.routes.Client")
+@patch("src.api.v1_3.catalogue.routes.Client")
 @pytest.mark.parametrize("stac_catalog", STAC_CATALOGS)
 def test_should_keep_only_specified_assets(
     client_mock: MagicMock,
@@ -169,7 +169,7 @@ def test_should_keep_only_specified_assets(
     assert set(result.assets.keys()).difference(assets_to_keep) == set()
 
 
-@patch("src.api.v1_3.visualization.routes.Client")
+@patch("src.api.v1_3.catalogue.routes.Client")
 @pytest.mark.parametrize("stac_catalog", ["v1-rc-ndvi", "v1-wq", "v2-wq", "v2-adv-wq", "v2-ndvi"])
 def test_spectral_indices_have_unique_colors(
     client_mock: MagicMock,

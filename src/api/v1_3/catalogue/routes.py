@@ -15,6 +15,7 @@ from starlette import status
 from src.api.v1_0.auth.routes import validate_access_token
 from src.api.v1_3.catalogue.schemas.stac_search import (
     EXAMPLE_SEARCH_MODEL,
+    ExtendedStacSearch,
     FieldsExtension,
     StacSearch,
 )
@@ -147,7 +148,7 @@ async def get_visualization_data_for_job_results(  # noqa: C901, PLR0912
         ) from APIError
 
     # Sanitize params
-    search_params = visualization_request.stac_query or StacSearch()
+    search_params = visualization_request.stac_query or ExtendedStacSearch()
     if search_params.fields is None:
         search_params.fields = FieldsExtension(include=set())
 
@@ -167,7 +168,6 @@ async def get_visualization_data_for_job_results(  # noqa: C901, PLR0912
         limit=search_params.limit,
         ids=search_params.ids,
         collections=search_params.collections,
-        bbox=search_params.bbox,
         intersects=search_params.intersects,
         datetime=search_params.datetime,
         query=search_params.query,
