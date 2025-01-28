@@ -60,6 +60,9 @@ def test_should_merge_results_from_multiple_datasets(
     client: TestClient,
     auth_token_module_scoped: str,
 ) -> None:
+    # Arrange
+    expected_collections = {"sentinel-1-grd", "sentinel-2-l1c", "sentinel-2-l2a", "sentinel2_ard"}
+
     # Act
     response = client.post(
         SEARCH_ENDPOINT_PATH,
@@ -86,4 +89,42 @@ def test_should_merge_results_from_multiple_datasets(
     assert datetimes == sorted_desc, "Features must be sorted by datetime descending"
 
     returned_collections = {feat["collection"] for feat in features}
-    assert returned_collections == {"sentinel-1-grd", "sentinel-2-l1c", "sentinel-2-l2a", "sentinel2_ard"}
+    assert returned_collections == expected_collections
+    assert all(token is not None for coll, token in json_resp["continuation_tokens"].items())
+
+
+def test_should_paginate_until_no_more_results(
+    client: TestClient,
+    auth_token_module_scoped: str,
+) -> None:
+    max_pages = 1000  # Define max_pages so that we can break the loop just in case
+    payload = {"sentinel-1-grd": STAC_SEARCH_PAYLOAD["sentinel-1-grd"]}
+    payload["sentinel-1-grd"]["limit"] = 20
+
+    response = client.post(
+        SEARCH_ENDPOINT_PATH,
+        json=payload,
+        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
+    )
+
+    # Assert
+    assert response.status_code == status.HTTP_200_OK, "Expected HTTP 200 OK"
+
+    page_count = 1
+    while True:
+        payload["sentinel-1-grd"]["token"] = response.json()["continuation_tokens"]["sentinel-1-grd"]
+        response = client.post(
+            SEARCH_ENDPOINT_PATH,
+            json=payload,
+            headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
+        )
+        assert response.status_code == status.HTTP_200_OK, "Expected HTTP 200 OK"
+        assert response.json()["features"]
+
+        if response.json()["continuation_tokens"]["sentinel-1-grd"] is None:
+            break
+
+        page_count += 1
+
+        if page_count > max_pages:
+            break

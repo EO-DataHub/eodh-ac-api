@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import asyncio
 import json
-from typing import Annotated, Any, TypedDict
+from itertools import starmap
+from typing import Annotated, Any, NamedTuple, TypedDict
 
+import aiohttp
 from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
 from pystac import Asset, Item
@@ -263,11 +265,7 @@ async def stac_search(
             f"Supported collections: {', '.join(SUPPORTED_DATASETS)}",
         )
 
-    loop = asyncio.get_running_loop()
-    tasks = [
-        loop.run_in_executor(None, fetch_items, collection, search_params)
-        for collection, search_params in stac_search_query.items()
-    ]
+    tasks = list(starmap(fetch_items, stac_search_query.items()))
 
     # Gather results from all endpoints
     _logger.debug("Gathering items from STAC endpoints...")
@@ -275,20 +273,29 @@ async def stac_search(
 
     # Flatten the item lists
     all_items: list[dict[str, Any]] = []
-    for items in results:
+    for _, items, _ in results:
         all_items.extend(items)
 
     # Sort items by datetime property if present
     # We'll skip items without a valid datetime to avoid errors
     all_items.sort(key=lambda x: x["properties"].get("datetime", ""), reverse=True)
 
-    return {"type": "FeatureCollection", "features": all_items}
+    return {
+        "type": "FeatureCollection",
+        "features": all_items,
+        "continuation_tokens": {collection: token for collection, _, token in results},
+    }
 
 
-def fetch_items(collection: str, search_params: StacSearch) -> list[dict[str, Any]]:
+class FetchItemResult(NamedTuple):
+    collection: str
+    items: list[dict[str, Any]]
+    token: str | None = None
+
+
+async def fetch_items(collection: str, search_params: StacSearch) -> FetchItemResult:
     settings = current_settings()
     lookup = DATASET_LOOKUP[collection]
-    stac_client = Client.open(f"{settings.eodh_stac_api.endpoint}/catalogs/{lookup['catalog_path']}")
 
     if search_params.fields is None:
         search_params.fields = FieldsExtension(include=set())
@@ -309,22 +316,28 @@ def fetch_items(collection: str, search_params: StacSearch) -> list[dict[str, An
     if search_params.sortby is None:
         search_params.sortby = [SortExtension(field="properties.datetime", direction=SortDirections.asc)]
 
-    # Perform STAC search
-    search = stac_client.search(
-        limit=search_params.limit,
-        collections=[lookup["collection_name"]],
-        intersects=search_params.intersects,
-        datetime=search_params.datetime,
-        query=search_params.query,
-        filter=search_params.filter,
-        filter_lang=search_params.filter_lang,
-        sortby=[s.model_dump(mode="json") for s in search_params.sortby],
-        fields=search_params.fields.model_dump(mode="json"),
-    )
-    items = []
-    for i, item in enumerate(search.items_as_dicts()):
-        if i >= search_params.limit:
-            break
-        items.append(item)
+    search_url = f"{settings.eodh_stac_api.endpoint}/catalogs/{lookup['catalog_path']}/search"
 
-    return items
+    search_model = search_params.model_dump(mode="json", exclude_unset=True, exclude_none=True)
+    search_model["collections"] = [lookup["collection_name"]]
+
+    async with aiohttp.ClientSession() as session, session.post(
+        search_url,
+        json=search_model,
+        timeout=aiohttp.ClientTimeout(total=30),
+    ) as response:
+        if response.status != status.HTTP_200_OK:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error when calling EODH STAC API. "
+                f"Status Code: {response.status}: Message: {await response.text()}",
+            )
+        result = await response.json()
+
+    next_page_link = [link for link in result["links"] if link["rel"] == "next"]
+    continuation_token: str | None = None
+
+    if next_page_link:
+        continuation_token = next_page_link[0]["body"]["token"]
+
+    return FetchItemResult(collection=collection, items=result["features"], token=continuation_token)

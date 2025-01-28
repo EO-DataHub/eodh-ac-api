@@ -234,6 +234,7 @@ class FieldsExtension(BaseModel):
 
 
 class StacSearch(BaseModel):
+    token: str | None = None
     limit: Limit = Field(
         100,
         description="Limits the number of results that are included in each page of the response (capped to 10_000).",
