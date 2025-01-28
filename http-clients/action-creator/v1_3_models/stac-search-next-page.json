@@ -1,5 +1,6 @@
 {
   "sentinel-1-grd": {
+    "token": "MTcxMDgzMDU3OTQ2NQ==",
     "limit": 2,
     "sortby": [
       {
@@ -14,15 +15,6 @@
         {
           "op": "and",
           "args": [
-            {
-              "op": "=",
-              "args": [
-                {
-                  "property": "collection"
-                },
-                "sentinel-1-grd"
-              ]
-            },
             {
               "op": "or",
               "args": [
@@ -184,6 +176,7 @@
     }
   },
   "sentinel-2-l1c": {
+    "token": "MTcxMDgyNzUwMDM3Ng==",
     "limit": 2,
     "sortby": [
       {
@@ -253,6 +246,7 @@
     }
   },
   "sentinel-2-l2a": {
+    "token": "MTcxMDgyNzUwMDM3Ng==",
     "limit": 2,
     "sortby": [
       {
@@ -322,6 +316,7 @@
     }
   },
   "sentinel-2-l2a-ard": {
+    "token": "MTcwMDIxOTYxMTAwMA==",
     "limit": 2,
     "sortby": [
       {

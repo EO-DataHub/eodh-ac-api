@@ -924,3 +924,11 @@ Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 
 < v1_3_models/stac-search.json
+
+### Search with next page tokens
+POST {{api_url}}/{{api_version}}/catalogue/stac/search
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_3_models/stac-search-next-page.json
