@@ -73,10 +73,10 @@ def test_should_merge_results_from_multiple_datasets(
     # Assert
     assert response.status_code == status.HTTP_200_OK, "Expected HTTP 200 OK"
     json_resp = response.json()
-    assert json_resp["type"] == "FeatureCollection", "Response must be a FeatureCollection"
-    assert "features" in json_resp, "FeatureCollection must contain 'features'"
+    assert json_resp["items"]["type"] == "FeatureCollection", "Response must be a FeatureCollection"
+    assert "features" in json_resp["items"], "FeatureCollection must contain 'features'"
 
-    features: list[dict[str, Any]] = json_resp["features"]
+    features: list[dict[str, Any]] = json_resp["items"]["features"]
     assert len(features) > 0, "Expected at least one feature in response"
 
     # Validate sorting - datetime should be descending
@@ -119,7 +119,7 @@ def test_should_paginate_until_no_more_results(
             headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
         )
         assert response.status_code == status.HTTP_200_OK, "Expected HTTP 200 OK"
-        assert response.json()["features"]
+        assert response.json()["items"]["features"]
 
         if response.json()["continuation_tokens"]["sentinel-1-grd"] is None:
             break

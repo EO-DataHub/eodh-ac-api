@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 from itertools import starmap
-from typing import Annotated, Any, NamedTuple, TypedDict
+from typing import Annotated, Any, TypedDict
 
 import aiohttp
 from fastapi import APIRouter, Body, Depends, HTTPException
@@ -17,9 +17,12 @@ from starlette import status
 from src.api.v1_0.auth.routes import validate_access_token
 from src.api.v1_3.catalogue.schemas.stac_search import (
     EXAMPLE_SEARCH_MODEL,
+    EXAMPLE_SEARCH_NEXT_PAGE,
     ExtendedStacSearch,
+    FetchItemResult,
     FieldsExtension,
     StacSearch,
+    StacSearchResponse,
 )
 from src.api.v1_3.catalogue.schemas.visualization import JobAssetsChartVisualizationResponse, VisualizationRequest
 from src.core.settings import current_settings
@@ -219,7 +222,7 @@ async def get_visualization_data_for_job_results(  # noqa: C901, PLR0912
     return {"job_id": job_id, "assets": assets_dict}
 
 
-@catalogue_router_v1_3.post("/stac/search")
+@catalogue_router_v1_3.post("/stac/search", response_model=StacSearchResponse)
 async def stac_search(
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
     stac_search_query: Annotated[
@@ -254,6 +257,11 @@ async def stac_search(
                     "description": "Multi-dataset search.",
                     "value": EXAMPLE_SEARCH_MODEL,
                 },
+                "next-page-query": {
+                    "summary": "Query S2 ARD - next page",
+                    "description": "S2 ARD next page search.",
+                    "value": EXAMPLE_SEARCH_NEXT_PAGE,
+                },
             },
         ),
     ],
@@ -266,12 +274,8 @@ async def stac_search(
         )
 
     tasks = list(starmap(fetch_items, stac_search_query.items()))
-
-    # Gather results from all endpoints
-    _logger.debug("Gathering items from STAC endpoints...")
     results = await asyncio.gather(*tasks)
 
-    # Flatten the item lists
     all_items: list[dict[str, Any]] = []
     for _, items, _ in results:
         all_items.extend(items)
@@ -281,16 +285,12 @@ async def stac_search(
     all_items.sort(key=lambda x: x["properties"].get("datetime", ""), reverse=True)
 
     return {
-        "type": "FeatureCollection",
-        "features": all_items,
+        "items": {
+            "type": "FeatureCollection",
+            "features": all_items,
+        },
         "continuation_tokens": {collection: token for collection, _, token in results},
     }
-
-
-class FetchItemResult(NamedTuple):
-    collection: str
-    items: list[dict[str, Any]]
-    token: str | None = None
 
 
 async def fetch_items(collection: str, search_params: StacSearch) -> FetchItemResult:
@@ -298,7 +298,7 @@ async def fetch_items(collection: str, search_params: StacSearch) -> FetchItemRe
     lookup = DATASET_LOOKUP[collection]
 
     if search_params.fields is None:
-        search_params.fields = FieldsExtension(include=set())
+        search_params.fields = FieldsExtension(include=set(), exclude=set())
 
     if search_params.fields.include is None:
         search_params.fields.include = set()
