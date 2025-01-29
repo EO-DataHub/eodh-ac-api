@@ -557,4 +557,9 @@ WORKFLOW_REGISTRY = {
         "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/scatter-water-quality-app.cwl",
     },
 }
-WORKFLOW_ID_OVERRIDE_LOOKUP = {"lulc-change": "land-cover-change", "land-cover-change": "land-cover-change"}
+WORKFLOW_ID_OVERRIDE_LOOKUP = {
+    "lulc-change": "land-cover-change",
+    "land-cover-change": "land-cover-change",
+    "scatter-lulc-change": "scatter-land-cover-change",
+    "scatter-land-cover-change": "scatter-land-cover-change",
+}
