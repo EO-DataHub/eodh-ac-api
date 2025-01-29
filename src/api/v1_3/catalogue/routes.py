@@ -6,6 +6,8 @@ from itertools import starmap
 from typing import Annotated, Any, TypedDict
 
 import aiohttp
+import numpy as np
+import pandas as pd
 from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
 from pystac import Asset, Item
@@ -213,13 +215,75 @@ async def get_visualization_data_for_job_results(  # noqa: C901, PLR0912
                 _handle_stacked_bar_chart(asset=asset, asset_key=asset_key, assets_dict=assets_dict, item=item)
                 continue
 
-    # Classes dict to list
+    # Post process stacked-bar-chart data
     for asset_key, asset_val in assets_dict.items():
-        if asset_val["chart_type"] != "classification-stacked-bar-chart":
+        if asset_val["chart_type"] == "classification-stacked-bar-chart":
+            assets_dict[asset_key] = post_process_stacked_bar_chart_data(asset_val)
+        elif asset_val["chart_type"] == "range-area-with-line":
+            assets_dict[asset_key] = post_process_range_area_data(asset_val)
+        else:
             continue
-        assets_dict[asset_key]["data"] = list(asset_val["data"].values())
 
     return {"job_id": job_id, "assets": assets_dict}
+
+
+def post_process_stacked_bar_chart_data(asset_data: dict[str, Any]) -> dict[str, Any]:
+    x_labels = asset_data["x_labels"]
+    records = []
+    chart_data: dict[str, Any] = {}
+
+    for cls in asset_data["data"].values():
+        chart_data[cls["name"]] = {}
+        for datetime, area in zip(x_labels, cls["area"]):
+            records.append({
+                "name": cls["name"],
+                "area": area,
+                "color-hint": cls["color-hint"],
+                "datetime": datetime,
+            })
+
+    records_df = pd.DataFrame(records)
+    results = records_df.groupby(["datetime", "name", "color-hint"]).sum().reset_index()
+    sum_per_dt = records_df[["datetime", "area"]].groupby("datetime").sum()
+    x_labels = []
+
+    for _, row in results.iterrows():
+        cls_name = row["name"]
+
+        if row["datetime"] not in x_labels:
+            x_labels.append(row["datetime"])
+
+        if "area" not in chart_data[cls_name]:
+            chart_data[cls_name]["name"] = cls_name
+            chart_data[cls_name]["color-hint"] = row["color-hint"]
+            chart_data[cls_name]["area"] = [row["area"]]
+            chart_data[cls_name]["percentage"] = [row["area"] / sum_per_dt.loc[row["datetime"]]["area"].item() * 100]
+            continue
+
+        chart_data[cls_name]["area"].append(row["area"])
+        chart_data[cls_name]["percentage"].append(row["area"] / sum_per_dt.loc[row["datetime"]]["area"].item() * 100)
+
+    asset_data["data"] = list(chart_data.values())
+    asset_data["x_labels"] = x_labels
+
+    return asset_data
+
+
+def post_process_range_area_data(asset_data: dict[str, Any]) -> dict[str, Any]:
+    asset_frame = pd.DataFrame(asset_data["data"])
+    results = []
+    for dt, frame in asset_frame.groupby("x_label"):
+        min_ = np.nanmin(frame["min"].fillna(np.nan)).item()
+        max_ = np.nanmax(frame["max"].fillna(np.nan)).item()
+        median = np.nanmean(frame["median"].fillna(np.nan)).item()
+        results.append({
+            "x_label": dt,
+            "min": min_ if not np.isnan(min_) else None,
+            "max": max_ if not np.isnan(max_) else None,
+            "median": median if not np.isnan(median) else None,
+        })
+    asset_data["data"] = results
+    return asset_data
 
 
 @catalogue_router_v1_3.post("/stac/search", response_model=StacSearchResponse)
