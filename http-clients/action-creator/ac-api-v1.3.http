@@ -856,7 +856,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     }
 }
 
-### Get data for WQ Chart - all assets
+### Get data for WQ Chart - all assets - no scatter
 POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_01e116ec-bdf2-11ef-a2af-8ef03814f15e/charts
 Accept: application/json
 Content-Type: application/json
@@ -886,8 +886,69 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     }
 }
 
-### Get data for LC Chart
+### Get data for WQ Chart - all assets - scatter
+POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_244fb332-de68-11ef-94fd-12e2ea552ab2/charts
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+{
+    "stac_query": {
+        "limit": 50,
+        "sortby": [
+            {
+                "field": "properties.datetime",
+                "direction": "asc"
+            }
+        ],
+        "filter_lang": "cql-json",
+        "filter": {
+            "op": "between",
+            "args": [
+                {
+                    "property": "properties.datetime"
+                },
+                "1992-07-01T00:00:00.000Z",
+                "2025-07-02T23:59:59.999Z"
+            ]
+        },
+        "fields": {}
+    }
+}
+
+### Get data for LC Chart - no scatter
 POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_81cac12c-bd17-11ef-94d6-8ef03814f15e/charts
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+{
+    "assets": ["data"],
+    "stac_query": {
+        "limit": 50,
+        "sortby": [
+            {
+                "field": "properties.datetime",
+                "direction": "asc"
+            }
+        ],
+        "filter_lang": "cql-json",
+        "filter": {
+            "op": "between",
+            "args": [
+                {
+                    "property": "properties.datetime"
+                },
+                "1992-07-01T00:00:00.000Z",
+                "2025-07-02T23:59:59.999Z"
+            ]
+        },
+        "fields": {}
+    }
+}
+
+### Get data for LC Chart - scatter
+POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_e454dbce-de4c-11ef-a182-12e2ea552ab2/charts
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}

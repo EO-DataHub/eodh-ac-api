@@ -83,13 +83,13 @@ Authorization: Bearer {{token}}
 
 
 ### Search results catalog
-POST {{eodh_stac_api_url}}/catalogs/user-datasets/{{workspace}}/processing-results/cat_01e116ec-bdf2-11ef-a2af-8ef03814f15e/search
+POST {{eodh_stac_api_url}}/catalogs/user-datasets/{{workspace}}/processing-results/cat_e454dbce-de4c-11ef-a182-12e2ea552ab2/search
 Accept: application/json
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-    "limit": 50,
+    "limit": 10000,
     "sortby": [
         {
             "field": "properties.datetime",
@@ -97,7 +97,12 @@ Content-Type: application/json
         }
     ],
     "filter-lang": "cql-json",
-    "fields": {}
+    "fields": {
+        "include": [
+            "properties.lulc_classes_percentage",
+            "properties.lulc_classes_m2"
+        ]
+    }
 }
 
 
