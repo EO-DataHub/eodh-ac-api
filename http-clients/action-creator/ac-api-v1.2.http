@@ -200,6 +200,22 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     });
 %}
 
+### Run Scatter Land Cover Change - Corine
+POST {{api_url}}/{{api_version}}/action-creator/submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/scatter-lcc-corine.json
+
+### Run Scatter Land Cover Change - Global LC
+POST {{api_url}}/{{api_version}}/action-creator/submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+< v1_2_models/scatter-lcc-global.json
+
 ### Get Job Status
 GET {{api_url}}/{{api_version}}/action-creator/submissions/a78b7580-d8b7-11ef-ac87-7acca6d0ccd7
 Accept: application/json
