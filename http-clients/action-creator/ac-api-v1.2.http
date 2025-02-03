@@ -391,3 +391,47 @@ Authorization: Bearer {{$auth.token("auth-id")}}
         "fields": {}
     }
 }
+
+### Get data for LC Chart - 1990 missing data
+POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_8de9589e-e222-11ef-84a9-86a1f8f9b25e/charts
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+{
+  "stac_query": {
+    "limit": 50,
+    "sortby": [
+      {
+        "field": "properties.datetime",
+        "direction": "desc"
+      }
+    ],
+    "filter-lang": "cql-json",
+    "filter": {
+      "op": "and",
+      "args": [
+        {
+          "op": "=",
+          "args": [
+            {
+              "property": "collection"
+            },
+            "col_8de9589e-e222-11ef-84a9-86a1f8f9b25e"
+          ]
+        },
+        {
+          "op": "between",
+          "args": [
+            {
+              "property": "properties.datetime"
+            },
+            "1990-01-01T00:00:00.000Z",
+            "2018-01-01T23:59:59.999Z"
+          ]
+        }
+      ]
+    },
+    "fields": {}
+  }
+}
