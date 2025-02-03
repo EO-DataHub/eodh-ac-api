@@ -257,11 +257,19 @@ def post_process_stacked_bar_chart_data(asset_data: dict[str, Any]) -> dict[str,
             chart_data[cls_name]["name"] = cls_name
             chart_data[cls_name]["color-hint"] = row["color-hint"]
             chart_data[cls_name]["area"] = [row["area"]]
-            chart_data[cls_name]["percentage"] = [row["area"] / sum_per_dt.loc[row["datetime"]]["area"].item() * 100]
+            chart_data[cls_name]["percentage"] = [
+                row["area"] / sum_per_dt.loc[row["datetime"]]["area"].item() * 100
+                if sum_per_dt.loc[row["datetime"]]["area"].item() != 0
+                else 0
+            ]
             continue
 
         chart_data[cls_name]["area"].append(row["area"])
-        chart_data[cls_name]["percentage"].append(row["area"] / sum_per_dt.loc[row["datetime"]]["area"].item() * 100)
+        chart_data[cls_name]["percentage"].append(
+            row["area"] / sum_per_dt.loc[row["datetime"]]["area"].item() * 100
+            if sum_per_dt.loc[row["datetime"]]["area"].item() != 0
+            else 0
+        )
 
     asset_data["data"] = list(chart_data.values())
     asset_data["x_labels"] = x_labels
