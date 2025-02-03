@@ -7,9 +7,12 @@ from pathlib import Path
 from typing import Any, ClassVar
 
 import yaml
+from shapely.geometry.geo import shape
 
 from src.api.v1_3.action_creator.schemas.workflow_tasks import SPECTRAL_INDEX_TASK_IDS
 from src.services.ades.client import replace_placeholders_in_text
+from src.services.validation_utils import MAX_AREA_SQ_KM
+from src.utils.geo import calculate_geodesic_area, chip_aoi
 from src.utils.names import generate_random_name
 
 _BASE_APP_CWL_FP = Path(__file__).resolve().parent / "app.cwl"
@@ -51,6 +54,7 @@ class WorkflowCreator:
         "clip": "clip.yaml",
         "reproject": "reproject.yaml",
         "stac-join": "stac-join.yaml",
+        "multi-stac-join": "multi-stac-join.yaml",
         "summarize-class-statistics": "summarize-class-statistics.yaml",
         "thumbnail": "thumbnail.yaml",
     }
@@ -188,6 +192,22 @@ class WorkflowCreator:
         }
 
     @classmethod
+    def handle_aoi_scatter_if_necessary(
+        cls, aoi: dict[str, Any], app_spec: dict[str, Any], wf_data: CWLGraphData
+    ) -> tuple[dict[str, Any], CWLGraphData]:
+        if calculate_geodesic_area(shape(aoi)) / 1e6 < MAX_AREA_SQ_KM:
+            return app_spec, wf_data
+
+        # Calculate area chips
+        areas = chip_aoi(shape(aoi))
+        wf_spec = app_spec["$graph"][0]
+        inputs = deepcopy(wf_spec["inputs"])
+
+        # substitute area with areas user inputs
+
+        return app_spec, wf_data
+
+    @classmethod
     def cwl_from_wf_spec(cls, wf_spec: dict[str, Any]) -> WorkflowCreatorResult:
         """Creates CWL Workflow from a JSON Graph workflow specification.
 
@@ -201,6 +221,13 @@ class WorkflowCreator:
         app_spec = yaml.safe_load(_BASE_APP_CWL_FP.open(encoding="utf-8"))
         wf_data = cls._wf_cwl_from_json_graph(wf_spec)
         app_spec["$graph"] = wf_data.graph
+
+        app_spec, wf_data = cls.handle_aoi_scatter_if_necessary(
+            aoi=wf_spec["inputs"]["area"],
+            app_spec=app_spec,
+            wf_data=wf_data,
+        )
+
         return WorkflowCreatorResult(
             app_spec=app_spec,
             wf_id=wf_data.wf_id,
