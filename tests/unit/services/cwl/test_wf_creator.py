@@ -86,21 +86,12 @@ def test_should_use_scatter_automatically_when_aoi_too_big(
     tmp_path: Path,
 ) -> None:
     # Arrange
-    wf_spec["aoi"] = UK_AOI
+    wf_spec["inputs"]["area"] = UK_AOI
 
     # Act
     create_result = WorkflowCreator.cwl_from_wf_spec(wf_spec)
 
     # Assert
-    assert isinstance(create_result.user_inputs["areas"], list)
-    assert "aoi" not in create_result.user_inputs
-
-    assert create_result.app_spec["$graph"][0]["id"].startswith("scatter-")
-    assert {"class": "SubworkflowFeatureRequirement"} in create_result.app_spec["$graph"][0]["requirements"]
-    assert {"class": "ScatterFeatureRequirement"} in create_result.app_spec["$graph"][0]["requirements"]
-
-    assert next(iter(create_result.app_spec["$graph"][0]["steps"].values()))["scatter"] == "area"
-
     tmp_cwl_fp = tmp_path / f"{identifier}.cwl"
     tmp_cwl_fp.write_text(yaml.safe_dump(create_result.app_spec, sort_keys=False), encoding="utf-8")
     sp_result = subprocess.run(  # noqa: S603
@@ -110,3 +101,12 @@ def test_should_use_scatter_automatically_when_aoi_too_big(
         check=False,
     )
     assert sp_result.returncode == 0
+
+    assert isinstance(create_result.user_inputs["areas"], list)
+    assert "area" not in create_result.user_inputs
+
+    assert create_result.app_spec["$graph"][0]["id"].startswith("scatter-")
+    assert {"class": "SubworkflowFeatureRequirement"} in create_result.app_spec["$graph"][0]["requirements"]
+    assert {"class": "ScatterFeatureRequirement"} in create_result.app_spec["$graph"][0]["requirements"]
+
+    assert next(iter(create_result.app_spec["$graph"][0]["steps"].values()))["scatter"] == "area"

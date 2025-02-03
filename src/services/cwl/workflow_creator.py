@@ -193,17 +193,74 @@ class WorkflowCreator:
 
     @classmethod
     def handle_aoi_scatter_if_necessary(
-        cls, aoi: dict[str, Any], app_spec: dict[str, Any], wf_data: CWLGraphData
+        cls, area: dict[str, Any], app_spec: dict[str, Any], wf_data: CWLGraphData
     ) -> tuple[dict[str, Any], CWLGraphData]:
-        if calculate_geodesic_area(shape(aoi)) / 1e6 < MAX_AREA_SQ_KM:
+        aoi = shape(area)
+        if calculate_geodesic_area(aoi) / 1e6 < MAX_AREA_SQ_KM:
             return app_spec, wf_data
 
         # Calculate area chips
-        areas = chip_aoi(shape(aoi))
+        areas = chip_aoi(aoi)
+
+        # Substitute area with areas user inputs
+        wf_data.user_inputs.pop("area")
+        wf_data.user_inputs["areas"] = areas
+
+        # Reuse inputs from original WF - replace "area" with "areas"
         wf_spec = app_spec["$graph"][0]
         inputs = deepcopy(wf_spec["inputs"])
+        inputs.pop("area")
+        inputs["areas"] = {
+            "label": "area",
+            "doc": "area",
+            "type": "string[]",
+        }
 
-        # substitute area with areas user inputs
+        # Replace original outputs with outputs from multi-stac-join step
+        outputs = deepcopy(wf_spec["outputs"])
+        outputs.pop("results")
+        outputs["results"] = {
+            "id": "results",
+            "type": "Directory",
+            "outputSource": "multi_stac_join/results",
+        }
+
+        # Create new main WF, Add scatter and sub-workflow requirements, pass inputs to sub-workflow
+        app_spec["$graph"].insert(
+            0,
+            {
+                "class": "Workflow",
+                "id": f"scatter-{wf_spec['id']}",
+                "label": f"Scatter {wf_spec['label']}",
+                "doc": f"Scatter {wf_spec['doc']}",
+                "requirements": [
+                    {"class": "ScatterFeatureRequirement"},
+                    {"class": "SubworkflowFeatureRequirement"},
+                ],
+                "inputs": inputs,
+                "outputs": outputs,
+                "steps": {
+                    "scatter_wf": {
+                        "run": f"#{wf_spec['id']}",
+                        "scatter": "area",
+                        "in": {k: k if k != "area" else "areas" for k in wf_spec["inputs"]},
+                        "out": ["results"],
+                    },
+                    "multi_stac_join": {
+                        "run": "#multi-stac-join",
+                        "in": {
+                            "stac_catalog_dir": {
+                                "source": "scatter_wf/results",
+                            }
+                        },
+                        "out": ["results"],
+                    },
+                },
+            },
+        )
+
+        # Append multi-stac-join step at the end
+        app_spec["$graph"].append(cls._resolve_task_spec("multi-stac-join"))
 
         return app_spec, wf_data
 
@@ -223,7 +280,7 @@ class WorkflowCreator:
         app_spec["$graph"] = wf_data.graph
 
         app_spec, wf_data = cls.handle_aoi_scatter_if_necessary(
-            aoi=wf_spec["inputs"]["area"],
+            area=shape(wf_spec["inputs"]["area"]),
             app_spec=app_spec,
             wf_data=wf_data,
         )
