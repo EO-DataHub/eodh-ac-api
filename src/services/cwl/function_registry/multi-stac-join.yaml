@@ -1,0 +1,32 @@
+class: CommandLineTool
+id: multi-stac-join
+
+requirements:
+  ResourceRequirement:
+    coresMin: 2
+    coresMax: 4
+    ramMin: 2048
+    ramMax: 8192
+  NetworkAccess:
+    networkAccess: True
+
+hints:
+  DockerRequirement:
+    dockerPull: ghcr.io/eo-datahub/eodh-workflows:latest
+
+baseCommand: [ "eopro", "stac", "join_v2" ]
+
+inputs:
+  stac_catalog_dir:
+    type:
+      type: array
+      items: Directory
+      inputBinding:
+        position: 1
+        prefix: --stac_catalog_dir
+
+outputs:
+  results:
+    type: Directory
+    outputBinding:
+      glob: ./stac-join/
