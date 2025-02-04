@@ -139,7 +139,16 @@ async def validate_workflow_specification(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=json.loads(exc.json(include_url=False)),
         ) from exc
-    return WorkflowValidationResult(valid=True)
+    wf_creation_result = WorkflowCreator.cwl_from_wf_spec(workflow_spec)
+    return WorkflowValidationResult(
+        valid=True,
+        apply_scatter_to_area=(
+            "areas" in wf_creation_result.user_inputs and isinstance(wf_creation_result.user_inputs["areas"], list)
+        ),
+        generated_cwl_schema=wf_creation_result.app_spec,
+        final_user_inputs=wf_creation_result.user_inputs,
+        wf_id=wf_creation_result.wf_id,
+    )
 
 
 @action_creator_router_v1_3.post(

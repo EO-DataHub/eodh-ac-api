@@ -91,7 +91,7 @@ def test_should_use_scatter_automatically_when_aoi_too_big(
     # Act
     create_result = WorkflowCreator.cwl_from_wf_spec(wf_spec)
 
-    # Assert
+    # Assert valid CWL
     tmp_cwl_fp = tmp_path / f"{identifier}.cwl"
     tmp_cwl_fp.write_text(yaml.safe_dump(create_result.app_spec, sort_keys=False), encoding="utf-8")
     sp_result = subprocess.run(  # noqa: S603
@@ -102,11 +102,19 @@ def test_should_use_scatter_automatically_when_aoi_too_big(
     )
     assert sp_result.returncode == 0
 
+    # Assert area was chipped into smaller tiles
     assert isinstance(create_result.user_inputs["areas"], list)
     assert "area" not in create_result.user_inputs
 
-    assert create_result.app_spec["$graph"][0]["id"].startswith("scatter-")
+    # Assert we have overridden ID and uses sub-workflow and scatter requirements
+    assert create_result.app_spec["$graph"][0]["id"].startswith("scttr-")
     assert {"class": "SubworkflowFeatureRequirement"} in create_result.app_spec["$graph"][0]["requirements"]
     assert {"class": "ScatterFeatureRequirement"} in create_result.app_spec["$graph"][0]["requirements"]
 
+    # Assert we are scattering the area
     assert next(iter(create_result.app_spec["$graph"][0]["steps"].values()))["scatter"] == "area"
+
+    # Assert all WF components have unique IDs
+    assert len(create_result.app_spec["$graph"]) == len({
+        component["id"] for component in create_result.app_spec["$graph"]
+    })
