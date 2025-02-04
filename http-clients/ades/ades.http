@@ -56,7 +56,7 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Get Process Details
-GET {{ades_url}}/{{username}}/ogc-api/processes/{{register_process_response.id}}
+GET {{ades_url}}/{{username}}/ogc-api/processes/scttr-lcc-corine
 Accept: application/json
 Authorization: Bearer {{token}}
 
@@ -115,7 +115,7 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Get Job Status
-GET {{ades_url}}/{{username}}/ogc-api/jobs/244fb332-de68-11ef-94fd-12e2ea552ab2
+GET {{ades_url}}/{{username}}/ogc-api/jobs/63b13036-e2d8-11ef-bc86-86a1f8f9b25e
 Accept: application/json
 Authorization: Bearer {{token}}
 
