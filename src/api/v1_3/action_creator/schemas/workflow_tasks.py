@@ -1143,6 +1143,10 @@ class StacJoinTask(WorkflowTask):
 
 class WorkflowValidationResult(BaseModel):
     valid: bool
+    apply_scatter_to_area: bool
+    generated_cwl_schema: dict[str, Any]
+    final_user_inputs: dict[str, Any]
+    wf_id: str
 
 
 SPECTRAL_INDEX_TASKS = [

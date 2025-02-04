@@ -4,16 +4,19 @@ import json
 from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
 
 import yaml
 from shapely.geometry.geo import shape
 
 from src.api.v1_3.action_creator.schemas.workflow_tasks import SPECTRAL_INDEX_TASK_IDS
 from src.services.ades.client import replace_placeholders_in_text
-from src.services.validation_utils import MAX_AREA_SQ_KM
+from src.services.validation_utils import CHIPPING_THRESHOLD_SQ_KM
 from src.utils.geo import calculate_geodesic_area, chip_aoi
 from src.utils.names import generate_random_name
+
+if TYPE_CHECKING:
+    from shapely.geometry.polygon import Polygon
 
 _BASE_APP_CWL_FP = Path(__file__).resolve().parent / "app.cwl"
 _FUNCTION_REGISTRY_DIR = Path(__file__).parent / "function_registry"
@@ -193,10 +196,14 @@ class WorkflowCreator:
 
     @classmethod
     def handle_aoi_scatter_if_necessary(
-        cls, area: dict[str, Any], app_spec: dict[str, Any], wf_data: CWLGraphData
+        cls,
+        area: dict[str, Any],
+        app_spec: dict[str, Any],
+        wf_data: CWLGraphData,
+        main_wf_prefix: str = "scttr",
     ) -> tuple[dict[str, Any], CWLGraphData]:
-        aoi = shape(area)
-        if calculate_geodesic_area(aoi) / 1e6 < MAX_AREA_SQ_KM:
+        aoi: Polygon = shape(area)  # type: ignore[assignment]
+        if calculate_geodesic_area(aoi) / 1e6 <= CHIPPING_THRESHOLD_SQ_KM:
             return app_spec, wf_data
 
         # Calculate area chips
@@ -204,7 +211,7 @@ class WorkflowCreator:
 
         # Substitute area with areas user inputs
         wf_data.user_inputs.pop("area")
-        wf_data.user_inputs["areas"] = areas
+        wf_data.user_inputs["areas"] = [json.dumps(a) for a in areas]
 
         # Reuse inputs from original WF - replace "area" with "areas"
         wf_spec = app_spec["$graph"][0]
@@ -230,9 +237,9 @@ class WorkflowCreator:
             0,
             {
                 "class": "Workflow",
-                "id": f"scatter-{wf_spec['id']}",
-                "label": f"Scatter {wf_spec['label']}",
-                "doc": f"Scatter {wf_spec['doc']}",
+                "id": f"{main_wf_prefix}-{wf_spec['id']}",
+                "label": wf_spec["label"],
+                "doc": wf_spec["doc"],
                 "requirements": [
                     {"class": "ScatterFeatureRequirement"},
                     {"class": "SubworkflowFeatureRequirement"},
@@ -262,6 +269,8 @@ class WorkflowCreator:
         # Append multi-stac-join step at the end
         app_spec["$graph"].append(cls._resolve_task_spec("multi-stac-join"))
 
+        wf_data.wf_id = f"{main_wf_prefix}-{wf_spec['id']}"
+
         return app_spec, wf_data
 
     @classmethod
@@ -280,7 +289,7 @@ class WorkflowCreator:
         app_spec["$graph"] = wf_data.graph
 
         app_spec, wf_data = cls.handle_aoi_scatter_if_necessary(
-            area=shape(wf_spec["inputs"]["area"]),
+            area=wf_spec["inputs"]["area"],
             app_spec=app_spec,
             wf_data=wf_data,
         )
