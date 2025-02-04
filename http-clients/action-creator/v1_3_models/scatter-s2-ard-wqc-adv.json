@@ -1,0 +1,384 @@
+{
+  "identifier": "s2ard-adv-wq",
+  "inputs": {
+    "area": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -3.3551249179922453,
+            51.222443075076285
+          ],
+          [
+            -2.2390233907873154,
+            51.222443075076285
+          ],
+          [
+            -2.2390233907873154,
+            51.85762602087286
+          ],
+          [
+            -3.3551249179922453,
+            51.85762602087286
+          ],
+          [
+            -3.3551249179922453,
+            51.222443075076285
+          ]
+        ]
+      ]
+    },
+    "dataset": "sentinel-2-l2a-ard",
+    "date_start": "2023-01-01",
+    "date_end": "2023-10-10"
+  },
+  "outputs": {
+    "results": {
+      "name": "results",
+      "type": "directory"
+    }
+  },
+  "functions": {
+    "query": {
+      "identifier": "s2-ds-query",
+      "inputs": {
+        "area": {
+          "$type": "ref",
+          "value": [
+            "inputs",
+            "area"
+          ]
+        },
+        "stac_collection": {
+          "$type": "ref",
+          "value": [
+            "inputs",
+            "dataset"
+          ]
+        },
+        "date_start": {
+          "$type": "ref",
+          "value": [
+            "inputs",
+            "date_start"
+          ]
+        },
+        "date_end": {
+          "$type": "ref",
+          "value": [
+            "inputs",
+            "date_end"
+          ]
+        },
+        "clip": {
+          "$type": "atom",
+          "value": true
+        },
+        "limit": {
+          "$type": "atom",
+          "value": 2
+        },
+        "cloud_cover_min": {
+          "$type": "atom",
+          "value": 0
+        },
+        "cloud_cover_max": {
+          "$type": "atom",
+          "value": 30
+        }
+      },
+      "outputs": {
+        "results": {
+          "name": "results",
+          "type": "directory"
+        }
+      }
+    },
+    "ndwi": {
+      "identifier": "ndwi",
+      "inputs": {
+        "data_dir": {
+          "$type": "ref",
+          "value": [
+            "functions",
+            "query",
+            "outputs",
+            "results"
+          ]
+        }
+      },
+      "outputs": {
+        "results": {
+          "name": "results",
+          "type": "directory"
+        }
+      }
+    },
+    "reproject_ndwi": {
+      "identifier": "reproject",
+      "inputs": {
+        "data_dir": {
+          "$type": "ref",
+          "value": [
+            "functions",
+            "ndwi",
+            "outputs",
+            "results"
+          ]
+        },
+        "epsg": {
+          "$type": "atom",
+          "value": "EPSG:3857"
+        }
+      },
+      "outputs": {
+        "results": {
+          "name": "results",
+          "type": "directory"
+        }
+      }
+    },
+    "cya": {
+      "identifier": "cya_cells",
+      "inputs": {
+        "data_dir": {
+          "$type": "ref",
+          "value": [
+            "functions",
+            "query",
+            "outputs",
+            "results"
+          ]
+        }
+      },
+      "outputs": {
+        "results": {
+          "name": "results",
+          "type": "directory"
+        }
+      }
+    },
+    "reproject_cya": {
+      "identifier": "reproject",
+      "inputs": {
+        "data_dir": {
+          "$type": "ref",
+          "value": [
+            "functions",
+            "cya",
+            "outputs",
+            "results"
+          ]
+        },
+        "epsg": {
+          "$type": "atom",
+          "value": "EPSG:3857"
+        }
+      },
+      "outputs": {
+        "results": {
+          "name": "results",
+          "type": "directory"
+        }
+      }
+    },
+    "doc": {
+      "identifier": "doc",
+      "inputs": {
+        "data_dir": {
+          "$type": "ref",
+          "value": [
+            "functions",
+            "query",
+            "outputs",
+            "results"
+          ]
+        }
+      },
+      "outputs": {
+        "results": {
+          "name": "results",
+          "type": "directory"
+        }
+      }
+    },
+    "reproject_doc": {
+      "identifier": "reproject",
+      "inputs": {
+        "data_dir": {
+          "$type": "ref",
+          "value": [
+            "functions",
+            "doc",
+            "outputs",
+            "results"
+          ]
+        },
+        "epsg": {
+          "$type": "atom",
+          "value": "EPSG:3857"
+        }
+      },
+      "outputs": {
+        "results": {
+          "name": "results",
+          "type": "directory"
+        }
+      }
+    },
+    "cdom": {
+      "identifier": "cdom",
+      "inputs": {
+        "data_dir": {
+          "$type": "ref",
+          "value": [
+            "functions",
+            "query",
+            "outputs",
+            "results"
+          ]
+        }
+      },
+      "outputs": {
+        "results": {
+          "name": "results",
+          "type": "directory"
+        }
+      }
+    },
+    "reproject_cdom": {
+      "identifier": "reproject",
+      "inputs": {
+        "data_dir": {
+          "$type": "ref",
+          "value": [
+            "functions",
+            "cdom",
+            "outputs",
+            "results"
+          ]
+        },
+        "epsg": {
+          "$type": "atom",
+          "value": "EPSG:3857"
+        }
+      },
+      "outputs": {
+        "results": {
+          "name": "results",
+          "type": "directory"
+        }
+      }
+    },
+    "stac_join_1": {
+      "identifier": "stac-join",
+      "inputs": {
+        "stac_catalog_dir_1": {
+          "$type": "ref",
+          "value": [
+            "functions",
+            "reproject_cya",
+            "outputs",
+            "results"
+          ]
+        },
+        "stac_catalog_dir_2": {
+          "$type": "ref",
+          "value": [
+            "functions",
+            "reproject_doc",
+            "outputs",
+            "results"
+          ]
+        }
+      },
+      "outputs": {
+        "results": {
+          "name": "results",
+          "type": "directory"
+        }
+      }
+    },
+    "stac_join_2": {
+      "identifier": "stac-join",
+      "inputs": {
+        "stac_catalog_dir_1": {
+          "$type": "ref",
+          "value": [
+            "functions",
+            "stac_join_1",
+            "outputs",
+            "results"
+          ]
+        },
+        "stac_catalog_dir_2": {
+          "$type": "ref",
+          "value": [
+            "functions",
+            "reproject_cdom",
+            "outputs",
+            "results"
+          ]
+        }
+      },
+      "outputs": {
+        "results": {
+          "name": "results",
+          "type": "directory"
+        }
+      }
+    },
+    "stac_join_3": {
+      "identifier": "stac-join",
+      "inputs": {
+        "stac_catalog_dir_1": {
+          "$type": "ref",
+          "value": [
+            "functions",
+            "stac_join_2",
+            "outputs",
+            "results"
+          ]
+        },
+        "stac_catalog_dir_2": {
+          "$type": "ref",
+          "value": [
+            "functions",
+            "reproject_ndwi",
+            "outputs",
+            "results"
+          ]
+        }
+      },
+      "outputs": {
+        "results": {
+          "name": "results",
+          "type": "directory"
+        }
+      }
+    },
+    "thumbnail": {
+      "identifier": "thumbnail",
+      "inputs": {
+        "data_dir": {
+          "$type": "ref",
+          "value": [
+            "functions",
+            "stac_join_3",
+            "outputs",
+            "results"
+          ]
+        }
+      },
+      "outputs": {
+        "results": {
+          "$type": "ref",
+          "value": [
+            "outputs",
+            "results"
+          ]
+        }
+      }
+    }
+  }
+}
