@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 
 from starlette import status
 
-from src.api.v1_3.catalogue.routes import SUPPORTED_DATASETS
+from src.services.stac.client import SUPPORTED_DATASETS
 from tests.api.v1_3.catalogue.conftest import DATA_DIR
 
 if TYPE_CHECKING:

@@ -5,7 +5,7 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field
 
-from src.api.v1_3.catalogue.schemas.stac_search import ExtendedStacSearch
+from src.services.stac.schemas import ExtendedStacSearch
 
 
 class ClassificationStackedBarChartRecord(BaseModel):
