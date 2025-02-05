@@ -4,7 +4,7 @@ import abc
 import asyncio
 import json
 from itertools import starmap
-from typing import TYPE_CHECKING, Any, ClassVar, Iterator, TypedDict
+from typing import TYPE_CHECKING, Any, ClassVar, Iterable, Iterator, TypedDict
 
 import aiohttp
 from fastapi import HTTPException
@@ -18,6 +18,9 @@ from src.core.settings import current_settings
 from src.services.stac.schemas import ExtendedStacSearch, FieldsExtension, StacSearch
 
 if TYPE_CHECKING:
+    from datetime import datetime
+
+    from geojson_pydantic import Polygon
     from pystac import Item
 
 
@@ -63,13 +66,22 @@ class StacSearchClientBase(abc.ABC):
         stac_api_endpoint: str,
         workspace: str,
         stac_query: StacSearch | None = None,
-    ) -> Iterator[Item]: ...
+    ) -> Iterable[Item]: ...
 
     @abc.abstractmethod
     async def multi_collection_fetch_items(
         self,
         stac_search_query: dict[str, StacSearch],
     ) -> dict[str, Any]: ...
+
+    @abc.abstractmethod
+    async def has_items(
+        self,
+        collection: str,
+        area: Polygon,
+        date_start: datetime | None = None,
+        date_end: datetime | None = None,
+    ) -> bool: ...
 
 
 class StacSearchClient:
@@ -210,3 +222,78 @@ class StacSearchClient:
             },
             "continuation_tokens": {collection: token for collection, _, token in results},
         }
+
+    async def has_items(
+        self,
+        collection: str,
+        area: Polygon,
+        date_start: datetime | None = None,
+        date_end: datetime | None = None,
+    ) -> bool:
+        filter_spec = {"op": "s_intersects", "args": [{"property": "geometry"}, area.model_dump(mode="json")]}
+
+        if date_start:
+            filter_spec["args"].append({"op": ">=", "args": [{"property": "datetime"}, date_start]})  # type: ignore[attr-defined]
+        if date_end:
+            filter_spec["args"].append({"op": "<=", "args": [{"property": "datetime"}, date_end]})  # type: ignore[attr-defined]
+
+        items = list(
+            await self.fetch_items(
+                collection=collection,
+                search_params=StacSearch(
+                    limit=1,
+                    max_items=1,
+                    intersects=area.model_dump(mode="json"),
+                    fields=FieldsExtension(include=set()),
+                    filter=filter_spec,
+                ),
+            )
+        )
+        return len(items) > 0
+
+
+class FakeStacClient(StacSearchClientBase):
+    def __init__(
+        self,
+        *,
+        items_to_fetch: FetchItemResult | None = None,
+        processing_results_to_fetch: list[Item] | None = None,
+        multi_collection_fetch_results: dict[str, Any] | None = None,
+        has_results: bool = False,
+    ) -> None:
+        self.multi_collection_fetch_results = multi_collection_fetch_results
+        self.processing_results_to_fetch = processing_results_to_fetch
+        self.items_to_fetch = items_to_fetch
+        self.has_results = has_results
+
+    async def fetch_items(
+        self,
+        collection: str,
+        search_params: StacSearch,  # noqa: ARG002
+    ) -> FetchItemResult:
+        return self.items_to_fetch or FetchItemResult(collection, items=[], token=None)
+
+    async def fetch_processing_results(
+        self,
+        token: str,  # noqa: ARG002
+        job_id: str,  # noqa: ARG002
+        stac_api_endpoint: str,  # noqa: ARG002
+        workspace: str,  # noqa: ARG002
+        stac_query: StacSearch | None = None,  # noqa: ARG002
+    ) -> Iterable[Item]:
+        return self.processing_results_to_fetch or []
+
+    async def multi_collection_fetch_items(
+        self,
+        stac_search_query: dict[str, StacSearch],
+    ) -> dict[str, Any]:
+        return self.multi_collection_fetch_results or {k: {} for k in stac_search_query}
+
+    async def has_items(
+        self,
+        collection: str,  # noqa: ARG002
+        area: Polygon,  # noqa: ARG002
+        date_start: datetime | None = None,  # noqa: ARG002
+        date_end: datetime | None = None,  # noqa: ARG002
+    ) -> bool:
+        return self.has_results

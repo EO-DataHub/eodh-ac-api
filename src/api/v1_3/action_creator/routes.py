@@ -38,6 +38,8 @@ from src.api.v1_3.action_creator.schemas.workflows import WorkflowSpec
 from src.services.ades.factory import ades_client_factory
 from src.services.ades.schemas import StatusCode
 from src.services.cwl.workflow_creator import WorkflowCreator
+from src.services.stac.client import StacSearchClient
+from src.services.validation_utils import validate_data_to_process_exists
 from src.utils.logging import get_logger
 
 _logger = get_logger(__name__)
@@ -167,7 +169,15 @@ async def submit_workflow(
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
 ) -> ActionCreatorJob:
     try:
-        _ = WorkflowSpec.model_validate(workflow_spec)
+        client = StacSearchClient()
+        wf_model = WorkflowSpec.model_validate(workflow_spec)
+        await validate_data_to_process_exists(
+            client,
+            collection=wf_model.inputs.dataset,
+            area=wf_model.inputs.area,
+            date_start=wf_model.inputs.date_start,
+            date_end=wf_model.inputs.date_end,
+        )
     except ValidationError as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,

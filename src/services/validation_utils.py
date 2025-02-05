@@ -4,7 +4,7 @@ import json
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any
 
-from geojson_pydantic.geometries import parse_geometry_obj
+from geojson_pydantic.geometries import Polygon, parse_geometry_obj
 from pydantic_core import PydanticCustomError
 from shapely.geometry import shape
 
@@ -15,6 +15,8 @@ from src.utils.geo import calculate_geodesic_area
 
 if TYPE_CHECKING:
     import shapely.geometry
+
+    from src.services.stac.client import StacSearchClient
 
 EXPECTED_BBOX_ELEMENT_COUNT = 4
 MAX_AREA_SQ_KM = 10_000
@@ -127,6 +129,27 @@ class StacDateRangeError:
         )
 
 
+class NoItemsToProcessError:
+    @classmethod
+    def make(
+        cls,
+        collection: str,
+        area: Polygon,
+        date_start: datetime | None = None,
+        date_end: datetime | None = None,
+    ) -> PydanticCustomError:
+        return PydanticCustomError(
+            "no_items_to_process_error",
+            "No items found to process for selected criteria.",
+            {
+                "collection": collection,
+                "area": area,
+                "date_start": date_start,
+                "date_end": date_end,
+            },
+        )
+
+
 def ensure_area_smaller_than(geom: dict[str, Any], area_size_limit: float = MAX_AREA_SQ_KM) -> None:
     # Parse the GeoJSON geometry (assume it's EPSG:4326)
     polygon: shapely.geometry.Polygon = shape(geom)
@@ -229,3 +252,24 @@ def validate_date_range(date_start: datetime | None = None, date_end: datetime |
 
     if date_start > date_end:
         raise InvalidDateRangeError.make(date_start, date_end)
+
+
+async def validate_data_to_process_exists(
+    client: StacSearchClient,
+    collection: str,
+    area: Polygon,
+    date_start: datetime | None = None,
+    date_end: datetime | None = None,
+) -> None:
+    if not await client.has_items(
+        collection=collection,
+        area=area,
+        date_start=date_start,
+        date_end=date_end,
+    ):
+        raise NoItemsToProcessError.make(
+            collection=collection,
+            area=area,
+            date_start=date_start,
+            date_end=date_end,
+        )
