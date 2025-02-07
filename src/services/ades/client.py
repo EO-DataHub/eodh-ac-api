@@ -191,7 +191,7 @@ class ADESClient(ADESClientBase):
         finally:
             await client_session.close()
 
-    async def cancel_job(self, job_id: str | UUID) -> tuple[ErrorResponse | None, StatusInfo | None]:
+    async def cancel_or_delete_job(self, job_id: str | UUID) -> tuple[ErrorResponse | None, StatusInfo | None]:
         client_session, retry_client = self._get_retry_client()
         try:
             async with retry_client.delete(
