@@ -20,6 +20,7 @@ auth_router_v1_0 = APIRouter(
 )
 
 jwt_bearer_scheme = HTTPBearer()
+optional_jwt_bearer_scheme = HTTPBearer(auto_error=False)
 TIMEOUT = 30
 
 
@@ -52,6 +53,15 @@ def decode_token(token: str, *, ws: bool = False) -> dict[str, Any]:
 def validate_access_token(
     credential: Annotated[HTTPAuthorizationCredentials, Depends(jwt_bearer_scheme)],
 ) -> HTTPAuthorizationCredentials:
+    decode_token(credential.credentials)
+    return credential
+
+
+def validate_access_token_if_provided(
+    credential: Annotated[HTTPAuthorizationCredentials | None, Depends(optional_jwt_bearer_scheme)] = None,
+) -> HTTPAuthorizationCredentials | None:
+    if credential is None:
+        return None
     decode_token(credential.credentials)
     return credential
 

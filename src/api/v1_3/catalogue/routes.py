@@ -5,7 +5,7 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials
 
-from src.api.v1_0.auth.routes import validate_access_token
+from src.api.v1_0.auth.routes import validate_access_token, validate_access_token_if_provided
 from src.api.v1_3.catalogue.schemas.stac_search import (
     StacSearchResponse,
 )
@@ -62,7 +62,7 @@ async def get_visualization_data_for_job_results(
 
 @catalogue_router_v1_3.post("/stac/search", response_model=StacSearchResponse)
 async def stac_search(
-    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],  # noqa: ARG001
+    credential: Annotated[HTTPAuthorizationCredentials | None, Depends(validate_access_token_if_provided)],  # noqa: ARG001
     stac_search_query: Annotated[
         dict[str, StacSearch],
         Body(

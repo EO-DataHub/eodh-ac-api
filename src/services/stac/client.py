@@ -3,13 +3,16 @@ from __future__ import annotations
 import abc
 import asyncio
 import json
+from datetime import datetime, timezone
 from itertools import starmap
 from typing import TYPE_CHECKING, Any, ClassVar, Iterable, Iterator, TypedDict
 
 import aiohttp
 from fastapi import HTTPException
+from oauthlib.oauth2 import BackendApplicationClient
 from pystac_client import Client
 from pystac_client.exceptions import APIError
+from requests_oauthlib import OAuth2Session
 from stac_pydantic.api.extensions.sort import SortDirections, SortExtension
 from starlette import status
 
@@ -18,33 +21,60 @@ from src.core.settings import current_settings
 from src.services.stac.schemas import ExtendedStacSearch, FieldsExtension, StacSearch
 
 if TYPE_CHECKING:
-    from datetime import datetime
-
     from geojson_pydantic import Polygon
     from pystac import Item
+    from requests import Response
 
 
 class DatasetLookupRecord(TypedDict):
+    catalog_url: str
     catalog_path: str
     collection_name: str
+    processor: str
 
 
 DATASET_LOOKUP: dict[str, DatasetLookupRecord] = {
     "sentinel-1-grd": DatasetLookupRecord(
+        catalog_url="https://test.eodatahub.org.uk/api/catalogue/stac/catalogs",
         catalog_path="supported-datasets/earth-search-aws",
         collection_name="sentinel-1-grd",
+        processor="Element84",
     ),
     "sentinel-2-l1c": DatasetLookupRecord(
+        catalog_url="https://test.eodatahub.org.uk/api/catalogue/stac/catalogs",
         catalog_path="supported-datasets/earth-search-aws",
         collection_name="sentinel-2-l1c",
+        processor="Element84",
     ),
     "sentinel-2-l2a": DatasetLookupRecord(
+        catalog_url="https://test.eodatahub.org.uk/api/catalogue/stac/catalogs",
         catalog_path="supported-datasets/earth-search-aws",
         collection_name="sentinel-2-l2a",
+        processor="Element84",
     ),
     "sentinel-2-l2a-ard": DatasetLookupRecord(
+        catalog_url="https://test.eodatahub.org.uk/api/catalogue/stac/catalogs",
         catalog_path="supported-datasets/ceda-stac-catalogue",
         collection_name="sentinel2_ard",
+        processor="CEDA",
+    ),
+    "esa-lcci-glc": DatasetLookupRecord(
+        catalog_url="https://test.eodatahub.org.uk/api/catalogue/stac/catalogs",
+        catalog_path="supported-datasets/ceda-stac-catalogue",
+        collection_name="land_cover",
+        processor="CEDA",
+    ),
+    "clms-corine-lc": DatasetLookupRecord(
+        catalog_url="https://creodias.sentinel-hub.com/api",
+        catalog_path="v1/catalog/1.0.0",
+        collection_name="byoc-cbdba844-f86d-41dc-95ad-b3f7f12535e9",
+        processor="Synergise",
+    ),
+    "clms-water-bodies": DatasetLookupRecord(
+        catalog_url="https://creodias.sentinel-hub.com/api",
+        catalog_path="v1/catalog/1.0.0",
+        collection_name="byoc-62bf6f6a-c584-48a8-a739-0bc60efee54a",
+        processor="Synergise",
     ),
 }
 SUPPORTED_DATASETS: set[str] = set(DATASET_LOOKUP.keys())
@@ -88,12 +118,33 @@ class StacSearchClient:
     DATASET_LOOKUP: ClassVar[dict[str, DatasetLookupRecord]] = DATASET_LOOKUP
     SUPPORTED_DATASETS: ClassVar[set[str]] = SUPPORTED_DATASETS
 
+    @staticmethod
+    def _sentinel_hub_compliance_hook(response: Response) -> Response:
+        response.raise_for_status()
+        return response
+
+    @staticmethod
+    def _sentinel_hub_auth_token() -> str:
+        settings = current_settings()
+
+        client = BackendApplicationClient(client_id=settings.sentinel_hub.client_id)
+        oauth = OAuth2Session(client=client)
+
+        oauth.register_compliance_hook("access_token_response", StacSearchClient._sentinel_hub_compliance_hook)
+
+        token = oauth.fetch_token(
+            token_url=settings.sentinel_hub.token_url,
+            client_secret=settings.sentinel_hub.client_secret,
+            include_client_id=True,
+        )
+
+        return token["access_token"]  # type: ignore[no-any-return]
+
     async def fetch_items(
         self,
         collection: str,
         search_params: StacSearch,
     ) -> FetchItemResult:
-        settings = current_settings()
         lookup = self.DATASET_LOOKUP[collection]
 
         if search_params.fields is None:
@@ -115,13 +166,29 @@ class StacSearchClient:
         if search_params.sortby is None:
             search_params.sortby = [SortExtension(field="properties.datetime", direction=SortDirections.asc)]
 
-        search_url = f"{settings.eodh_stac_api.endpoint}/catalogs/{lookup['catalog_path']}/search"
+        search_url = f"{lookup['catalog_url']}/{lookup['catalog_path']}/search"
 
         search_model = search_params.model_dump(mode="json", exclude_unset=True, exclude_none=True)
         search_model["collections"] = [lookup["collection_name"]]
 
+        if lookup["processor"] == "Synergise":
+            # Pop unsupported fields
+            search_model.pop("sortby", None)
+            search_model.pop("filter_lang", None)
+            search_model.pop("filter", None)
+            search_model.pop("fields", None)
+
+            # Filter on datetime in filter field is not supported, and we can't just extract it from the filter
+            # field easily. If not set as datetime filter - get all data until now
+            search_model["datetime"] = (
+                search_model.pop("datetime", None) or f"/{datetime.now(timezone.utc).isoformat()}"
+            )
+
         async with aiohttp.ClientSession() as session, session.post(
             search_url,
+            headers={"Authorization": f"Bearer {self._sentinel_hub_auth_token()}", "Accept": "application/geo+json"}
+            if lookup["processor"] == "Synergise"
+            else None,
             json=search_model,
             timeout=aiohttp.ClientTimeout(total=30),
         ) as response:
@@ -137,7 +204,7 @@ class StacSearchClient:
         continuation_token: str | None = None
 
         if next_page_link:
-            continuation_token = next_page_link[0]["body"]["token"]
+            continuation_token = next_page_link[0]["body"].get("token", None)
 
         return FetchItemResult(collection=collection, items=result["features"], token=continuation_token)
 
@@ -209,7 +276,7 @@ class StacSearchClient:
 
         all_items: list[dict[str, Any]] = []
         for _, items, _ in results:
-            all_items.extend(items)
+            all_items.extend([i for i in items if i])
 
         # Sort items by datetime property if present
         # We'll skip items without a valid datetime to avoid errors
@@ -297,3 +364,7 @@ class FakeStacClient(StacSearchClientBase):
         date_end: datetime | None = None,  # noqa: ARG002
     ) -> bool:
         return self.has_results
+
+
+def stac_client_factory() -> StacSearchClient:
+    return StacSearchClient()
