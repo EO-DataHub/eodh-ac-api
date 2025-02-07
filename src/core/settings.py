@@ -63,6 +63,7 @@ class Settings(BaseSettings):
     eodh_stac_api: StacApiSettings
     ades: ADESSettings
     sentinel_hub: OAuthClientSettings
+    sentinel_hub_stac_api: StacApiSettings
 
     model_config = SettingsConfigDict(
         env_file=consts.directories.ROOT_DIR / ".env",
