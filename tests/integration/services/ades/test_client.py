@@ -268,6 +268,9 @@ async def test_ades_executing_job(ades: ADESClient) -> None:
     # Assert
     assert err is None
 
+    # Cleanup afterward
+    await ades.cancel_or_delete_job(execution_result.job_id)
+
 
 @flaky(max_runs=3)
 @pytest.mark.asyncio(scope="function")
@@ -307,7 +310,7 @@ async def test_ades_cancelling_job_returns_204(ades: ADESClient) -> None:
     assert execution_result is not None
 
     # Act
-    err, result = await ades.cancel_job(execution_result.job_id)
+    err, result = await ades.cancel_or_delete_job(execution_result.job_id)
 
     # Assert
     assert err is None
@@ -319,7 +322,7 @@ async def test_ades_cancelling_job_returns_204(ades: ADESClient) -> None:
 @pytest.mark.asyncio(scope="function")
 async def test_ades_cancelling_non_existent_job_returns_error_response(ades: ADESClient) -> None:
     # Act
-    err, result = await ades.cancel_job(uuid4())
+    err, result = await ades.cancel_or_delete_job(uuid4())
 
     # Assert
     assert result is None

@@ -1086,7 +1086,7 @@ class FakeADESClient(ADESClientBase):
     ) -> tuple[ErrorResponse | None, JobList | dict[str, Any] | None]:
         return None, GET_JOB_LIST_RESPONSE if raw_output else JobList(**GET_JOB_LIST_RESPONSE)
 
-    async def cancel_job(self, job_id: str | UUID) -> tuple[ErrorResponse | None, StatusInfo | None]:
+    async def cancel_or_delete_job(self, job_id: str | UUID) -> tuple[ErrorResponse | None, StatusInfo | None]:
         job = StatusInfo(**GET_JOB_FINISHED_STATUS_RESPONSE)
         job.status = StatusCode.dismissed
         return None, job
