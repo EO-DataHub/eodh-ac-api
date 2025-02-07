@@ -53,7 +53,9 @@ jobs:
           echo "ADES__OGC_JOBS_API_PATH=${{ secrets.ADES__OGC_JOBS_API_PATH }}" >> envs.env
           echo "SENTINEL_HUB__CLIENT_ID=${{ secrets.SENTINEL_HUB__CLIENT_ID }}" >> envs.env
           echo "SENTINEL_HUB__CLIENT_SECRET=${{ secrets.SENTINEL_HUB__CLIENT_SECRET }}" >> envs.env
+          echo "SENTINEL_HUB__TOKEN_URL=${{ secrets.SENTINEL_HUB__TOKEN_URL }}" >> envs.env
           echo "EODH_STAC_API__ENDPOINT=${{ secrets.EODH_STAC_API__ENDPOINT }}" >> envs.env
+          echo "SENTINEL_HUB_STAC_API__ENDPOINT=${{ secrets.SENTINEL_HUB_STAC_API__ENDPOINT }}" >> envs.env
       - name: Upload file as artifact
         run: |
           aws s3 cp envs.env s3://ukri-task-definition-variables/${{ vars.TAGS }}/
@@ -99,7 +101,9 @@ jobs:
           echo "ADES__OGC_JOBS_API_PATH=${{ secrets.ADES__OGC_JOBS_API_PATH }}" >> envs.env
           echo "SENTINEL_HUB__CLIENT_ID=${{ secrets.SENTINEL_HUB__CLIENT_ID }}" >> envs.env
           echo "SENTINEL_HUB__CLIENT_SECRET=${{ secrets.SENTINEL_HUB__CLIENT_SECRET }}" >> envs.env
+          echo "SENTINEL_HUB__TOKEN_URL=${{ secrets.SENTINEL_HUB__TOKEN_URL }}" >> envs.env
           echo "EODH_STAC_API__ENDPOINT=${{ secrets.EODH_STAC_API__ENDPOINT }}" >> envs.env
+          echo "SENTINEL_HUB_STAC_API__ENDPOINT=${{ secrets.SENTINEL_HUB_STAC_API__ENDPOINT }}" >> envs.env
       - name: Upload file as artifact
         run: |
           aws s3 cp envs.env s3://ukri-task-definition-variables/${{ vars.TAGS }}/
@@ -145,7 +149,9 @@ jobs:
           echo "ADES__OGC_JOBS_API_PATH=${{ secrets.ADES__OGC_JOBS_API_PATH }}" >> envs.env
           echo "SENTINEL_HUB__CLIENT_ID=${{ secrets.SENTINEL_HUB__CLIENT_ID }}" >> envs.env
           echo "SENTINEL_HUB__CLIENT_SECRET=${{ secrets.SENTINEL_HUB__CLIENT_SECRET }}" >> envs.env
+          echo "SENTINEL_HUB__TOKEN_URL=${{ secrets.SENTINEL_HUB__TOKEN_URL }}" >> envs.env
           echo "EODH_STAC_API__ENDPOINT=${{ secrets.EODH_STAC_API__ENDPOINT }}" >> envs.env
+          echo "SENTINEL_HUB_STAC_API__ENDPOINT=${{ secrets.SENTINEL_HUB_STAC_API__ENDPOINT }}" >> envs.env
       - name: Upload file as artifact
         run: |
           aws s3 cp envs.env s3://ukri-task-definition-variables/${{ vars.TAGS }}/

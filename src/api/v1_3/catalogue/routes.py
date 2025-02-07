@@ -12,7 +12,7 @@ from src.api.v1_3.catalogue.schemas.stac_search import (
 from src.api.v1_3.catalogue.schemas.visualization import JobAssetsChartVisualizationResponse, VisualizationRequest
 from src.core.settings import current_settings
 from src.services.charts.data_builder import ChartDataBuilder
-from src.services.stac.client import StacSearchClient
+from src.services.stac.client import StacSearchClient, stac_client_factory
 from src.services.stac.schemas import (
     EXAMPLE_SEARCH_MODEL,
     EXAMPLE_SEARCH_NEXT_PAGE,
@@ -38,7 +38,7 @@ async def get_visualization_data_for_job_results(
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
 ) -> dict[str, Any]:
     settings = current_settings()
-    client = StacSearchClient()
+    client = stac_client_factory()
     builder = ChartDataBuilder()
 
     items = await client.fetch_processing_results(

@@ -28,63 +28,55 @@ if TYPE_CHECKING:
 
 class DatasetLookupRecord(TypedDict):
     catalog_url: str
-    catalog_path: str
     collection_name: str
     processor: str
 
 
+settings = current_settings()
+
 DATASET_LOOKUP: dict[str, DatasetLookupRecord] = {
     "sentinel-1-grd": DatasetLookupRecord(
-        catalog_url="https://test.eodatahub.org.uk/api/catalogue/stac/catalogs",
-        catalog_path="supported-datasets/earth-search-aws",
+        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/earth-search-aws",
         collection_name="sentinel-1-grd",
         processor="Element84",
     ),
     "sentinel-2-l1c": DatasetLookupRecord(
-        catalog_url="https://test.eodatahub.org.uk/api/catalogue/stac/catalogs",
-        catalog_path="supported-datasets/earth-search-aws",
+        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/earth-search-aws",
         collection_name="sentinel-2-l1c",
         processor="Element84",
     ),
     "sentinel-2-l2a": DatasetLookupRecord(
-        catalog_url="https://test.eodatahub.org.uk/api/catalogue/stac/catalogs",
-        catalog_path="supported-datasets/earth-search-aws",
+        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/earth-search-aws",
         collection_name="sentinel-2-l2a",
         processor="Element84",
     ),
     "sentinel-2-l2a-ard": DatasetLookupRecord(
-        catalog_url="https://test.eodatahub.org.uk/api/catalogue/stac/catalogs",
-        catalog_path="supported-datasets/ceda-stac-catalogue",
+        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/ceda-stac-catalogue",
         collection_name="sentinel2_ard",
         processor="CEDA",
     ),
     "esa-lccci-glcm": DatasetLookupRecord(
-        catalog_url="https://test.eodatahub.org.uk/api/catalogue/stac/catalogs",
-        catalog_path="supported-datasets/ceda-stac-catalogue",
+        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/ceda-stac-catalogue",
         collection_name="land_cover",
         processor="CEDA",
     ),
     "esacci-globallc": DatasetLookupRecord(
-        catalog_url="https://test.eodatahub.org.uk/api/catalogue/stac/catalogs",
-        catalog_path="supported-datasets/ceda-stac-catalogue",
+        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/ceda-stac-catalogue",
         collection_name="land_cover",
         processor="CEDA",
     ),
     "clms-corinelc": DatasetLookupRecord(
-        catalog_url="https://creodias.sentinel-hub.com/api",
-        catalog_path="v1/catalog/1.0.0",
+        catalog_url=settings.sentinel_hub_stac_api.endpoint,
         collection_name="byoc-cbdba844-f86d-41dc-95ad-b3f7f12535e9",
         processor="Synergise",
     ),
     "clms-corine-lc": DatasetLookupRecord(
-        catalog_url="https://creodias.sentinel-hub.com/api",
-        catalog_path="v1/catalog/1.0.0",
+        catalog_url=settings.sentinel_hub_stac_api.endpoint,
         collection_name="byoc-cbdba844-f86d-41dc-95ad-b3f7f12535e9",
         processor="Synergise",
     ),
     "clms-water-bodies": DatasetLookupRecord(
-        catalog_url="https://creodias.sentinel-hub.com/api",
-        catalog_path="v1/catalog/1.0.0",
+        catalog_url=settings.sentinel_hub_stac_api.endpoint,
         collection_name="byoc-62bf6f6a-c584-48a8-a739-0bc60efee54a",
         processor="Synergise",
     ),
@@ -178,7 +170,7 @@ class StacSearchClient:
         if search_params.sortby is None:
             search_params.sortby = [SortExtension(field="properties.datetime", direction=SortDirections.asc)]
 
-        search_url = f"{lookup['catalog_url']}/{lookup['catalog_path']}/search"
+        search_url = f"{lookup['catalog_url']}/search"
 
         search_model = search_params.model_dump(mode="json", exclude_unset=True, exclude_none=True)
         search_model["collections"] = [lookup["collection_name"]]
