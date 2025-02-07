@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-import json
 import math
 import uuid
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from fastapi.security import HTTPAuthorizationCredentials
-from pydantic import ValidationError
 from starlette import status
 
 from src.api.v1_0.auth.routes import decode_token, validate_access_token
@@ -36,8 +34,7 @@ from src.api.v1_2.action_creator.schemas import (
 )
 from src.services.ades.factory import ades_client_factory
 from src.services.ades.schemas import StatusCode
-from src.services.stac.client import StacSearchClient
-from src.services.validation_utils import validate_data_to_process_exists
+from src.services.stac.client import stac_client_factory
 from src.utils.logging import get_logger
 
 _logger = get_logger(__name__)
@@ -132,22 +129,22 @@ async def submit_workflow(
     workflow_spec: TWorkflowCreationSpec,
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
 ) -> ActionCreatorJob:
-    try:
-        client = StacSearchClient()
-        main_wf_key = next(iter(workflow_spec.workflow.keys()))
-        wf_inputs = workflow_spec.workflow[main_wf_key].inputs
-        await validate_data_to_process_exists(
-            client,
-            collection=wf_inputs.stac_collection,  # type: ignore[arg-type]
-            area=wf_inputs.aoi,
-            date_start=wf_inputs.date_start,
-            date_end=wf_inputs.date_end,
-        )
-    except ValidationError as exc:
+    stac_client = stac_client_factory()
+
+    main_wf_key = next(iter(workflow_spec.workflow.keys()))
+    wf_inputs = workflow_spec.workflow[main_wf_key].inputs
+
+    if not await stac_client.has_items(
+        collection=wf_inputs.stac_collection,  # type: ignore[arg-type]
+        area=wf_inputs.aoi,
+        date_start=wf_inputs.date_start,
+        date_end=wf_inputs.date_end,
+    ):
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=json.loads(exc.json(include_url=False)),
-        ) from exc
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No STAC items found for the selected configuration. "
+            "Adjust area, data set, date range, or functions and try again.",
+        )
 
     introspected_token = decode_token(credential.credentials)
 

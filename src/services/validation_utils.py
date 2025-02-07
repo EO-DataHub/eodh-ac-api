@@ -16,8 +16,6 @@ from src.utils.geo import calculate_geodesic_area
 if TYPE_CHECKING:
     import shapely.geometry
 
-    from src.services.stac.client import StacSearchClient
-
 EXPECTED_BBOX_ELEMENT_COUNT = 4
 MAX_AREA_SQ_KM = 10_000
 CHIPPING_THRESHOLD_SQ_KM = 2500
@@ -140,7 +138,7 @@ class NoItemsToProcessError:
     ) -> PydanticCustomError:
         return PydanticCustomError(
             "no_items_to_process_error",
-            "No items found to process for selected criteria.",
+            "No STAC items found for the selected configuration. Adjust area, data set, date range, or functions and try again.",  # noqa: E501
             {
                 "collection": collection,
                 "area": area,
@@ -252,24 +250,3 @@ def validate_date_range(date_start: datetime | None = None, date_end: datetime |
 
     if date_start > date_end:
         raise InvalidDateRangeError.make(date_start, date_end)
-
-
-async def validate_data_to_process_exists(
-    client: StacSearchClient,
-    collection: str,
-    area: Polygon,
-    date_start: datetime | None = None,
-    date_end: datetime | None = None,
-) -> None:
-    if not await client.has_items(
-        collection=collection,
-        area=area,
-        date_start=date_start,
-        date_end=date_end,
-    ):
-        raise NoItemsToProcessError.make(
-            collection=collection,
-            area=area,
-            date_start=date_start,
-            date_end=date_end,
-        )

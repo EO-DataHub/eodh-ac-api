@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from typing import TYPE_CHECKING, Any
+from unittest.mock import patch
 
 import pytest
 from starlette import status
@@ -14,6 +15,7 @@ from src.api.v1_2.action_creator.presets import (
     WATER_QUALITY_PRESET_SPEC_ARD,
 )
 from src.services.ades.schemas import StatusCode
+from src.services.stac.client import FakeStacClient
 
 if TYPE_CHECKING:
     from unittest.mock import MagicMock
@@ -192,4 +194,32 @@ def test_job_submissions_endpoint_returns_422_when_stac_date_range_is_invalid_lc
     assert (
         response_body["detail"][0]["msg"] == "Invalid date range for selected STAC collection: esacci-globallc. "
         "Valid range is between 1992-01-01T00:00:00+00:00 and 2015-12-31T23:59:59+00:00."
+    )
+
+
+@patch("src.api.v1_2.action_creator.routes.stac_client_factory")
+@pytest.mark.parametrize("wf_spec", _TEST_DATA, ids=_TEST_IDS)
+def test_job_submission_endpoint_returns_400_when_no_items_to_process_for_given_workflow_spec(
+    stac_client_factory_mock: MagicMock,
+    wf_spec: dict[str, Any],
+    client: TestClient,
+    mocked_ades_factory: MagicMock,  # noqa: ARG001
+    auth_token_module_scoped: str,
+) -> None:
+    # Arrange
+    stac_client_factory_mock.return_value = FakeStacClient(has_results=False)
+
+    # Act
+    response = client.post(
+        url="/api/v1.2/action-creator/submissions",
+        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
+        json=wf_spec,
+    )
+
+    # Assert
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    response_body = response.json()
+    assert (
+        response_body["detail"] == "No STAC items found for the selected configuration. "
+        "Adjust area, data set, date range, or functions and try again."
     )

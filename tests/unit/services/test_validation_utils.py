@@ -1,18 +1,14 @@
 from __future__ import annotations
 
-from datetime import datetime
 from typing import Any
 
 import pytest
-from geojson_pydantic import Polygon
 
 from src.consts.geometries import HEATHROW_AOI, UK_AOI
-from src.services.stac.client import FakeStacClient
 from src.services.validation_utils import (
     MAX_AREA_SQ_KM,
     SQ_MILES_DIVISOR,
     ensure_area_smaller_than,
-    validate_data_to_process_exists,
 )
 
 FEATURES = [
@@ -192,18 +188,3 @@ def test_ensure_area_rises_error_if_necessary(feature: dict[str, Any]) -> None:
             ensure_area_smaller_than(geom=feature["geometry"], area_size_limit=MAX_AREA_SQ_KM)
     else:
         ensure_area_smaller_than(geom=feature["geometry"], area_size_limit=MAX_AREA_SQ_KM)
-
-
-async def test_validate_data_to_process_exists_raises_error_if_necessary() -> None:
-    # Arrange
-    client = FakeStacClient(has_results=False)
-
-    # Act & Assert
-    with pytest.raises(ValueError, match="No items found to process for selected criteria."):
-        await validate_data_to_process_exists(
-            client=client,  # type: ignore[arg-type]
-            collection="test",
-            area=Polygon(**HEATHROW_AOI),
-            date_start=datetime.fromisoformat("2020-01-01:00:00:00+00:00"),
-            date_end=datetime.fromisoformat("2020-01-01:00:00:00+00:00"),
-        )
