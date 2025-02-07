@@ -58,11 +58,23 @@ DATASET_LOOKUP: dict[str, DatasetLookupRecord] = {
         collection_name="sentinel2_ard",
         processor="CEDA",
     ),
-    "esa-lcci-glc": DatasetLookupRecord(
+    "esa-lccci-glcm": DatasetLookupRecord(
         catalog_url="https://test.eodatahub.org.uk/api/catalogue/stac/catalogs",
         catalog_path="supported-datasets/ceda-stac-catalogue",
         collection_name="land_cover",
         processor="CEDA",
+    ),
+    "esacci-globallc": DatasetLookupRecord(
+        catalog_url="https://test.eodatahub.org.uk/api/catalogue/stac/catalogs",
+        catalog_path="supported-datasets/ceda-stac-catalogue",
+        collection_name="land_cover",
+        processor="CEDA",
+    ),
+    "clms-corinelc": DatasetLookupRecord(
+        catalog_url="https://creodias.sentinel-hub.com/api",
+        catalog_path="v1/catalog/1.0.0",
+        collection_name="byoc-cbdba844-f86d-41dc-95ad-b3f7f12535e9",
+        processor="Synergise",
     ),
     "clms-corine-lc": DatasetLookupRecord(
         catalog_url="https://creodias.sentinel-hub.com/api",
