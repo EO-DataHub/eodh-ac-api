@@ -8,6 +8,7 @@ geojson-pydantic==1.1.1
 geopandas==1.0.1
 matplotlib==3.9.2
 networkx==3.3
+oauthlib==3.2.2
 pydantic==2.9.2
 pydantic-settings==2.5.2
 pygraphviz==1.14
@@ -16,6 +17,7 @@ pyproj==3.7.0
 pystac==1.11.0
 pystac-client==0.8.5
 python-dotenv==1.0.1
+requests-oauthlib==2.0.0
 retry==0.9.2
 shapely==2.0.6
 stac-pydantic==3.1.3

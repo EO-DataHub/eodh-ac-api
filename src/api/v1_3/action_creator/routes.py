@@ -38,7 +38,7 @@ from src.api.v1_3.action_creator.schemas.workflows import WorkflowSpec
 from src.services.ades.factory import ades_client_factory
 from src.services.ades.schemas import StatusCode
 from src.services.cwl.workflow_creator import WorkflowCreator
-from src.services.stac.client import StacSearchClient
+from src.services.stac.client import StacSearchClient, stac_client_factory
 from src.services.validation_utils import validate_data_to_process_exists
 from src.utils.logging import get_logger
 
@@ -167,12 +167,12 @@ async def validate_workflow_specification(
 async def submit_workflow(
     workflow_spec: TWorkflowSpec,
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
+    stac_client: StacSearchClient = Depends(stac_client_factory),  # noqa: B008
 ) -> ActionCreatorJob:
     try:
-        client = StacSearchClient()
         wf_model = WorkflowSpec.model_validate(workflow_spec)
         await validate_data_to_process_exists(
-            client,
+            stac_client,
             collection=wf_model.inputs.dataset,
             area=wf_model.inputs.area,
             date_start=wf_model.inputs.date_start,

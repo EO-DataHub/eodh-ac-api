@@ -48,6 +48,7 @@ class ADESSettings(BaseModel):
 class OAuthClientSettings(BaseModel):
     client_id: str
     client_secret: str
+    token_url: str
 
 
 class StacApiSettings(BaseModel):
@@ -61,7 +62,7 @@ class Settings(BaseSettings):
     eodh_auth: OAuth2Settings
     eodh_stac_api: StacApiSettings
     ades: ADESSettings
-    sentinel_hub: OAuthClientSettings | None = None
+    sentinel_hub: OAuthClientSettings
 
     model_config = SettingsConfigDict(
         env_file=consts.directories.ROOT_DIR / ".env",
