@@ -292,6 +292,10 @@ class StacSearchClient:
                 "features": all_items,
             },
             "continuation_tokens": {collection: token for collection, _, token in results},
+            "context": {
+                "returned": len(all_items),
+                "limit": next(iter(stac_search_query.values())).limit,
+            },
         }
 
     async def has_items(
