@@ -317,7 +317,6 @@ class StacSearchClient:
                 collection=collection,
                 search_params=StacSearch(
                     limit=1,
-                    max_items=1,
                     intersects=area.model_dump(mode="json"),
                     fields=FieldsExtension(include=set()),
                     filter=filter_spec,
