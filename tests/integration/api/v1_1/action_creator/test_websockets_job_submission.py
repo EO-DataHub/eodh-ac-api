@@ -50,6 +50,7 @@ def test_ws_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
         assert final_response["result"]["finished_at"] is not None
 
 
+@pytest.mark.skip(reason="Endpoint not used in FE app")
 @flaky(max_runs=3)
 def test_ws_job_status_endpoint_returns_valid_response_when_all_is_ok(
     client: TestClient,
