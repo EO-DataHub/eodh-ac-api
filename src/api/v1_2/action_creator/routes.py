@@ -142,8 +142,14 @@ async def submit_workflow(
     ):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No STAC items found for the selected configuration. "
-            "Adjust area, data set, date range, or functions and try again.",
+            detail=[
+                {
+                    "type": "no_items_to_process_error",
+                    "loc": ["body", "workflow"],
+                    "msg": "No STAC items found for the selected configuration. "
+                    "Adjust area, data set, date range, or functions and try again.",
+                }
+            ],
         )
 
     introspected_token = decode_token(credential.credentials)
