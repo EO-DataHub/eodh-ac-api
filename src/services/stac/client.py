@@ -312,18 +312,16 @@ class StacSearchClient:
         if date_end:
             filter_spec["args"].append({"op": "<=", "args": [{"property": "datetime"}, date_end]})  # type: ignore[attr-defined]
 
-        items = list(
-            await self.fetch_items(
-                collection=collection,
-                search_params=StacSearch(
-                    limit=1,
-                    intersects=area.model_dump(mode="json"),
-                    fields=FieldsExtension(include=set()),
-                    filter=filter_spec,
-                ),
-            )
+        result = await self.fetch_items(
+            collection=collection,
+            search_params=StacSearch(
+                limit=1,
+                intersects=area.model_dump(mode="json"),
+                fields=FieldsExtension(include=set()),
+                filter=filter_spec,
+            ),
         )
-        return len(items) > 0
+        return len(result.items) > 0
 
 
 class FakeStacClient(StacSearchClientBase):
