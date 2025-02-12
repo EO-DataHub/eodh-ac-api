@@ -219,7 +219,8 @@ def test_job_submission_endpoint_returns_400_when_no_items_to_process_for_given_
     # Assert
     assert response.status_code == status.HTTP_400_BAD_REQUEST
     response_body = response.json()
+    assert response_body["detail"][0]["type"] == "no_items_to_process_error"
     assert (
-        response_body["detail"] == "No STAC items found for the selected configuration. "
+        response_body["detail"][0]["msg"] == "No STAC items found for the selected configuration. "
         "Adjust area, data set, date range, or functions and try again."
     )
