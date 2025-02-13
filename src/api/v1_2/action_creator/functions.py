@@ -468,7 +468,7 @@ WATER_QUALITY_FUNCTION_SPEC = {
         "stac_collection": {
             "type": "string",
             "required": False,
-            "default": "sentinel-2-l2a",
+            "default": "sentinel-2-l2a-ard",
             "description": "The STAC collection to use.",
             "options": [
                 {
