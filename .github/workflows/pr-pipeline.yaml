@@ -11,6 +11,7 @@ permissions:
 jobs:
   pr-checks:
     runs-on: ubuntu-latest
+    environment: dev
 
     steps:
       - name: Check out the repository
