@@ -35,21 +35,6 @@ class DatasetLookupRecord(TypedDict):
 settings = current_settings()
 
 DATASET_LOOKUP: dict[str, DatasetLookupRecord] = {
-    "sentinel-1-grd": DatasetLookupRecord(
-        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/catalogs/earth-search-aws",
-        collection_name="sentinel-1-grd",
-        processor="Element84",
-    ),
-    "sentinel-2-l1c": DatasetLookupRecord(
-        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/catalogs/earth-search-aws",
-        collection_name="sentinel-2-l1c",
-        processor="Element84",
-    ),
-    "sentinel-2-l2a": DatasetLookupRecord(
-        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/catalogs/earth-search-aws",
-        collection_name="sentinel-2-l2a",
-        processor="Element84",
-    ),
     "sentinel-2-l2a-ard": DatasetLookupRecord(
         catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/catalogs/ceda-stac-catalogue",
         collection_name="sentinel2_ard",
