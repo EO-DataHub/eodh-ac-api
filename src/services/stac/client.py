@@ -36,32 +36,32 @@ settings = current_settings()
 
 DATASET_LOOKUP: dict[str, DatasetLookupRecord] = {
     "sentinel-2-l2a-ard": DatasetLookupRecord(
-        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/catalogs/ceda-stac-catalogue",
+        catalog_url=f"{settings.eodh.stac_api_endpoint}/catalogs/supported-datasets/catalogs/ceda-stac-catalogue",
         collection_name="sentinel2_ard",
         processor="CEDA",
     ),
     "esa-lccci-glcm": DatasetLookupRecord(
-        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/catalogs/ceda-stac-catalogue",
+        catalog_url=f"{settings.eodh.stac_api_endpoint}/catalogs/supported-datasets/catalogs/ceda-stac-catalogue",
         collection_name="land_cover",
         processor="CEDA",
     ),
     "esacci-globallc": DatasetLookupRecord(
-        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/catalogs/ceda-stac-catalogue",
+        catalog_url=f"{settings.eodh.stac_api_endpoint}/catalogs/supported-datasets/catalogs/ceda-stac-catalogue",
         collection_name="land_cover",
         processor="CEDA",
     ),
     "clms-corinelc": DatasetLookupRecord(
-        catalog_url=settings.sentinel_hub_stac_api.endpoint,
+        catalog_url=settings.sentinel_hub.stac_api_endpoint,
         collection_name="byoc-cbdba844-f86d-41dc-95ad-b3f7f12535e9",
         processor="Synergise",
     ),
     "clms-corine-lc": DatasetLookupRecord(
-        catalog_url=settings.sentinel_hub_stac_api.endpoint,
+        catalog_url=settings.sentinel_hub.stac_api_endpoint,
         collection_name="byoc-cbdba844-f86d-41dc-95ad-b3f7f12535e9",
         processor="Synergise",
     ),
     "clms-water-bodies": DatasetLookupRecord(
-        catalog_url=settings.sentinel_hub_stac_api.endpoint,
+        catalog_url=settings.sentinel_hub.stac_api_endpoint,
         collection_name="byoc-62bf6f6a-c584-48a8-a739-0bc60efee54a",
         processor="Synergise",
     ),

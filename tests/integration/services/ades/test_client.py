@@ -41,7 +41,7 @@ NON_EXISTENT_PROCESS_ID = NON_EXISTENT_JOB_ID = "i-dont-exist"
 def ades(ws_token: str) -> ADESClient:
     settings = current_settings()
     return ades_client_factory(
-        workspace=settings.eodh_auth.username,
+        workspace=settings.eodh.username,
         token=ws_token,
     )
 

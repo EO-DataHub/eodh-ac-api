@@ -43,7 +43,7 @@ def auth_token_module_scoped() -> str:
     client = TestClient(fast_api_app)
     response = client.post(
         "/api/v1.0/auth/token",
-        json={"username": settings.eodh_auth.username, "password": settings.eodh_auth.password},
+        json={"username": settings.eodh.username, "password": settings.eodh.password},
     )
     return response.json()["access_token"]  # type: ignore[no-any-return]
 
@@ -54,7 +54,7 @@ def auth_token_func_scoped() -> str:
     client = TestClient(fast_api_app)
     response = client.post(
         "/api/v1.0/auth/token",
-        json={"username": settings.eodh_auth.username, "password": settings.eodh_auth.password},
+        json={"username": settings.eodh.username, "password": settings.eodh.password},
     )
     return response.json()["access_token"]  # type: ignore[no-any-return]
 
@@ -65,7 +65,7 @@ def auth_token_session_scoped() -> str:
     client = TestClient(fast_api_app)
     response = client.post(
         "/api/v1.0/auth/token",
-        json={"username": settings.eodh_auth.username, "password": settings.eodh_auth.password},
+        json={"username": settings.eodh.username, "password": settings.eodh.password},
     )
     return response.json()["access_token"]  # type: ignore[no-any-return]
 
@@ -75,7 +75,7 @@ def ws_token(auth_token_session_scoped: str) -> typing.Generator[str]:
     settings = current_settings()
 
     response = requests.post(
-        settings.eodh_auth.workspace_tokens_url,
+        settings.eodh.workspace_tokens_url,
         headers={"Authorization": f"Bearer {auth_token_session_scoped}"},
         timeout=30,
         json={"name": "API Token", "scope": "offline_access", "expires": 30},
@@ -86,7 +86,7 @@ def ws_token(auth_token_session_scoped: str) -> typing.Generator[str]:
     yield token
 
     requests.delete(
-        f"{settings.eodh_auth.workspace_tokens_url}/{token_response['id']}",
+        f"{settings.eodh.workspace_tokens_url}/{token_response['id']}",
         headers={"Authorization": f"Bearer {token}"},
         timeout=30,
     )

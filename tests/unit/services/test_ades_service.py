@@ -78,8 +78,15 @@ def test_ades_client_factory_function_should_normalize_workspace_name(mocked_cur
 
 def test_placeholder_replacement(tmp_cwl_file: Path, monkeypatch: MonkeyPatch) -> None:
     # Arrange
-    monkeypatch.setenv("SENTINEL_HUB__CLIENT_ID", str(uuid.uuid4()))
-    monkeypatch.setenv("SENTINEL_HUB__CLIENT_SECRET", str(uuid.uuid4()))
+    env_config = {
+        "ENVIRONMENT": "test",
+        "SENTINEL_HUB__CLIENT_ID": str(uuid.uuid4()),
+        "SENTINEL_HUB__CLIENT_SECRET": str(uuid.uuid4()),
+        "SENTINEL_HUB__STAC_API_ENDPOINT": "https://test.sentinel-hub.com/stac/api/v1.0.0",
+        "EODH__STAC_API_ENDPOINT": "https://test.eodatahub.org.uk/api/catalogue/stac",
+    }
+    for k, v in env_config.items():
+        monkeypatch.setenv(k, v)
 
     # Act
     replace_placeholders_in_cwl_file(tmp_cwl_file)
@@ -107,7 +114,7 @@ def test_placeholder_replacement(tmp_cwl_file: Path, monkeypatch: MonkeyPatch) -
         env_vars: dict[str, str] = requirements["EnvVarRequirement"]["envDef"]
 
         for var_name, var_val in env_vars.items():
-            if var_name in {"SENTINEL_HUB__CLIENT_ID", "SENTINEL_HUB__CLIENT_SECRET"}:
+            if var_name in env_config:
                 assert var_val == os.environ[var_name]
 
 
