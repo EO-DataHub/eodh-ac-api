@@ -36,32 +36,32 @@ settings = current_settings()
 
 DATASET_LOOKUP: dict[str, DatasetLookupRecord] = {
     "sentinel-1-grd": DatasetLookupRecord(
-        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/earth-search-aws",
+        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/catalogs/earth-search-aws",
         collection_name="sentinel-1-grd",
         processor="Element84",
     ),
     "sentinel-2-l1c": DatasetLookupRecord(
-        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/earth-search-aws",
+        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/catalogs/earth-search-aws",
         collection_name="sentinel-2-l1c",
         processor="Element84",
     ),
     "sentinel-2-l2a": DatasetLookupRecord(
-        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/earth-search-aws",
+        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/catalogs/earth-search-aws",
         collection_name="sentinel-2-l2a",
         processor="Element84",
     ),
     "sentinel-2-l2a-ard": DatasetLookupRecord(
-        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/ceda-stac-catalogue",
+        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/catalogs/ceda-stac-catalogue",
         collection_name="sentinel2_ard",
         processor="CEDA",
     ),
     "esa-lccci-glcm": DatasetLookupRecord(
-        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/ceda-stac-catalogue",
+        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/catalogs/ceda-stac-catalogue",
         collection_name="land_cover",
         processor="CEDA",
     ),
     "esacci-globallc": DatasetLookupRecord(
-        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/ceda-stac-catalogue",
+        catalog_url=f"{settings.eodh_stac_api.endpoint}/catalogs/supported-datasets/catalogs/ceda-stac-catalogue",
         collection_name="land_cover",
         processor="CEDA",
     ),
@@ -218,13 +218,17 @@ class StacSearchClient:
         job_id: str,
         stac_api_endpoint: str,
         workspace: str,
+        workflow_identifier: str | None = None,
         stac_query: StacSearch | None = None,
     ) -> Iterator[Item]:
+        url = (
+            f"{stac_api_endpoint}/catalogs/user-datasets/catalogs/{workspace}/catalogs/processing-results/catalogs/{workflow_identifier}/catalogs/cat_{job_id}"
+            if workflow_identifier is None
+            else f"{stac_api_endpoint}/catalogs/user-datasets/{workspace}/processing-results/cat_{job_id}"
+        )
+
         try:
-            stac_client = Client.open(
-                f"{stac_api_endpoint}/catalogs/user-datasets/{workspace}/processing-results/cat_{job_id}",
-                headers={"Authorization": f"Bearer {token}"},
-            )
+            stac_client = Client.open(url=url, headers={"Authorization": f"Bearer {token}"})
         except APIError as ex:
             # User not authorized to access this resource or catalog does not exist
             raise HTTPException(

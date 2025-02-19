@@ -4,7 +4,7 @@
       "identifier": "ndvi",
       "order": 0,
       "inputs": {
-        "stac_collection": "sentinel-2-l2a-ard",
+        "stac_collection": "sentinel-2-l2a",
         "date_start": "2023-01-01T00:00:00Z",
         "date_end": "2024-12-31T23:59:59Z",
         "aoi": {
