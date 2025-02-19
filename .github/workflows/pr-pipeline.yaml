@@ -44,22 +44,22 @@ jobs:
         run: |
           pytest -vv --cov=src tests/ --cov-report xml:coverage/coverage.xml
         env:
-          EODH_AUTH__BASE_URL: ${{ secrets.EODH_AUTH__BASE_URL }}
-          EODH_AUTH__REALM: ${{ secrets.EODH_AUTH__REALM }}
-          EODH_AUTH__USERNAME: ${{ secrets.EODH_AUTH__USERNAME }}
-          EODH_AUTH__PASSWORD: ${{ secrets.EODH_AUTH__PASSWORD }}
-          EODH_AUTH__CLIENT_ID: ${{ secrets.EODH_AUTH__CLIENT_ID }}
-          EODH_AUTH__API_TOKEN: ${{ secrets.EODH_AUTH__API_TOKEN }}
-          EODH_AUTH__WORKSPACE_TOKENS_URL: ${{ secrets.EODH_AUTH__WORKSPACE_TOKENS_URL }}
-          EODH_AUTH__TMP_S3_CREDENTIALS_URL: ${{ secrets.EODH_AUTH__TMP_S3_CREDENTIALS_URL }}
+          EODH__BASE_URL: ${{ secrets.EODH__BASE_URL }}
+          EODH__REALM: ${{ secrets.EODH__REALM }}
+          EODH__USERNAME: ${{ secrets.EODH__USERNAME }}
+          EODH__PASSWORD: '${{ secrets.EODH__PASSWORD }}'
+          EODH__CLIENT_ID: ${{ secrets.EODH__CLIENT_ID }}
+          EODH__API_TOKEN: ${{ secrets.EODH__API_TOKEN }}
+          EODH__WORKSPACE_TOKENS_URL: ${{ secrets.EODH__WORKSPACE_TOKENS_URL }}
+          EODH__TMP_S3_CREDENTIALS_URL: ${{ secrets.EODH__TMP_S3_CREDENTIALS_URL }}
+          EODH__STAC_API_ENDPOINT: ${{ secrets.EODH__STAC_API_ENDPOINT }}
           ADES__URL: ${{ secrets.ADES__URL }}
           ADES__OGC_PROCESSES_API_PATH: ${{ secrets.ADES__OGC_PROCESSES_API_PATH }}
           ADES__OGC_JOBS_API_PATH: ${{ secrets.ADES__OGC_JOBS_API_PATH }}
           SENTINEL_HUB__CLIENT_ID: ${{ secrets.SENTINEL_HUB__CLIENT_ID }}
           SENTINEL_HUB__CLIENT_SECRET: ${{ secrets.SENTINEL_HUB__CLIENT_SECRET }}
           SENTINEL_HUB__TOKEN_URL: ${{ secrets.SENTINEL_HUB__TOKEN_URL }}
-          SENTINEL_HUB_STAC_API__ENDPOINT: ${{ secrets.SENTINEL_HUB_STAC_API__ENDPOINT }}
-          EODH_STAC_API__ENDPOINT: ${{ secrets.EODH_STAC_API__ENDPOINT }}
+          SENTINEL_HUB__STAC_API_ENDPOINT: ${{ secrets.SENTINEL_HUB__STAC_API_ENDPOINT }}
 
       - name: Get code coverage
         uses: orgoro/coverage@v3.2

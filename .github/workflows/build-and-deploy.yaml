@@ -40,22 +40,22 @@ jobs:
       - name: Create file with environment variables
         run: |
           echo 'ENVIRONMENT=dev' >> envs.env
-          echo 'EODH_AUTH__API_TOKEN=${{ secrets.EODH_AUTH__API_TOKEN }}' >> envs.env
-          echo 'EODH_AUTH__BASE_URL=${{ secrets.EODH_AUTH__BASE_URL }}' >> envs.env
-          echo 'EODH_AUTH__CLIENT_ID=${{ secrets.EODH_AUTH__CLIENT_ID }}' >> envs.env
-          echo 'EODH_AUTH__PASSWORD=${{ secrets.EODH_AUTH__PASSWORD }}' >> envs.env
-          echo 'EODH_AUTH__REALM=${{ secrets.EODH_AUTH__REALM }}' >> envs.env
-          echo 'EODH_AUTH__USERNAME=${{ secrets.EODH_AUTH__USERNAME }}' >> envs.env
-          echo 'EODH_AUTH__WORKSPACE_TOKENS_URL=${{ secrets.EODH_AUTH__WORKSPACE_TOKENS_URL }}' >> envs.env
-          echo 'EODH_AUTH__TMP_S3_CREDENTIALS_URL=${{ secrets.EODH_AUTH__TMP_S3_CREDENTIALS_URL }}' >> envs.env
+          echo 'EODH__API_TOKEN=${{ secrets.EODH__API_TOKEN }}' >> envs.env
+          echo 'EODH__BASE_URL=${{ secrets.EODH__BASE_URL }}' >> envs.env
+          echo 'EODH__CLIENT_ID=${{ secrets.EODH__CLIENT_ID }}' >> envs.env
+          echo 'EODH__PASSWORD=${{ secrets.EODH__PASSWORD }}' >> envs.env
+          echo 'EODH__REALM=${{ secrets.EODH__REALM }}' >> envs.env
+          echo 'EODH__USERNAME=${{ secrets.EODH__USERNAME }}' >> envs.env
+          echo 'EODH__WORKSPACE_TOKENS_URL=${{ secrets.EODH__WORKSPACE_TOKENS_URL }}' >> envs.env
+          echo 'EODH__TMP_S3_CREDENTIALS_URL=${{ secrets.EODH__TMP_S3_CREDENTIALS_URL }}' >> envs.env
+          echo 'EODH__STAC_API_ENDPOINT=${{ secrets.EODH__STAC_API_ENDPOINT }}' >> envs.env
           echo 'ADES__URL=${{ secrets.ADES__URL }}' >> envs.env
           echo 'ADES__OGC_PROCESSES_API_PATH=${{ secrets.ADES__OGC_PROCESSES_API_PATH }}' >> envs.env
           echo 'ADES__OGC_JOBS_API_PATH=${{ secrets.ADES__OGC_JOBS_API_PATH }}' >> envs.env
           echo 'SENTINEL_HUB__CLIENT_ID=${{ secrets.SENTINEL_HUB__CLIENT_ID }}' >> envs.env
           echo 'SENTINEL_HUB__CLIENT_SECRET=${{ secrets.SENTINEL_HUB__CLIENT_SECRET }}' >> envs.env
           echo 'SENTINEL_HUB__TOKEN_URL=${{ secrets.SENTINEL_HUB__TOKEN_URL }}' >> envs.env
-          echo 'EODH_STAC_API__ENDPOINT=${{ secrets.EODH_STAC_API__ENDPOINT }}' >> envs.env
-          echo 'SENTINEL_HUB_STAC_API__ENDPOINT=${{ secrets.SENTINEL_HUB_STAC_API__ENDPOINT }}' >> envs.env
+          echo 'SENTINEL_HUB__STAC_API_ENDPOINT=${{ secrets.SENTINEL_HUB__STAC_API_ENDPOINT }}' >> envs.env
       - name: Upload file as artifact
         run: |
           aws s3 cp envs.env s3://ukri-task-definition-variables/${{ vars.TAGS }}/
@@ -88,22 +88,22 @@ jobs:
       - name: Create file with environment variables
         run: |
           echo 'ENVIRONMENT=qa' >> envs.env
-          echo 'EODH_AUTH__API_TOKEN=${{ secrets.EODH_AUTH__API_TOKEN }}' >> envs.env
-          echo 'EODH_AUTH__BASE_URL=${{ secrets.EODH_AUTH__BASE_URL }}' >> envs.env
-          echo 'EODH_AUTH__CLIENT_ID=${{ secrets.EODH_AUTH__CLIENT_ID }}' >> envs.env
-          echo 'EODH_AUTH__PASSWORD=${{ secrets.EODH_AUTH__PASSWORD }}' >> envs.env
-          echo 'EODH_AUTH__REALM=${{ secrets.EODH_AUTH__REALM }}' >> envs.env
-          echo 'EODH_AUTH__USERNAME=${{ secrets.EODH_AUTH__USERNAME }}' >> envs.env
-          echo 'EODH_AUTH__WORKSPACE_TOKENS_URL=${{ secrets.EODH_AUTH__WORKSPACE_TOKENS_URL }}' >> envs.env
-          echo 'EODH_AUTH__TMP_S3_CREDENTIALS_URL=${{ secrets.EODH_AUTH__TMP_S3_CREDENTIALS_URL }}' >> envs.env
+          echo 'EODH__API_TOKEN=${{ secrets.EODH__API_TOKEN }}' >> envs.env
+          echo 'EODH__BASE_URL=${{ secrets.EODH__BASE_URL }}' >> envs.env
+          echo 'EODH__CLIENT_ID=${{ secrets.EODH__CLIENT_ID }}' >> envs.env
+          echo 'EODH__PASSWORD=${{ secrets.EODH__PASSWORD }}' >> envs.env
+          echo 'EODH__REALM=${{ secrets.EODH__REALM }}' >> envs.env
+          echo 'EODH__USERNAME=${{ secrets.EODH__USERNAME }}' >> envs.env
+          echo 'EODH__WORKSPACE_TOKENS_URL=${{ secrets.EODH__WORKSPACE_TOKENS_URL }}' >> envs.env
+          echo 'EODH__TMP_S3_CREDENTIALS_URL=${{ secrets.EODH__TMP_S3_CREDENTIALS_URL }}' >> envs.env
+          echo 'EODH__STAC_API_ENDPOINT=${{ secrets.EODH__STAC_API_ENDPOINT }}' >> envs.env
           echo 'ADES__URL=${{ secrets.ADES__URL }}' >> envs.env
           echo 'ADES__OGC_PROCESSES_API_PATH=${{ secrets.ADES__OGC_PROCESSES_API_PATH }}' >> envs.env
           echo 'ADES__OGC_JOBS_API_PATH=${{ secrets.ADES__OGC_JOBS_API_PATH }}' >> envs.env
           echo 'SENTINEL_HUB__CLIENT_ID=${{ secrets.SENTINEL_HUB__CLIENT_ID }}' >> envs.env
           echo 'SENTINEL_HUB__CLIENT_SECRET=${{ secrets.SENTINEL_HUB__CLIENT_SECRET }}' >> envs.env
           echo 'SENTINEL_HUB__TOKEN_URL=${{ secrets.SENTINEL_HUB__TOKEN_URL }}' >> envs.env
-          echo 'EODH_STAC_API__ENDPOINT=${{ secrets.EODH_STAC_API__ENDPOINT }}' >> envs.env
-          echo 'SENTINEL_HUB_STAC_API__ENDPOINT=${{ secrets.SENTINEL_HUB_STAC_API__ENDPOINT }}' >> envs.env
+          echo 'SENTINEL_HUB__STAC_API_ENDPOINT=${{ secrets.SENTINEL_HUB__STAC_API_ENDPOINT }}' >> envs.env
       - name: Upload file as artifact
         run: |
           aws s3 cp envs.env s3://ukri-task-definition-variables/${{ vars.TAGS }}/
@@ -136,22 +136,22 @@ jobs:
       - name: Create file with environment variables
         run: |
           echo 'ENVIRONMENT=staging' >> envs.env
-          echo 'EODH_AUTH__API_TOKEN=${{ secrets.EODH_AUTH__API_TOKEN }}' >> envs.env
-          echo 'EODH_AUTH__BASE_URL=${{ secrets.EODH_AUTH__BASE_URL }}' >> envs.env
-          echo 'EODH_AUTH__CLIENT_ID=${{ secrets.EODH_AUTH__CLIENT_ID }}' >> envs.env
-          echo 'EODH_AUTH__PASSWORD=${{ secrets.EODH_AUTH__PASSWORD }}' >> envs.env
-          echo 'EODH_AUTH__REALM=${{ secrets.EODH_AUTH__REALM }}' >> envs.env
-          echo 'EODH_AUTH__USERNAME=${{ secrets.EODH_AUTH__USERNAME }}' >> envs.env
-          echo 'EODH_AUTH__WORKSPACE_TOKENS_URL=${{ secrets.EODH_AUTH__WORKSPACE_TOKENS_URL }}' >> envs.env
-          echo 'EODH_AUTH__TMP_S3_CREDENTIALS_URL=${{ secrets.EODH_AUTH__TMP_S3_CREDENTIALS_URL }}' >> envs.env
+          echo 'EODH__API_TOKEN=${{ secrets.EODH__API_TOKEN }}' >> envs.env
+          echo 'EODH__BASE_URL=${{ secrets.EODH__BASE_URL }}' >> envs.env
+          echo 'EODH__CLIENT_ID=${{ secrets.EODH__CLIENT_ID }}' >> envs.env
+          echo 'EODH__PASSWORD=${{ secrets.EODH__PASSWORD }}' >> envs.env
+          echo 'EODH__REALM=${{ secrets.EODH__REALM }}' >> envs.env
+          echo 'EODH__USERNAME=${{ secrets.EODH__USERNAME }}' >> envs.env
+          echo 'EODH__WORKSPACE_TOKENS_URL=${{ secrets.EODH__WORKSPACE_TOKENS_URL }}' >> envs.env
+          echo 'EODH__TMP_S3_CREDENTIALS_URL=${{ secrets.EODH__TMP_S3_CREDENTIALS_URL }}' >> envs.env
+          echo 'EODH__STAC_API_ENDPOINT=${{ secrets.EODH__STAC_API_ENDPOINT }}' >> envs.env
           echo 'ADES__URL=${{ secrets.ADES__URL }}' >> envs.env
           echo 'ADES__OGC_PROCESSES_API_PATH=${{ secrets.ADES__OGC_PROCESSES_API_PATH }}' >> envs.env
           echo 'ADES__OGC_JOBS_API_PATH=${{ secrets.ADES__OGC_JOBS_API_PATH }}' >> envs.env
           echo 'SENTINEL_HUB__CLIENT_ID=${{ secrets.SENTINEL_HUB__CLIENT_ID }}' >> envs.env
           echo 'SENTINEL_HUB__CLIENT_SECRET=${{ secrets.SENTINEL_HUB__CLIENT_SECRET }}' >> envs.env
           echo 'SENTINEL_HUB__TOKEN_URL=${{ secrets.SENTINEL_HUB__TOKEN_URL }}' >> envs.env
-          echo 'EODH_STAC_API__ENDPOINT=${{ secrets.EODH_STAC_API__ENDPOINT }}' >> envs.env
-          echo 'SENTINEL_HUB_STAC_API__ENDPOINT=${{ secrets.SENTINEL_HUB_STAC_API__ENDPOINT }}' >> envs.env
+          echo 'SENTINEL_HUB__STAC_API_ENDPOINT=${{ secrets.SENTINEL_HUB__STAC_API_ENDPOINT }}' >> envs.env
       - name: Upload file as artifact
         run: |
           aws s3 cp envs.env s3://ukri-task-definition-variables/${{ vars.TAGS }}/
