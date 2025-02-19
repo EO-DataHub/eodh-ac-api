@@ -51,19 +51,21 @@ class OAuthClientSettings(BaseModel):
     token_url: str
 
 
-class StacApiSettings(BaseModel):
-    endpoint: str
+class SentinelHubSettings(OAuthClientSettings):
+    stac_api_endpoint: str
+
+
+class EODHSettings(OAuth2Settings):
+    stac_api_endpoint: str
 
 
 class Settings(BaseSettings):
     """Represents Application Settings with nested configuration sections."""
 
     environment: str = "local"
-    eodh_auth: OAuth2Settings
-    eodh_stac_api: StacApiSettings
+    eodh: EODHSettings
     ades: ADESSettings
-    sentinel_hub: OAuthClientSettings
-    sentinel_hub_stac_api: StacApiSettings
+    sentinel_hub: SentinelHubSettings
 
     model_config = SettingsConfigDict(
         env_file=consts.directories.ROOT_DIR / ".env",

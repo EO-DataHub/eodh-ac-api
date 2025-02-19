@@ -1,272 +1,123 @@
 cwlVersion: v1.0
-
 $namespaces:
   s: https://schema.org/
-s:softwareVersion: 1.1.8
+s:softwareVersion: 0.1.2
 schemas:
   - http://schema.org/version/9.0/schemaorg-current-http.rdf
-
 $graph:
+  # Workflow entrypoint
   - class: Workflow
-
-    id: water_bodies
-    label: Water bodies detection based on NDWI and otsu threshold
-    doc: Water bodies detection based on NDWI and otsu threshold
-
+    id: raster-calculate
+    label: Test raster calculator for Spyrosoft workflows
+    doc: Test raster calculator for Spyrosoft workflows
     requirements:
-      - class: ScatterFeatureRequirement
-      - class: SubworkflowFeatureRequirement
-
-    inputs:
-      aoi:
-        label: area of interest
-        doc: area of interest as a bounding box
-        type: string
-      epsg:
-        label: EPSG code
-        doc: EPSG code
-        type: string
-        default: "EPSG:4326"
-      stac_items:
-        label: Sentinel-2 STAC items
-        doc: list of Sentinel-2 COG STAC items
-        type: string[]
-
-    outputs:
-      - id: stac_catalog
-        outputSource:
-          - node_stac/stac_catalog
-        type: Directory
-
-    steps:
-      node_water_bodies:
-        run: "#detect_water_body"
-        in:
-          item: stac_items
-          aoi: aoi
-          epsg: epsg
-        out:
-          - detected_water_body
-        scatter: item
-        scatterMethod: dotproduct
-      node_stac:
-        run: "#stac"
-        in:
-          item: stac_items
-          rasters:
-            source: node_water_bodies/detected_water_body
-        out:
-          - stac_catalog
-
-  - class: Workflow
-
-    id: detect_water_body
-    label: Water body detection based on NDWI and otsu threshold
-    doc: Water body detection based on NDWI and otsu threshold
-
-    requirements:
-      - class: ScatterFeatureRequirement
-
-    inputs:
-      aoi:
-        doc: area of interest as a bounding box
-        type: string
-      epsg:
-        doc: EPSG code
-        type: string
-        default: "EPSG:4326"
-      bands:
-        doc: bands used for the NDWI
-        type: string[]
-        default: [ "green", "nir" ]
-      item:
-        doc: STAC item
-        type: string
-
-    outputs:
-      - id: detected_water_body
-        outputSource:
-          - node_otsu/binary_mask_item
-        type: File
-
-    steps:
-      node_crop:
-        run: "#crop"
-        in:
-          item: item
-          aoi: aoi
-          epsg: epsg
-          band:
-            default: [ "green", "nir" ]
-        out:
-          - cropped
-        scatter: band
-        scatterMethod: dotproduct
-      node_normalized_difference:
-        run: "#norm_diff"
-        in:
-          rasters:
-            source: node_crop/cropped
-        out:
-          - ndwi
-      node_otsu:
-        run: "#otsu"
-        in:
-          raster:
-            source: node_normalized_difference/ndwi
-        out:
-          - binary_mask_item
-
-  - class: CommandLineTool
-    id: crop
-
-    requirements:
-      InlineJavascriptRequirement: { }
-      EnvVarRequirement:
-        envDef:
-          PATH: /srv/conda/envs/env_crop/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-          PYTHONPATH: /workspaces/ogc-eo-application-package-hands-on/water-bodies/command-line-tools/crop:/home/jovyan/ogc-eo-application-package-hands-on/water-bodies/command-line-tools/crop:/home/jovyan/water-bodies/command-line-tools/crop:/workspaces/vscode-binder/command-line-tools/crop
-          PROJ_LIB: /srv/conda/envs/env_crop/share/proj/
-          SENTINEL_HUB__CLIENT_ID: "<<SENTINEL_HUB__CLIENT_ID>>"
-          SENTINEL_HUB__CLIENT_SECRET: "<<SENTINEL_HUB__CLIENT_SECRET>>"
       ResourceRequirement:
         coresMax: 2
-        ramMax: 2028
+        ramMax: 4096
+    inputs:
+      stac_collection:
+        label: STAC collection
+        doc: The STAC collection to use
+        type: string
+      aoi:
+        label: Area
+        doc: The area of interest as GeoJSON
+        type: string
+      date_start:
+        label: Date start
+        doc: The start date for the STAC item search
+        type: string
+      date_end:
+        label: Date end
+        doc: The start date for the STAC item search
+        type: string
+      index:
+        label: Index
+        doc: The spectral index to calculate
+        type: string
+      clip:
+        label: Clip
+        doc: A flag indicating whether to crop the data to the AOI footprint
+        type: string
+      limit:
+        label: Limit
+        doc: Max number of STAC items to process
+        type: string
+    outputs:
+      - id: results
+        type: Directory
+        outputSource:
+          - calculator/results
+    steps:
+      calculator:
+        run: "#calculator"
+        in:
+          stac_collection: stac_collection
+          aoi: aoi
+          date_start: date_start
+          date_end: date_end
+          index: index
+          limit: limit
+          clip: clip
+        out:
+          - results
 
+  # calculator
+  - class: CommandLineTool
+    id: calculator
+    requirements:
+      ResourceRequirement:
+        coresMax: 2
+        ramMax: 4096
+      EnvVarRequirement:
+        envDef:
+          ENVIRONMENT: <<ENVIRONMENT>>
+          SENTINEL_HUB__CLIENT_ID: <<SENTINEL_HUB__CLIENT_ID>>
+          SENTINEL_HUB__CLIENT_SECRET: <<SENTINEL_HUB__CLIENT_SECRET>>
+          SENTINEL_HUB__STAC_API_ENDPOINT: <<SENTINEL_HUB__STAC_API_ENDPOINT>>
+          EODH__STAC_API_ENDPOINT: <<EODH__STAC_API_ENDPOINT>>
     hints:
       DockerRequirement:
-        dockerPull: crop
-
-    baseCommand: [ "python", "-m", "app" ]
-    arguments: [ ]
+        dockerPull: ghcr.io/eo-datahub/eodh-workflows:latest
+    baseCommand: [ "eodh", "raster", "calculate" ]
     inputs:
-      item:
+      stac_collection:
         type: string
         inputBinding:
-          prefix: --input-item
+          position: 1
+          prefix: --stac_collection
       aoi:
         type: string
         inputBinding:
+          position: 2
           prefix: --aoi
-      epsg:
+      date_start:
         type: string
         inputBinding:
-          prefix: --epsg
-      band:
+          position: 3
+          prefix: --date_start
+      date_end:
         type: string
         inputBinding:
-          prefix: --band
-    outputs:
-      cropped:
-        outputBinding:
-          glob: '*.tif'
-        type: File
-
-  - class: CommandLineTool
-    id: norm_diff
-
-    requirements:
-      InlineJavascriptRequirement: { }
-      EnvVarRequirement:
-        envDef:
-          PATH: /srv/conda/envs/env_norm_diff/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-          PYTHONPATH: /workspaces/ogc-eo-application-package-hands-on/water-bodies/command-line-tools/norm_diff:/home/jovyan/ogc-eo-application-package-hands-on/water-bodies/command-line-tools/norm_diff:/workspaces/vscode-binder/command-line-tools/norm_diff
-          PROJ_LIB: /srv/conda/envs/env_norm_diff/share/proj/
-          SENTINEL_HUB__CLIENT_ID: "<<SENTINEL_HUB__CLIENT_ID>>"
-          SENTINEL_HUB__CLIENT_SECRET: "<<SENTINEL_HUB__CLIENT_SECRET>>"
-      ResourceRequirement:
-        coresMax: 2
-        ramMax: 2028
-
-    hints:
-      DockerRequirement:
-        dockerPull: norm_diff
-
-    baseCommand: [ "python", "-m", "app" ]
-    arguments: [ ]
-    inputs:
-      rasters:
-        type: File[]
+          position: 4
+          prefix: --date_end
+      index:
+        type: string
         inputBinding:
-          position: 1
-    outputs:
-      ndwi:
-        outputBinding:
-          glob: '*.tif'
-        type: File
-
-  - class: CommandLineTool
-    id: otsu
-
-    requirements:
-      InlineJavascriptRequirement: { }
-      EnvVarRequirement:
-        envDef:
-          PATH: /srv/conda/envs/env_otsu/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-          PYTHONPATH: /workspaces/ogc-eo-application-package-hands-on/water-bodies/command-line-tools/otsu:/home/jovyan/ogc-eo-application-package-hands-on/water-bodies/command-line-tools/otsu:/workspaces/vscode-binder/command-line-tools/otsu
-          PROJ_LIB: /srv/conda/envs/env_otsu/share/proj/
-          SENTINEL_HUB__CLIENT_ID: "<<SENTINEL_HUB__CLIENT_ID>>"
-          SENTINEL_HUB__CLIENT_SECRET: "<<SENTINEL_HUB__CLIENT_SECRET>>"
-      ResourceRequirement:
-        coresMax: 2
-        ramMax: 2028
-
-    hints:
-      DockerRequirement:
-        dockerPull: otsu
-
-    baseCommand: [ "python", "-m", "app" ]
-    arguments: [ ]
-    inputs:
-      raster:
-        type: File
+          position: 5
+          prefix: --index
+      clip:
+        type: string
         inputBinding:
-          position: 1
+          position: 6
+          prefix: --clip
+      limit:
+        type: string
+        inputBinding:
+          position: 7
+          prefix: --limit
     outputs:
-      binary_mask_item:
-        outputBinding:
-          glob: '*.tif'
-        type: File
-
-  - class: CommandLineTool
-    id: stac
-
-    requirements:
-      InlineJavascriptRequirement: { }
-      EnvVarRequirement:
-        envDef:
-          PATH: /srv/conda/envs/env_stac/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-          PYTHONPATH: /workspaces/ogc-eo-application-package-hands-on/water-bodies/command-line-tools/stac:/home/jovyan/ogc-eo-application-package-hands-on/water-bodies/command-line-tools/stac:/workspaces/vscode-binder/command-line-tools/stac
-          PROJ_LIB: /srv/conda/envs/env_stac/lib/python3.9/site-packages/rasterio/proj_data
-          SENTINEL_HUB__CLIENT_ID: "<<SENTINEL_HUB__CLIENT_ID>>"
-          SENTINEL_HUB__CLIENT_SECRET: "<<SENTINEL_HUB__CLIENT_SECRET>>"
-      ResourceRequirement:
-        coresMax: 2
-        ramMax: 2028
-
-    hints:
-      DockerRequirement:
-        dockerPull: stac
-
-    baseCommand: [ "python", "-m", "app" ]
-    arguments: [ ]
-    inputs:
-      item:
-        type:
-          type: array
-          items: string
-          inputBinding:
-            prefix: --input-item
-
-      rasters:
-        type:
-          type: array
-          items: File
-          inputBinding:
-            prefix: --water-body
-
-    outputs:
-      stac_catalog:
-        outputBinding:
-          glob: .
+      results:
         type: Directory
+        outputBinding:
+          glob: ./data/stac-catalog/

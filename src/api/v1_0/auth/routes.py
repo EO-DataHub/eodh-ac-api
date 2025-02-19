@@ -26,7 +26,7 @@ TIMEOUT = 30
 
 def decode_token(token: str, *, ws: bool = False) -> dict[str, Any]:
     optional_custom_headers = {"User-agent": "custom-user-agent"}
-    jwks_client = PyJWKClient(current_settings().eodh_auth.certs_url, headers=optional_custom_headers)
+    jwks_client = PyJWKClient(current_settings().eodh.certs_url, headers=optional_custom_headers)
 
     try:
         signing_key = jwks_client.get_signing_key_from_jwt(token)
@@ -95,10 +95,10 @@ async def authenticate(
     settings: Annotated[Settings, Depends(current_settings)],
 ) -> TokenResponse:
     async with aiohttp.ClientSession() as session, session.post(
-        url=settings.eodh_auth.token_url,
+        url=settings.eodh.token_url,
         headers=_HEADERS,
         data={
-            "client_id": settings.eodh_auth.client_id,
+            "client_id": settings.eodh.client_id,
             "username": token_request.username,
             "password": token_request.password,
             "grant_type": "password",

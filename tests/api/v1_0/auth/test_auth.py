@@ -17,7 +17,7 @@ def test_authenticate_success(api_version: str, client: TestClient) -> None:
 
     response = client.post(
         f"/api/v{api_version}/auth/token",
-        json={"username": settings.eodh_auth.username, "password": settings.eodh_auth.password},
+        json={"username": settings.eodh.username, "password": settings.eodh.password},
     )
 
     assert response.status_code == status.HTTP_200_OK
@@ -42,7 +42,7 @@ def test_introspect_success(api_version: str, client: TestClient) -> None:
 
     token_response = client.post(
         f"/api/v{api_version}/auth/token",
-        json={"username": settings.eodh_auth.username, "password": settings.eodh_auth.password},
+        json={"username": settings.eodh.username, "password": settings.eodh.password},
     )
 
     response = client.post(

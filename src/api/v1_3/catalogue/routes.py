@@ -84,7 +84,7 @@ async def get_visualization_data_for_job_results(
     items = await client.fetch_processing_results(
         token=credential.credentials,
         job_id=job_id,
-        stac_api_endpoint=settings.eodh_stac_api.endpoint,
+        stac_api_endpoint=settings.eodh.stac_api_endpoint,
         workspace=workspace,
         stac_query=visualization_request.stac_query,
     )
@@ -119,7 +119,7 @@ async def get_visualization_data_for_job_results_v2(
         token=credential.credentials,
         job_id=job_id,
         workflow_identifier=workflow_identifier,
-        stac_api_endpoint=settings.eodh_stac_api.endpoint,
+        stac_api_endpoint=settings.eodh.stac_api_endpoint,
         workspace=workspace,
         stac_query=visualization_request.stac_query,
     )
