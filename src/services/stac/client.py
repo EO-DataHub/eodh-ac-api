@@ -208,7 +208,7 @@ class StacSearchClient:
     ) -> Iterator[Item]:
         url = (
             f"{stac_api_endpoint}/catalogs/user-datasets/catalogs/{workspace}/catalogs/processing-results/catalogs/{workflow_identifier}/catalogs/cat_{job_id}"
-            if workflow_identifier is None
+            if workflow_identifier is not None
             else f"{stac_api_endpoint}/catalogs/user-datasets/{workspace}/processing-results/cat_{job_id}"
         )
 

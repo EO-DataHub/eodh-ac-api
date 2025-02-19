@@ -16,8 +16,10 @@ if TYPE_CHECKING:
     from httpx import Response
     from starlette.testclient import TestClient
 
+
 _VISUALIZATION_ENDPOINT_TEMPLATE = (
-    "/api/v1.3/catalogue/stac/catalogs/user-datasets/{username}/processing-results/cat_{job_id}/charts"
+    "/api/v1.3/catalogue/stac/catalogs/user-datasets/catalogs/{username}"
+    "/catalogs/processing-results/catalogs/some-workflow/catalogs/cat_{job_id}/charts"
 )
 
 
