@@ -1,4 +1,4 @@
-@eodh_stac_api_url=https://test.eodatahub.org.uk/api/catalogue/stac
+@eodh_stac_api_url=https://staging.eodatahub.org.uk/api/catalogue/stac
 @job_id=56ecdb48-b88a-11ef-8fa3-6a040e2afd6f
 
 
@@ -67,6 +67,7 @@ Content-Type: application/json
 
 %}
 
+
 ### Get item
 GET {{collection_items.features[0].assets.data.href}}
 Authorization: Bearer {{token}}
@@ -106,13 +107,272 @@ Content-Type: application/json
 }
 
 
-### GET
+### GET collection
 GET https://test.eodatahub.org.uk/api/catalogue/stac/catalogs/user-datasets/eopro-spyro-test/processing-results/cat_01e116ec-bdf2-11ef-a2af-8ef03814f15e/collections/collection
 Accept: application/json
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
-### GET #2
-GET https://test.eodatahub.org.uk/api/catalogue/stac/catalogs/supported-datasets/ceda-stac-catalogue/collections/sentinel2_ard/items
+### Search S2 ARD TEST
+POST https://test.eodatahub.org.uk/api/catalogue/stac/catalogs/supported-datasets/ceda-stac-catalogue/search
 Accept: application/json
 Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+   "limit":1,
+   "sortby":[
+      {
+         "field":"properties.datetime",
+         "direction":"desc"
+      }
+   ],
+   "filter-lang":"cql-json",
+   "filter":{
+      "op":"and",
+      "args":[
+         {
+            "op":"between",
+            "args":[
+               {
+                  "property":"properties.datetime"
+               },
+               "2020-01-18T00:00:00.000Z",
+               "2025-02-18T23:59:59.999Z"
+            ]
+         },
+         {
+            "op":"and",
+            "args":[
+               {
+                  "op":"=",
+                  "args":[
+                     {
+                        "property":"collection"
+                     },
+                     "sentinel2_ard"
+                  ]
+               },
+               {
+                  "op":"<=",
+                  "args":[
+                     {
+                        "property":"properties.eo:cloud_cover"
+                     },
+                     70
+                  ]
+               }
+            ]
+         }
+      ]
+   },
+   "fields":{
+      "include":[
+         "properties.eo:cloud_cover",
+         "properties.grid:code"
+      ],
+      "exclude":[
+
+      ]
+   },
+   "intersects":{
+      "type":"Polygon",
+      "coordinates":[
+         [
+            [
+               -0.9568355910868445,
+               51.267645557244634
+            ],
+            [
+               0.45604791329275884,
+               51.267645557244634
+            ],
+            [
+               0.45604791329275884,
+               52.23238470243538
+            ],
+            [
+               -0.9568355910868445,
+               52.23238470243538
+            ],
+            [
+               -0.9568355910868445,
+               51.267645557244634
+            ]
+         ]
+      ]
+   }
+}
+
+### Search S2 ARD STAGING
+POST https://staging.eodatahub.org.uk/api/catalogue/stac/catalogs/supported-datasets/catalogs/ceda-stac-catalogue/search
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+   "limit":1,
+   "sortby":[
+      {
+         "field":"properties.datetime",
+         "direction":"desc"
+      }
+   ],
+   "filter-lang":"cql-json",
+   "filter":{
+      "op":"and",
+      "args":[
+         {
+            "op":"between",
+            "args":[
+               {
+                  "property":"properties.datetime"
+               },
+               "2020-01-18T00:00:00.000Z",
+               "2025-02-18T23:59:59.999Z"
+            ]
+         },
+         {
+            "op":"and",
+            "args":[
+               {
+                  "op":"=",
+                  "args":[
+                     {
+                        "property":"collection"
+                     },
+                     "sentinel2_ard"
+                  ]
+               },
+               {
+                  "op":"<=",
+                  "args":[
+                     {
+                        "property":"properties.eo:cloud_cover"
+                     },
+                     70
+                  ]
+               }
+            ]
+         }
+      ]
+   },
+   "fields":{
+      "include":[
+         "properties.eo:cloud_cover",
+         "properties.grid:code"
+      ],
+      "exclude":[
+
+      ]
+   },
+   "intersects":{
+      "type":"Polygon",
+      "coordinates":[
+         [
+            [
+               -0.9568355910868445,
+               51.267645557244634
+            ],
+            [
+               0.45604791329275884,
+               51.267645557244634
+            ],
+            [
+               0.45604791329275884,
+               52.23238470243538
+            ],
+            [
+               -0.9568355910868445,
+               52.23238470243538
+            ],
+            [
+               -0.9568355910868445,
+               51.267645557244634
+            ]
+         ]
+      ]
+   }
+}
+
+### Planet collections
+GET https://staging.eodatahub.org.uk/api/catalogue/stac/catalogs/supported-datasets/catalogs/planet/collections
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### Planet Scope items
+GET https://staging.eodatahub.org.uk/api/catalogue/stac/catalogs/supported-datasets/catalogs/planet/collections/PSScene/items?limit=5
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+
+### Planet search
+POST https://staging.eodatahub.org.uk/api/catalogue/stac/catalogs/supported-datasets/catalogs/planet/search
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "collections": ["PSScene"],
+  "limit": 5,
+  "sortby": [
+    {
+      "field": "properties.datetime",
+      "direction": "desc"
+    }
+  ],
+  "filter-lang": "cql-json",
+  "filter": {
+    "op": "and",
+    "args": [
+      {
+        "op": "between",
+        "args": [
+          {
+            "property": "properties.datetime"
+          },
+          "2023-01-12T00:00:00.000Z",
+          "2023-02-12T23:59:59.999Z"
+        ]
+      },
+      {
+        "op": "<=",
+        "args": [
+          {
+            "property": "properties.cloud_percent"
+          },
+          18
+        ]
+      }
+    ]
+  },
+  "intersects": {
+    "type": "Polygon",
+     "coordinates": [
+        [
+          [
+            -2.652110837830426,
+            51.31487834129703
+          ],
+          [
+            -2.5885590161086514,
+            51.31487834129703
+          ],
+          [
+            -2.5885590161086514,
+            51.35420103894873
+          ],
+          [
+            -2.652110837830426,
+            51.35420103894873
+          ],
+          [
+            -2.652110837830426,
+            51.31487834129703
+          ]
+        ]
+     ]
+  }
+}
