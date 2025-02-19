@@ -39,27 +39,27 @@ class ResourceAccess(BaseModel):
 
 
 class IntrospectResponse(BaseModel):
-    exp: int
-    iat: int
-    jti: str
-    iss: str
-    aud: list[str]
-    sub: str
-    typ: str
+    exp: int | None = None
+    iat: int | None = None
+    jti: str | None = None
+    iss: str | None = None
+    aud: list[str] | None = None
+    sub: str | None = None
+    typ: str | None = None
     arc: str | None = None
-    azp: str
+    azp: str | None = None
     session_state: str | None = None
-    allowed_origins: list[str] = Field(..., alias="allowed-origins")
-    realm_access: RealmAccess
-    resource_access: ResourceAccess
-    scope: str
-    sid: str
-    email_verified: bool
-    name: str
-    preferred_username: str
-    given_name: str
-    family_name: str
-    email: str
+    allowed_origins: list[str] | None = Field(None, alias="allowed-origins")
+    realm_access: RealmAccess | None = None
+    resource_access: ResourceAccess | None = None
+    scope: str | None = None
+    sid: str | None = None
+    email_verified: bool | None = None
+    name: str | None = None
+    preferred_username: str | None = None
+    given_name: str | None = None
+    family_name: str | None = None
+    email: str | None = None
     client_id: str | None = None
     username: str | None = None
     token_type: str | None = None
