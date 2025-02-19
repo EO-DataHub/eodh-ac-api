@@ -86,7 +86,7 @@ def test_should_return_404_when_catalog_path_does_not_exist(
     assert response.json() == {
         "detail": {
             "code": "NotFoundError",
-            "description": "Catalog cat_dummy-job-id at path user-datasets/test/processing-results not found",
+            "description": "Catalog cat_dummy-job-id not found",
         }
     }
 

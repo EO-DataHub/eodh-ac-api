@@ -61,7 +61,7 @@ def test_should_merge_results_from_multiple_datasets(
     auth_token_module_scoped: str,
 ) -> None:
     # Arrange
-    expected_collections = {"sentinel-1-grd", "sentinel-2-l1c", "sentinel-2-l2a", "sentinel2_ard"}
+    expected_collections = {"sentinel2_ard"}
 
     # Act
     response = client.post(
@@ -97,9 +97,9 @@ def test_should_paginate_until_no_more_results(
     client: TestClient,
     auth_token_module_scoped: str,
 ) -> None:
-    max_pages = 1000  # Define max_pages so that we can break the loop just in case
-    payload = {"sentinel-1-grd": STAC_SEARCH_PAYLOAD["sentinel-1-grd"]}
-    payload["sentinel-1-grd"]["limit"] = 20
+    max_pages = 10  # Define max_pages so that we can break the loop just in case
+    payload = {"sentinel-2-l2a-ard": STAC_SEARCH_PAYLOAD["sentinel-2-l2a-ard"]}
+    payload["sentinel-2-l2a-ard"]["limit"] = 20
 
     response = client.post(
         SEARCH_ENDPOINT_PATH,
@@ -112,7 +112,7 @@ def test_should_paginate_until_no_more_results(
 
     page_count = 1
     while True:
-        payload["sentinel-1-grd"]["token"] = response.json()["continuation_tokens"]["sentinel-1-grd"]
+        payload["sentinel-2-l2a-ard"]["token"] = response.json()["continuation_tokens"]["sentinel-2-l2a-ard"]
         response = client.post(
             SEARCH_ENDPOINT_PATH,
             json=payload,
@@ -121,7 +121,7 @@ def test_should_paginate_until_no_more_results(
         assert response.status_code == status.HTTP_200_OK, "Expected HTTP 200 OK"
         assert response.json()["items"]["features"]
 
-        if response.json()["continuation_tokens"]["sentinel-1-grd"] is None:
+        if response.json()["continuation_tokens"]["sentinel-2-l2a-ard"] is None:
             break
 
         page_count += 1

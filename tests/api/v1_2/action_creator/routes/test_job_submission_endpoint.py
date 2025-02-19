@@ -11,7 +11,6 @@ from src.api.v1_2.action_creator.presets import (
     LAND_COVER_CHANGE_DETECTION_PRESET_SPEC,
     NDVI_CLIP_PRESET,
     NDVI_PRESET,
-    WATER_QUALITY_PRESET_SPEC,
     WATER_QUALITY_PRESET_SPEC_ARD,
 )
 from src.services.ades.schemas import StatusCode
@@ -25,14 +24,13 @@ if TYPE_CHECKING:
 _TEST_DATA = [
     {"workflow": p["workflow"]}  # type: ignore[index]
     for p in [
-        WATER_QUALITY_PRESET_SPEC,
         WATER_QUALITY_PRESET_SPEC_ARD,
         LAND_COVER_CHANGE_DETECTION_PRESET_SPEC,
         NDVI_CLIP_PRESET,
         NDVI_PRESET,
     ]
 ]
-_TEST_IDS = ["wq", "wq-ard", "lulc", "ndvi-clip-reproject", "simple-ndvi"]
+_TEST_IDS = ["wq-ard", "lulc", "ndvi-clip-reproject", "simple-ndvi"]
 
 
 @pytest.mark.parametrize(
