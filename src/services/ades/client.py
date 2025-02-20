@@ -14,7 +14,6 @@ from aiohttp import ClientSession
 from aiohttp_retry import ExponentialRetry, RetryClient
 from dotenv import load_dotenv
 from starlette import status
-from tqdm import tqdm
 
 from src import consts
 from src.api.v1_1.action_creator.functions import (
@@ -482,7 +481,9 @@ class ADESClient(ADESClientBase):
 
         assert jobs is not None  # noqa: S101
 
-        for job in tqdm(jobs["jobs"], desc="Running batch delete for job history"):
+        for job in jobs["jobs"]:
+            _logger.info("Running batch delete for job history, processing job: %s", job["jobID"])
+
             if job["status"] in remove_statuses:
                 _logger.info("Removing job: %s with status: %s", job["jobID"], job["status"])
                 err = await delete_job(job)
