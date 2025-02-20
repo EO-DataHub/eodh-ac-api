@@ -346,6 +346,7 @@ async def batch_cancel_or_delete_jobs(
         remove_all_after=request.remove_all_after,
         max_jobs_to_process=request.max_jobs_to_process,
         stac_endpoint=settings.eodh.stac_api_endpoint,
+        remove_jobs_without_results=request.remove_jobs_without_results,
     )
 
     if err:
