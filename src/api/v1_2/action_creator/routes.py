@@ -27,11 +27,14 @@ from src.api.v1_2.action_creator.schemas import (
     ActionCreatorJobSummary,
     ActionCreatorSubmissionRequest,
     ActionCreatorSubmissionsQueryParams,
+    BatchDeleteRequest,
+    BatchDeleteResponse,
     ErrorResponse,
     FunctionsResponse,
     PaginationResults,
     PresetsResponse,
 )
+from src.core.settings import current_settings
 from src.services.ades.factory import ades_client_factory
 from src.services.ades.schemas import StatusCode
 from src.services.stac.client import stac_client_factory
@@ -321,3 +324,31 @@ async def cancel_or_delete_job(
     err, _ = await ades.cancel_or_delete_job(submission_id)
     if err:
         raise HTTPException(status_code=err.code, detail=err.detail)
+
+
+@action_creator_router_v1_2.delete(
+    "/submissions",
+    response_model=None,
+    responses={status.HTTP_404_NOT_FOUND: {"description": "Not Found", "model": ErrorResponse}},
+)
+async def batch_cancel_or_delete_jobs(
+    request: BatchDeleteRequest,
+    credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
+) -> BatchDeleteResponse:
+    settings = current_settings()
+    introspected_token = decode_token(credential.credentials)
+    username = introspected_token["preferred_username"]
+    ades = ades_client_factory(workspace=username, token=credential.credentials)
+
+    err, removed_ids = await ades.batch_cancel_or_delete_jobs(
+        remove_statuses=request.remove_statuses or [],  # type: ignore[arg-type]
+        remove_all_before=request.remove_all_before,
+        remove_all_after=request.remove_all_after,
+        max_jobs_to_process=request.max_jobs_to_process,
+        stac_endpoint=settings.eodh.stac_api_endpoint,
+    )
+
+    if err:
+        raise HTTPException(status_code=err.code, detail=err.detail)
+
+    return BatchDeleteResponse(removed_jobs=removed_ids)

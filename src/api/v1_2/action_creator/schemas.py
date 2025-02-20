@@ -430,3 +430,15 @@ class PaginationResults(BaseModel, Generic[T]):
     results_per_page: int | None = None
     ordered_by: str
     order_direction: OrderDirection
+
+
+class BatchDeleteResponse(BaseModel):
+    removed_jobs: list[str]
+
+
+class BatchDeleteRequest(BaseModel):
+    remove_statuses: list[ActionCreatorJobStatus] | None = None
+    remove_all_before: datetime | None = None
+    remove_all_after: datetime | None = None
+    remove_jobs_without_results: bool = False
+    max_jobs_to_process: int = 1000

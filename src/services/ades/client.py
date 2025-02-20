@@ -8,11 +8,13 @@ from tempfile import TemporaryDirectory
 from typing import TYPE_CHECKING, Any
 from urllib.parse import urlparse
 
+import aiohttp
 import yaml
 from aiohttp import ClientSession
 from aiohttp_retry import ExponentialRetry, RetryClient
 from dotenv import load_dotenv
 from starlette import status
+from tqdm import tqdm
 
 from src import consts
 from src.api.v1_1.action_creator.functions import (
@@ -24,6 +26,7 @@ from src.services.ades.schemas import JobList, Process, ProcessList, ProcessSumm
 from src.utils.logging import get_logger
 
 if TYPE_CHECKING:
+    import datetime
     from logging import Logger
     from uuid import UUID
 
@@ -451,3 +454,86 @@ class ADESClient(ADESClientBase):
             return ErrorResponse(code=response.status, detail=await response.text())
 
         return None
+
+    async def batch_cancel_or_delete_jobs(  # noqa: C901
+        self,
+        *,
+        stac_endpoint: str,
+        remove_statuses: list[str] | None,
+        remove_all_before: datetime.datetime | None = None,
+        remove_all_after: datetime.datetime | None = None,
+        max_jobs_to_process: int = 1000,
+        remove_jobs_without_results: bool = False,
+    ) -> tuple[ErrorResponse | None, list[str] | None]:
+        if remove_statuses is None:
+            remove_statuses = []
+
+        removed_ids = []
+
+        async def delete_job(job: dict[str, Any]) -> ErrorResponse | None:
+            _logger.info("Removing job: %s with status: %s", job["jobID"], job["status"])
+            err, _ = await self.cancel_or_delete_job(job["jobID"])
+            removed_ids.append(job["jobID"])
+            return err
+
+        jobs: dict[str, Any] | None
+        err, jobs = await self.list_job_submissions(raw_output=True, limit=max_jobs_to_process)
+        if err:
+            return err, None
+
+        assert jobs is not None  # noqa: S101
+
+        for job in tqdm(jobs["jobs"], desc="Running batch delete for job history"):
+            if job["status"] in remove_statuses:
+                _logger.info("Removing job: %s with status: %s", job["jobID"], job["status"])
+                err = await delete_job(job)
+                if err:
+                    return err, None
+                continue
+
+            if remove_all_after and job["created"] > remove_all_after.isoformat():
+                _logger.info(
+                    "Removing job submission %s, because it is after cutoff date: %s", job["jobID"], job["created"]
+                )
+                err = await delete_job(job)
+                if err:
+                    return err, None
+                continue
+
+            if remove_all_before and job["created"] < remove_all_before.isoformat():
+                _logger.info(
+                    "Removing job submission %s, because it is before cutoff date: %s", job["jobID"], job["created"]
+                )
+                err = await delete_job(job)
+                if err:
+                    return err, None
+                continue
+
+            if job["status"] == "successful" and remove_jobs_without_results:
+                async with aiohttp.ClientSession() as session, session.post(
+                    f"{stac_endpoint}/catalogs/user-datasets/catalogs/{self.workspace}/catalogs/processing-results/catalogs/cat_{job['jobID']}/search",
+                    headers={
+                        "Authorization": f"Bearer {self.token}",
+                        "Accept": "application/json",
+                        "Content-Type": "application/json",
+                    },
+                    json={
+                        "limit": 1,
+                        "sortby": [{"field": "properties.datetime", "direction": "desc"}],
+                        "filter-lang": "cql-json",
+                        "fields": {},
+                    },
+                    timeout=aiohttp.ClientTimeout(total=30),
+                ) as response:
+                    if response.status == status.HTTP_200_OK:
+                        continue
+                    _logger.info(
+                        "Job %s has no results - EODH STAC API returned: %s",
+                        job["jobID"],
+                        response.status,
+                    )
+                    err = await delete_job(job)
+                    if err:
+                        return err, None
+
+        return None, removed_ids
