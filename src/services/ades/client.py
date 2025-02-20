@@ -471,7 +471,6 @@ class ADESClient(ADESClientBase):
         removed_ids = []
 
         async def delete_job(job: dict[str, Any]) -> ErrorResponse | None:
-            _logger.info("Removing job: %s with status: %s", job["jobID"], job["status"])
             err, _ = await self.cancel_or_delete_job(job["jobID"])
             removed_ids.append(job["jobID"])
             return err
@@ -511,7 +510,7 @@ class ADESClient(ADESClientBase):
 
             if job["status"] == "successful" and remove_jobs_without_results:
                 async with aiohttp.ClientSession() as session, session.post(
-                    f"{stac_endpoint}/catalogs/user-datasets/catalogs/{self.workspace}/catalogs/processing-results/catalogs/cat_{job['jobID']}/search",
+                    f"{stac_endpoint}/catalogs/user-datasets/catalogs/{self.workspace}/catalogs/processing-results/catalogs/{job['processID']}/catalogs/cat_{job['jobID']}/search",
                     headers={
                         "Authorization": f"Bearer {self.token}",
                         "Accept": "application/json",
@@ -528,7 +527,7 @@ class ADESClient(ADESClientBase):
                     if response.status == status.HTTP_200_OK:
                         continue
                     _logger.info(
-                        "Job %s has no results - EODH STAC API returned: %s",
+                        "Removing job: %s - EODH STAC API returned: %s - job has no results.",
                         job["jobID"],
                         response.status,
                     )

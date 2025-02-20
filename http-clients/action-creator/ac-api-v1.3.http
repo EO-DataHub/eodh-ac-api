@@ -921,7 +921,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
   ],
   "remove_all_before": "2025-02-15T13:18:40.108Z",
   "remove_all_after": null,
-  "remove_jobs_without_results": false,
+  "remove_jobs_without_results": true,
   "max_jobs_to_process": 1000
 }
 
