@@ -466,3 +466,19 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     "fields": {}
   }
 }
+
+### Batch delete
+DELETE {{api_url}}/{{api_version}}/action-creator/submissions
+Accept: application/json
+Content-Type: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}
+
+{
+  "remove_statuses": [
+    "failed"
+  ],
+  "remove_all_before": "2025-02-15T13:18:40.108Z",
+  "remove_all_after": null,
+  "remove_jobs_without_results": false,
+  "max_jobs_to_process": 1000
+}
