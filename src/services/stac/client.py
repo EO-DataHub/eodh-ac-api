@@ -2,27 +2,24 @@ from __future__ import annotations
 
 import abc
 import asyncio
-import json
 from datetime import datetime, timezone
 from itertools import starmap
-from typing import TYPE_CHECKING, Any, ClassVar, Iterable, Iterator, TypedDict
+from typing import TYPE_CHECKING, Any, ClassVar, TypedDict
 
 import aiohttp
 from fastapi import HTTPException
 from oauthlib.oauth2 import BackendApplicationClient
-from pystac_client import Client
-from pystac_client.exceptions import APIError
+from pystac import Item
 from requests_oauthlib import OAuth2Session
 from stac_pydantic.api.extensions.sort import SortDirections, SortExtension
 from starlette import status
 
 from src.api.v1_3.catalogue.schemas.stac_search import FetchItemResult
 from src.core.settings import current_settings
-from src.services.stac.schemas import ExtendedStacSearch, FieldsExtension, StacSearch
+from src.services.stac.schemas import ExtendedStacSearch, FieldsExtension, ProcessingResultsResponse, StacSearch
 
 if TYPE_CHECKING:
     from geojson_pydantic import Polygon
-    from pystac import Item
     from requests import Response
 
 
@@ -84,8 +81,9 @@ class StacSearchClientBase(abc.ABC):
         job_id: str,
         stac_api_endpoint: str,
         workspace: str,
+        workflow_identifier: str | None = None,
         stac_query: StacSearch | None = None,
-    ) -> Iterable[Item]: ...
+    ) -> ProcessingResultsResponse: ...
 
     @abc.abstractmethod
     async def multi_collection_fetch_items(
@@ -205,21 +203,12 @@ class StacSearchClient:
         workspace: str,
         workflow_identifier: str | None = None,
         stac_query: StacSearch | None = None,
-    ) -> Iterator[Item]:
+    ) -> ProcessingResultsResponse:
         url = (
-            f"{stac_api_endpoint}/catalogs/user-datasets/catalogs/{workspace}/catalogs/processing-results/catalogs/{workflow_identifier}/catalogs/cat_{job_id}"
+            f"{stac_api_endpoint}/catalogs/user-datasets/catalogs/{workspace}/catalogs/processing-results/catalogs/{workflow_identifier}/catalogs/cat_{job_id}/search"
             if workflow_identifier is not None
-            else f"{stac_api_endpoint}/catalogs/user-datasets/{workspace}/processing-results/cat_{job_id}"
+            else f"{stac_api_endpoint}/catalogs/user-datasets/{workspace}/processing-results/cat_{job_id}/search"
         )
-
-        try:
-            stac_client = Client.open(url=url, headers={"Authorization": f"Bearer {token}"})
-        except APIError as ex:
-            # User not authorized to access this resource or catalog does not exist
-            raise HTTPException(
-                status_code=ex.status_code,
-                detail=json.loads(str(ex)),
-            ) from APIError
 
         # Sanitize params
         search_params = stac_query or ExtendedStacSearch()
@@ -238,20 +227,29 @@ class StacSearchClient:
         if search_params.sortby is None:
             search_params.sortby = [SortExtension(field="properties.datetime", direction=SortDirections.asc)]
 
-        search = stac_client.search(
-            limit=search_params.limit,
-            ids=search_params.ids,
-            collections=search_params.collections,
-            intersects=search_params.intersects,
-            datetime=search_params.datetime,
-            query=search_params.query,
-            filter=search_params.filter,
-            filter_lang=search_params.filter_lang,
-            sortby=[s.model_dump(mode="json") for s in search_params.sortby],
-            fields=search_params.fields.model_dump(mode="json"),
-        )
+        async with aiohttp.ClientSession() as session, session.post(
+            url,
+            headers={"Authorization": f"Bearer {token}"},
+            json=search_params.model_dump(mode="json"),
+            timeout=aiohttp.ClientTimeout(total=30),
+        ) as response:
+            if response.status != status.HTTP_200_OK:
+                raise HTTPException(
+                    status_code=response.status,
+                    detail=await response.json(),
+                )
 
-        return search.items()  # type: ignore[no-any-return]
+            result = await response.json()
+            next_page_link = [link for link in result["links"] if link["rel"] == "next"]
+            continuation_token: str | None = None
+
+            if next_page_link:
+                continuation_token = next_page_link[0]["body"].get("token", None)
+
+            return ProcessingResultsResponse(
+                items=[Item.from_dict(i) for i in result["features"]],
+                continuation_token=continuation_token,
+            )
 
     async def multi_collection_fetch_items(
         self,
@@ -321,17 +319,26 @@ class FakeStacClient(StacSearchClientBase):
         processing_results_to_fetch: list[Item] | None = None,
         multi_collection_fetch_results: dict[str, Any] | None = None,
         has_results: bool = False,
+        raise_status_code: int | None = None,
+        raise_status_msg: str | None = None,
     ) -> None:
         self.multi_collection_fetch_results = multi_collection_fetch_results
         self.processing_results_to_fetch = processing_results_to_fetch
         self.items_to_fetch = items_to_fetch
         self.has_results = has_results
+        self.raise_status_code = raise_status_code
+        self.raise_status_msg = raise_status_msg
+
+    def _raise_if_necessary(self) -> None:
+        if self.raise_status_code:
+            raise HTTPException(status_code=self.raise_status_code, detail=self.raise_status_msg)
 
     async def fetch_items(
         self,
         collection: str,
         search_params: StacSearch,  # noqa: ARG002
     ) -> FetchItemResult:
+        self._raise_if_necessary()
         return self.items_to_fetch or FetchItemResult(collection, items=[], token=None)
 
     async def fetch_processing_results(
@@ -340,14 +347,17 @@ class FakeStacClient(StacSearchClientBase):
         job_id: str,  # noqa: ARG002
         stac_api_endpoint: str,  # noqa: ARG002
         workspace: str,  # noqa: ARG002
+        workflow_identifier: str | None = None,  # noqa: ARG002
         stac_query: StacSearch | None = None,  # noqa: ARG002
-    ) -> Iterable[Item]:
-        return self.processing_results_to_fetch or []
+    ) -> ProcessingResultsResponse:
+        self._raise_if_necessary()
+        return ProcessingResultsResponse(self.processing_results_to_fetch or [], continuation_token=None)
 
     async def multi_collection_fetch_items(
         self,
         stac_search_query: dict[str, StacSearch],
     ) -> dict[str, Any]:
+        self._raise_if_necessary()
         return self.multi_collection_fetch_results or {k: {} for k in stac_search_query}
 
     async def has_items(
@@ -357,6 +367,7 @@ class FakeStacClient(StacSearchClientBase):
         date_start: datetime | None = None,  # noqa: ARG002
         date_end: datetime | None = None,  # noqa: ARG002
     ) -> bool:
+        self._raise_if_necessary()
         return self.has_results
 
 

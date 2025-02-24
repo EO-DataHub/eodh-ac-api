@@ -49,16 +49,16 @@ def test_should_return_401_when_invalid_user_credentials(client: TestClient) -> 
     assert response.json() == {"detail": "Invalid authentication credentials"}
 
 
-@patch("src.services.stac.client.Client")
+@patch("src.api.v1_3.catalogue.routes.stac_client_factory")
 @pytest.mark.parametrize("stac_catalog", STAC_CATALOGS)
 def test_should_return_200_no_params(
-    client_mock: MagicMock,
+    stac_client_factory_mock: MagicMock,
     stac_catalog: str,
     client: TestClient,
     auth_token_module_scoped: str,
 ) -> None:
     # Arrange
-    prepare_stac_client_mock(client_mock, stac_catalog)
+    prepare_stac_client_mock(stac_client_factory_mock, stac_catalog)
 
     # Act
     response = _send_visualization_request(client, token=auth_token_module_scoped)
@@ -86,21 +86,18 @@ def test_should_return_404_when_catalog_path_does_not_exist(
     )
     assert response.status_code == status.HTTP_404_NOT_FOUND
     assert response.json() == {
-        "detail": {
-            "code": "NotFoundError",
-            "description": "Catalog cat_dummy-job-id not found",
-        }
+        "detail": {"code": "NotFoundError", "description": "Catalog cat_dummy-job-id not found"},
     }
 
 
-@patch("src.services.stac.client.Client")
+@patch("src.api.v1_3.catalogue.routes.stac_client_factory")
 def test_returns_no_data_when_no_assets_to_visualize(
-    client_mock: MagicMock,
+    stac_client_factory_mock: MagicMock,
     client: TestClient,
     auth_token_module_scoped: str,
 ) -> None:
     # Arrange
-    prepare_stac_client_mock(client_mock, "v2-s2")
+    prepare_stac_client_mock(stac_client_factory_mock, "v2-s2")
 
     # Act
     response = _send_visualization_request(client, token=auth_token_module_scoped)
@@ -111,16 +108,16 @@ def test_returns_no_data_when_no_assets_to_visualize(
     assert result.assets == {}
 
 
-@patch("src.services.stac.client.Client")
+@patch("src.api.v1_3.catalogue.routes.stac_client_factory")
 @pytest.mark.parametrize("stac_catalog", STAC_CATALOGS)
 def test_returns_404_when_asset_does_not_exist(
-    client_mock: MagicMock,
+    stac_client_factory_mock: MagicMock,
     stac_catalog: str,
     client: TestClient,
     auth_token_module_scoped: str,
 ) -> None:
     # Arrange
-    prepare_stac_client_mock(client_mock, stac_catalog)
+    prepare_stac_client_mock(stac_client_factory_mock, stac_catalog)
 
     # Act
     response = _send_visualization_request(client, token=auth_token_module_scoped, assets=["i-dont-exist"])
@@ -129,16 +126,16 @@ def test_returns_404_when_asset_does_not_exist(
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-@patch("src.services.stac.client.Client")
+@patch("src.api.v1_3.catalogue.routes.stac_client_factory")
 @pytest.mark.parametrize("stac_catalog", STAC_CATALOGS)
 def test_skips_non_data_assets(
-    client_mock: MagicMock,
+    stac_client_factory_mock: MagicMock,
     stac_catalog: str,
     client: TestClient,
     auth_token_module_scoped: str,
 ) -> None:
     # Arrange
-    prepare_stac_client_mock(client_mock, stac_catalog)
+    prepare_stac_client_mock(stac_client_factory_mock, stac_catalog)
     expected_assets = STAC_CATALOGS[stac_catalog]["assets"]
 
     # Act
@@ -150,16 +147,16 @@ def test_skips_non_data_assets(
     assert set(result.assets.keys()).difference(expected_assets) == set()
 
 
-@patch("src.services.stac.client.Client")
+@patch("src.api.v1_3.catalogue.routes.stac_client_factory")
 @pytest.mark.parametrize("stac_catalog", STAC_CATALOGS)
 def test_should_keep_only_specified_assets(
-    client_mock: MagicMock,
+    stac_client_factory_mock: MagicMock,
     stac_catalog: str,
     client: TestClient,
     auth_token_module_scoped: str,
 ) -> None:
     # Arrange
-    prepare_stac_client_mock(client_mock, stac_catalog)
+    prepare_stac_client_mock(stac_client_factory_mock, stac_catalog)
     assets_to_keep = STAC_CATALOGS[stac_catalog]["assets_to_keep"]
 
     # Act
@@ -171,17 +168,17 @@ def test_should_keep_only_specified_assets(
     assert set(result.assets.keys()).difference(assets_to_keep) == set()
 
 
-@patch("src.services.stac.client.Client")
+@patch("src.api.v1_3.catalogue.routes.stac_client_factory")
 @pytest.mark.parametrize("stac_catalog", ["v1-rc-ndvi", "v1-wq", "v2-wq", "v2-adv-wq", "v2-ndvi"])
 def test_spectral_indices_have_unique_colors(
-    client_mock: MagicMock,
+    stac_client_factory_mock: MagicMock,
     stac_catalog: str,
     client: TestClient,
     auth_token_module_scoped: str,
 ) -> None:
     # Arrange
     expected_color_hint_len = 7  # hash symbol + hex RGB color value
-    prepare_stac_client_mock(client_mock, stac_catalog)
+    prepare_stac_client_mock(stac_client_factory_mock, stac_catalog)
 
     # Act
     response = _send_visualization_request(client, token=auth_token_module_scoped)

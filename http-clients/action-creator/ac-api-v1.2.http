@@ -240,7 +240,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 %}
 
 ### Get data for WQ Chart - selected assets
-POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_01e116ec-bdf2-11ef-a2af-8ef03814f15e/charts
+POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/catalogs/{{username}}/catalogs/processing-results/catalogs/water-quality/catalogs/cat_01e116ec-bdf2-11ef-a2af-8ef03814f15e/charts
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
@@ -271,7 +271,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 }
 
 ### Get data for WQ Chart - all assets - no scatter
-POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_01e116ec-bdf2-11ef-a2af-8ef03814f15e/charts
+POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/catalogs/{{username}}/catalogs/processing-results/catalogs/water-quality/catalogs/cat_01e116ec-bdf2-11ef-a2af-8ef03814f15e/charts
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
@@ -301,7 +301,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 }
 
 ### Get data for WQ Chart - all assets - scatter
-POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_244fb332-de68-11ef-94fd-12e2ea552ab2/charts
+POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/catalogs/{{username}}/catalogs/processing-results/catalogs/water-quality/catalogs/cat_244fb332-de68-11ef-94fd-12e2ea552ab2/charts
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
@@ -331,37 +331,6 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 }
 
 ### Get data for LC Chart - no scatter
-POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_81cac12c-bd17-11ef-94d6-8ef03814f15e/charts
-Accept: application/json
-Content-Type: application/json
-Authorization: Bearer {{$auth.token("auth-id")}}
-
-{
-    "assets": ["data"],
-    "stac_query": {
-        "limit": 50,
-        "sortby": [
-            {
-                "field": "properties.datetime",
-                "direction": "asc"
-            }
-        ],
-        "filter_lang": "cql-json",
-        "filter": {
-            "op": "between",
-            "args": [
-                {
-                    "property": "properties.datetime"
-                },
-                "1992-07-01T00:00:00.000Z",
-                "2025-07-02T23:59:59.999Z"
-            ]
-        },
-        "fields": {}
-    }
-}
-
-### Get data for LC Chart - no scatter STAGING
 POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/catalogs/{{username}}/catalogs/processing-results/catalogs/land-cover-change/catalogs/cat_3d13f7fa-eecd-11ef-bc57-ca3e8cd28499/charts
 Accept: application/json
 Content-Type: application/json
@@ -393,7 +362,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 }
 
 ### Get data for LC Chart - scatter
-POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_e454dbce-de4c-11ef-a182-12e2ea552ab2/charts
+POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/catalogs/{{username}}/catalogs/processing-results/catalogs/land-cover-change/catalogs/cat_e454dbce-de4c-11ef-a182-12e2ea552ab2/charts
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
@@ -424,7 +393,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 }
 
 ### Get data for LC Chart - 1990 missing data
-POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_8de9589e-e222-11ef-84a9-86a1f8f9b25e/charts
+POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/catalogs/{{username}}/catalogs/processing-results/catalogs/land-cover-change/catalogs/cat_8de9589e-e222-11ef-84a9-86a1f8f9b25e/charts
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}

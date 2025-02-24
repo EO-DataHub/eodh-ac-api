@@ -48,6 +48,7 @@ class JobAssetsChartVisualizationResponse(BaseModel):
             Field(discriminator="chart_type"),
         ],
     ]
+    continuation_token: str | None = None
 
 
 class VisualizationRequest(BaseModel):

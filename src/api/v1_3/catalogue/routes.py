@@ -81,7 +81,7 @@ async def get_visualization_data_for_job_results(
     client = stac_client_factory()
     builder = ChartDataBuilder()
 
-    items = await client.fetch_processing_results(
+    processing_results = await client.fetch_processing_results(
         token=credential.credentials,
         job_id=job_id,
         stac_api_endpoint=settings.eodh.stac_api_endpoint,
@@ -89,10 +89,14 @@ async def get_visualization_data_for_job_results(
         stac_query=visualization_request.stac_query,
     )
 
-    build_result = builder.build(items=items, assets=visualization_request.assets)
+    build_result = builder.build(items=processing_results.items, assets=visualization_request.assets)
 
     if build_result.success:
-        return {"job_id": job_id, "assets": build_result.result}
+        return {
+            "job_id": job_id,
+            "assets": build_result.result,
+            "continuation_token": processing_results.continuation_token,
+        }
 
     raise HTTPException(
         status_code=build_result.error.status_code,  # type: ignore[union-attr]
@@ -115,7 +119,7 @@ async def get_visualization_data_for_job_results_v2(
     client = stac_client_factory()
     builder = ChartDataBuilder()
 
-    items = await client.fetch_processing_results(
+    processing_results = await client.fetch_processing_results(
         token=credential.credentials,
         job_id=job_id,
         workflow_identifier=workflow_identifier,
@@ -124,10 +128,14 @@ async def get_visualization_data_for_job_results_v2(
         stac_query=visualization_request.stac_query,
     )
 
-    build_result = builder.build(items=items, assets=visualization_request.assets)
+    build_result = builder.build(items=processing_results.items, assets=visualization_request.assets)
 
     if build_result.success:
-        return {"job_id": job_id, "assets": build_result.result}
+        return {
+            "job_id": job_id,
+            "assets": build_result.result,
+            "continuation_token": processing_results.continuation_token,
+        }
 
     raise HTTPException(
         status_code=build_result.error.status_code,  # type: ignore[union-attr]

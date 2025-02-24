@@ -926,7 +926,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 }
 
 ### Get data for WQ Chart - selected assets
-POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_01e116ec-bdf2-11ef-a2af-8ef03814f15e/charts
+POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/catalogs/{{username}}/catalogs/processing-results/catalogs/water-quality/catalogs/cat_9d246f52-f27f-11ef-b50c-7aa938a18040/charts
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
@@ -957,7 +957,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 }
 
 ### Get data for WQ Chart - all assets - no scatter
-POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_01e116ec-bdf2-11ef-a2af-8ef03814f15e/charts
+POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/catalogs/{{username}}/catalogs/processing-results/catalogs/water-quality/catalogs/cat_01e116ec-bdf2-11ef-a2af-8ef03814f15e/charts
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
@@ -987,7 +987,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 }
 
 ### Get data for WQ Chart - all assets - scatter
-POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_244fb332-de68-11ef-94fd-12e2ea552ab2/charts
+POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/catalogs/{{username}}/catalogs/processing-results/catalogs/water-quality/catalogs/cat_244fb332-de68-11ef-94fd-12e2ea552ab2/charts
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
@@ -1017,7 +1017,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 }
 
 ### Get data for LC Chart - no scatter
-POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_81cac12c-bd17-11ef-94d6-8ef03814f15e/charts
+POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/catalogs/{{username}}/catalogs/processing-results/catalogs/land-cover-change/catalogs/cat_2814bdc6-f27e-11ef-ae55-7aa938a18040/charts
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
@@ -1048,7 +1048,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 }
 
 ### Get data for LC Chart - scatter
-POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/{{username}}/processing-results/cat_e454dbce-de4c-11ef-a182-12e2ea552ab2/charts
+POST {{api_url}}/{{api_version}}/catalogue/stac/catalogs/user-datasets/catalogs/{{username}}/catalogs/processing-results/catalogs/land-cover-change/catalogs/cat_e454dbce-de4c-11ef-a182-12e2ea552ab2/charts
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
