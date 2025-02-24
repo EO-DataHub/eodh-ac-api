@@ -1,13 +1,19 @@
 from __future__ import annotations
 
+import dataclasses
 from datetime import datetime as dt
-from typing import Annotated, Any, List, Literal, Optional, Union, cast
+from typing import TYPE_CHECKING, Annotated, Any, List, Literal, Optional, Union, cast
 
 from geojson_pydantic import GeometryCollection, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon
 from pydantic import AfterValidator, BaseModel, Field, PositiveInt, TypeAdapter, field_validator, model_validator
 from stac_pydantic.api.extensions.query import Operator  # noqa: TCH002
 from stac_pydantic.api.extensions.sort import SortExtension  # noqa: TCH002
 from stac_pydantic.shared import UtcDatetime
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+    from pystac import Item
 
 EXAMPLE_SEARCH_MODEL = {
     "sentinel-1-grd": {
@@ -526,3 +532,9 @@ class StacSearch(BaseModel):
 class ExtendedStacSearch(StacSearch):
     ids: list[str] | None = None
     collections: list[str] | None = None
+
+
+@dataclasses.dataclass
+class ProcessingResultsResponse:
+    items: Iterable[Item]
+    continuation_token: str | None = None
