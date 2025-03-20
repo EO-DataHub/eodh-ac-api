@@ -299,20 +299,16 @@ Authorization: Bearer {{token}}
 GET https://staging.eodatahub.org.uk/api/catalogue/stac/catalogs/supported-datasets/catalogs/planet/collections
 Accept: application/json
 Content-Type: application/json
-Authorization: Bearer {{token}}
 
 ### Planet Scope items
 GET https://staging.eodatahub.org.uk/api/catalogue/stac/catalogs/supported-datasets/catalogs/planet/collections/PSScene/items?limit=5
 Accept: application/json
 Content-Type: application/json
-Authorization: Bearer {{token}}
-
 
 ### Planet search
 POST https://staging.eodatahub.org.uk/api/catalogue/stac/catalogs/supported-datasets/catalogs/planet/search
 Accept: application/json
 Content-Type: application/json
-Authorization: Bearer {{token}}
 
 {
   "collections": ["PSScene"],

@@ -1,7 +1,7 @@
 @raster_calculator_cwl_href=https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/raster-calculate-app.cwl
 @lulc_change_cwl_href=https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/lulc-change-app.cwl
 @water_quality_cwl_href=https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/water-quality-app.cwl
-@ades_url=https://test.eodatahub.org.uk/ades
+@ades_url=https://staging.eodatahub.org.uk/ades
 
 
 ### List Processes
@@ -110,12 +110,12 @@ Prefer: respond-async
 }
 
 ### List Jobs
-GET {{ades_url}}/{{username}}/ogc-api/jobs?limit=100&skip=0
+GET {{ades_url}}/{{username}}/ogc-api/jobs?limit=100
 Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Get Job Status
-GET {{ades_url}}/{{username}}/ogc-api/jobs/1f99db76-eeab-11ef-b024-324e385d1755
+GET {{ades_url}}/{{username}}/ogc-api/jobs/917c50c6-f2c4-11ef-b19d-7aa938a18040
 Accept: application/json
 Authorization: Bearer {{token}}
 
