@@ -205,9 +205,9 @@ class StacSearchClient:
         stac_query: StacSearch | None = None,
     ) -> ProcessingResultsResponse:
         url = (
-            f"{stac_api_endpoint}/catalogs/user-datasets/catalogs/{workspace}/catalogs/processing-results/catalogs/{workflow_identifier}/catalogs/cat_{job_id}/search"
+            f"{stac_api_endpoint}/catalogs/user/catalogs/{workspace}/catalogs/processing-results/catalogs/{workflow_identifier}/catalogs/cat_{job_id}/search"
             if workflow_identifier is not None
-            else f"{stac_api_endpoint}/catalogs/user-datasets/{workspace}/processing-results/cat_{job_id}/search"
+            else f"{stac_api_endpoint}/catalogs/user/{workspace}/processing-results/cat_{job_id}/search"
         )
 
         # Sanitize params
