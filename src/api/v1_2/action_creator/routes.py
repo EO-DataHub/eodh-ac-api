@@ -161,9 +161,9 @@ async def submit_workflow(
 
     workflow_step_spec = next(iter(workflow_spec.workflow.values()))
     ogc_inputs = workflow_step_spec.inputs.as_ogc_process_inputs()
-    ogc_inputs["clip"] = (
-        "True" if any(step.identifier == "clip" for step in workflow_spec.workflow.values()) else "False"
-    )
+
+    # FIXME - Force clipping for now, since WFs on ADES are timing out - disable once stable
+    ogc_inputs["clip"] = "True"
 
     wf_identifier = FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING[workflow_step_spec.identifier]
 
