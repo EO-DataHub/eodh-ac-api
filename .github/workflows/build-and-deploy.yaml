@@ -207,7 +207,7 @@ jobs:
           echo 'SENTINEL_HUB__STAC_API_ENDPOINT=${{ vars.SENTINEL_HUB__STAC_API_ENDPOINT }}' >> envs.env
       - name: Upload file as artifact
         run: |
-          aws s3 cp envs.env s3://ukri-task-definition-variables/${{ vars.TAGS }}/
+          aws s3 cp envs.env s3://prod-ukri-task-definition-variables/${{ vars.TAGS }}/
       - name: Update ECS service
         run: |
           aws --region ${{ vars.AWS_REGION }} ecs update-service --cluster ${{ vars.TAGS }} --service ${{ secrets.ECR_REPOSITORY }} --force-new-deployment
