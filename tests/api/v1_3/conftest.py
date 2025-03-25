@@ -24,7 +24,7 @@ from src.api.v1_3.action_creator.schemas.presets import (
     WF_OUTPUT_NOT_MAPPED_TO_TASK_RESULT_PRESET,
 )
 from tests.fakes.ades import FakeADESClient, fake_ades_client_factory
-from tests.fakes.ws_token_client import FakeTokenClient, fake_ws_token_session_auth_client_factory
+from tests.fakes.ws_token_client import FakeTokenClient
 
 
 @pytest.fixture
@@ -41,9 +41,8 @@ def mocked_ades_factory() -> Generator[MagicMock]:
 @pytest.fixture
 def mocked_token_client_factory() -> Generator[MagicMock, None]:
     token_client_factory_mock: MagicMock
-    with patch(
+    with patch(  # type: ignore[assignment]
         "src.api.v1_3.action_creator.routes.ws_token_session_auth_client_factory",
-        fake_ws_token_session_auth_client_factory,
     ) as token_client_factory_mock:
         token_client_factory_mock.return_value = FakeTokenClient
         yield token_client_factory_mock

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import datetime as dt
+import datetime as dt  # noqa: TCH003
 from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
