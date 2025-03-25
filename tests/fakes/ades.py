@@ -1122,7 +1122,10 @@ class FakeADESClient(ADESClientBase):
     async def list_processes(self) -> tuple[ErrorResponse | None, ProcessList | None]:
         return None, ProcessList(**GET_PROCESS_LIST_RESPONSE)
 
-    async def get_process_details(self, process_identifier: str) -> tuple[ErrorResponse | None, Process | None]:
+    async def get_process_details(
+        self,
+        process_identifier: str,
+    ) -> tuple[ErrorResponse | None, Process | None]:
         return None, Process(**GET_PROCESS_DETAILS_RESPONSE)
 
     async def execute_process(
@@ -1135,7 +1138,10 @@ class FakeADESClient(ADESClientBase):
     async def unregister_process(self, process_identifier: str) -> ErrorResponse | None:
         return None
 
-    async def reregister_process(self, process_identifier: str) -> tuple[ErrorResponse | None, ProcessSummary | None]:
+    async def reregister_process(
+        self,
+        process_identifier: str,
+    ) -> tuple[ErrorResponse | None, ProcessSummary | None]:
         return None, ProcessSummary(**REGISTER_PROCESS_RESPONSE)
 
     async def reregister_process_v2(

@@ -204,7 +204,10 @@ async def submit_workflow(
     if err:
         raise HTTPException(status_code=err.code, detail=err.detail)
 
-    ades = ades_client_factory(workspace=introspected_token["preferred_username"], token=token_response.access)
+    ades = ades_client_factory(
+        workspace=introspected_token["preferred_username"],
+        token=token_response.access,  # type: ignore[union-attr]
+    )
 
     wf_creation_result = WorkflowCreator.cwl_from_wf_spec(workflow_spec)
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -268,7 +271,10 @@ async def get_job_history(
     if err:
         raise HTTPException(status_code=err.code, detail=err.detail)
 
-    ades = ades_client_factory(workspace=introspected_token["preferred_username"], token=token_response.access)
+    ades = ades_client_factory(
+        workspace=introspected_token["preferred_username"],
+        token=token_response.access,  # type: ignore[union-attr]
+    )
 
     # Get the jobs
     ades_jobs: dict[str, Any]
@@ -341,7 +347,10 @@ async def get_job_status(
     if err:
         raise HTTPException(status_code=err.code, detail=err.detail)
 
-    ades = ades_client_factory(workspace=introspected_token["preferred_username"], token=token_response.access)
+    ades = ades_client_factory(
+        workspace=introspected_token["preferred_username"],
+        token=token_response.access,  # type: ignore[union-attr]
+    )
     err, job = await ades.get_job_details(job_id=submission_id)
 
     if err:
@@ -378,7 +387,10 @@ async def cancel_or_delete_job(
     if err:
         raise HTTPException(status_code=err.code, detail=err.detail)
 
-    ades = ades_client_factory(workspace=introspected_token["preferred_username"], token=token_response.access)
+    ades = ades_client_factory(
+        workspace=introspected_token["preferred_username"],
+        token=token_response.access,  # type: ignore[union-attr]
+    )
     err, _ = await ades.cancel_or_delete_job(job_id)
     if err:
         raise HTTPException(status_code=err.code, detail=err.detail)
@@ -402,7 +414,10 @@ async def batch_cancel_or_delete_jobs(
     if err:
         raise HTTPException(status_code=err.code, detail=err.detail)
 
-    ades = ades_client_factory(workspace=introspected_token["preferred_username"], token=token_response.access)
+    ades = ades_client_factory(
+        workspace=introspected_token["preferred_username"],
+        token=token_response.access,  # type: ignore[union-attr]
+    )
 
     err, removed_ids = await ades.batch_cancel_or_delete_jobs(
         remove_statuses=request.remove_statuses or [],  # type: ignore[arg-type]

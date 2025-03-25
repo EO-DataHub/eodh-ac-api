@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import abc
-from logging import Logger
 from typing import TYPE_CHECKING, Any
 
 from aiohttp import ClientResponse, ClientSession
@@ -10,6 +9,7 @@ from pydantic import BaseModel
 from starlette import status
 
 if TYPE_CHECKING:
+    from logging import Logger
     from pathlib import Path
     from uuid import UUID
 

@@ -144,7 +144,7 @@ combine-as-imports = true
 "src/api/v1_3/action_creator/schemas/errors.py" = [
     "RUF027", # see: https://pypi.org/project/Pylint - Possible f-string without an `f` prefix
 ]
-"src/services/ades/fake_client.py" = [
+"tests/fakes/ades.py" = [
     "ARG002", # see: https://pypi.org/project/flake8-unused-arguments - Unused method argument
     "PLR6301", # see: https://pypi.org/project/Pylint - Method `X` could be a function, class method, or static method
     "E501", # see: https://pypi.org/project/pycodestyle - Line too long
