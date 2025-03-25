@@ -50,6 +50,7 @@ jobs:
           EODH__PASSWORD: '${{ secrets.EODH__PASSWORD }}'
           EODH__CLIENT_ID: ${{ secrets.EODH__CLIENT_ID }}
           EODH__API_TOKEN: ${{ secrets.EODH__API_TOKEN }}
+          EODH__WORKSPACE_SERVICES_ENDPOINT: ${{ secrets.EODH__WORKSPACE_SERVICES_ENDPOINT }}
           EODH__WORKSPACE_TOKENS_URL: ${{ secrets.EODH__WORKSPACE_TOKENS_URL }}
           EODH__TMP_S3_CREDENTIALS_URL: ${{ vars.EODH__TMP_S3_CREDENTIALS_URL }}
           EODH__STAC_API_ENDPOINT: ${{ vars.EODH__STAC_API_ENDPOINT }}
