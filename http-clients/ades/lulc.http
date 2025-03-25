@@ -1,6 +1,12 @@
 @app_cwl_href=https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/lulc-change-app.cwl
 @app_name=land-cover-change
-@ades_url=https://test.eodatahub.org.uk/ades
+#@ades_url=https://{{env}}.eodatahub.org.uk/api/catalogue/stac/catalogs/user/catalogs
+#@processes_path=processes
+#@jobs_path=jobs
+
+@ades_url=https://{{env}}.eodatahub.org.uk/ades
+@processes_path=ogc-api/processes
+@jobs_path=ogc-api/jobs
 
 
 ### Get Land Cover Change Detection File
@@ -9,12 +15,12 @@ GET {{app_cwl_href}}
 >> land-cover-change-app.cwl
 
 ### Unregister Process
-DELETE {{ades_url}}/{{username}}/ogc-api/processes/{{app_name}}
+DELETE {{ades_url}}/{{username}}/{{processes_path}}/{{app_name}}
 Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Register Process
-POST {{ades_url}}/{{username}}/ogc-api/processes
+POST {{ades_url}}/{{username}}/{{processes_path}}
 Accept: application/json
 Authorization: Bearer {{token}}
 Content-Type: application/cwl+yaml
@@ -22,12 +28,12 @@ Content-Type: application/cwl+yaml
 < land-cover-change-app.cwl
 
 ### Get Process details
-GET {{ades_url}}/{{username}}/ogc-api/processes/{{app_name}}
+GET {{ades_url}}/{{username}}/{{processes_path}}/{{app_name}}
 Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Execute Process
-POST {{ades_url}}/{{username}}/ogc-api/processes/{{app_name}}/execution
+POST {{ades_url}}/{{username}}/{{processes_path}}/{{app_name}}/execution
 Accept: application/json
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -36,7 +42,7 @@ Prefer: respond-async
 {
     "inputs": {
         "aoi": "{\"type\":\"Polygon\",\"coordinates\":[[[14.763294437090849,50.833598186651244],[15.052268923898112,50.833598186651244],[15.052268923898112,50.989077215056824],[14.763294437090849,50.989077215056824],[14.763294437090849,50.833598186651244]]]}",
-        "date_start": "20010-01-01",
+        "date_start": "2010-01-01",
         "date_end": "2024-04-03",
         "source": "esacci-globallc",
         "workspace": "{{username}}"
@@ -50,7 +56,7 @@ Prefer: respond-async
 %}
 
 ### Get Job status
-GET https://test.eodatahub.org.uk/ades/{{username}}/ogc-api/jobs/{{execute_process_response.jobID}}
+GET {{ades_url}}/{{username}}/{{jobs_path}}/{{execute_process_response.jobID}}
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -61,7 +67,7 @@ Content-Type: application/json
 %}
 
 ### Get results
-GET https://test.eodatahub.org.uk/ades/{{username}}/ogc-api/jobs/{{execute_process_response.jobID}}/results
+GET {{ades_url}}/{{username}}/{{jobs_path}}/{{execute_process_response.jobID}}/results
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -86,6 +92,6 @@ Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Cancel Job
-DELETE {{ades_url}}/{{username}}/ogc-api/jobs/{{execute_process_response.jobID}}
+DELETE {{ades_url}}/{{username}}/{{jobs_path}}/{{execute_process_response.jobID}}
 Accept: application/json
 Authorization: Bearer {{token}}

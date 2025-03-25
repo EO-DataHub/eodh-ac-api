@@ -14,9 +14,6 @@ class OAuth2Settings(BaseModel):
     username: str
     password: str
     client_id: str
-    api_token: str
-    workspace_tokens_url: str
-    tmp_s3_credentials_url: str
 
     @property
     def oid_url(self) -> str:
@@ -58,6 +55,14 @@ class SentinelHubSettings(OAuthClientSettings):
 class EODHSettings(OAuth2Settings):
     stac_api_endpoint: str
     workspace_services_endpoint: str
+
+    @property
+    def workspace_tokens_url(self) -> str:
+        return f"{self.workspace_services_endpoint}/{self.username}/me/tokens"
+
+    @property
+    def workspace_session_tokens_url(self) -> str:
+        return f"{self.workspace_services_endpoint}/{self.username}/me/sessions"
 
 
 class Settings(BaseSettings):
