@@ -46,6 +46,7 @@ jobs:
           echo 'EODH__PASSWORD=${{ secrets.EODH__PASSWORD }}' >> envs.env
           echo 'EODH__REALM=${{ vars.EODH__REALM }}' >> envs.env
           echo 'EODH__USERNAME=${{ secrets.EODH__USERNAME }}' >> envs.env
+          echo 'EODH__WORKSPACE_SERVICES_ENDPOINT=${{ secrets.EODH__WORKSPACE_SERVICES_ENDPOINT }}' >> envs.env
           echo 'EODH__WORKSPACE_TOKENS_URL=${{ secrets.EODH__WORKSPACE_TOKENS_URL }}' >> envs.env
           echo 'EODH__TMP_S3_CREDENTIALS_URL=${{ vars.EODH__TMP_S3_CREDENTIALS_URL }}' >> envs.env
           echo 'EODH__STAC_API_ENDPOINT=${{ vars.EODH__STAC_API_ENDPOINT }}' >> envs.env
@@ -94,6 +95,7 @@ jobs:
           echo 'EODH__PASSWORD=${{ secrets.EODH__PASSWORD }}' >> envs.env
           echo 'EODH__REALM=${{ vars.EODH__REALM }}' >> envs.env
           echo 'EODH__USERNAME=${{ secrets.EODH__USERNAME }}' >> envs.env
+          echo 'EODH__WORKSPACE_SERVICES_ENDPOINT=${{ secrets.EODH__WORKSPACE_SERVICES_ENDPOINT }}' >> envs.env
           echo 'EODH__WORKSPACE_TOKENS_URL=${{ secrets.EODH__WORKSPACE_TOKENS_URL }}' >> envs.env
           echo 'EODH__TMP_S3_CREDENTIALS_URL=${{ vars.EODH__TMP_S3_CREDENTIALS_URL }}' >> envs.env
           echo 'EODH__STAC_API_ENDPOINT=${{ vars.EODH__STAC_API_ENDPOINT }}' >> envs.env
@@ -142,6 +144,7 @@ jobs:
           echo 'EODH__PASSWORD=${{ secrets.EODH__PASSWORD }}' >> envs.env
           echo 'EODH__REALM=${{ vars.EODH__REALM }}' >> envs.env
           echo 'EODH__USERNAME=${{ secrets.EODH__USERNAME }}' >> envs.env
+          echo 'EODH__WORKSPACE_SERVICES_ENDPOINT=${{ secrets.EODH__WORKSPACE_SERVICES_ENDPOINT }}' >> envs.env
           echo 'EODH__WORKSPACE_TOKENS_URL=${{ secrets.EODH__WORKSPACE_TOKENS_URL }}' >> envs.env
           echo 'EODH__TMP_S3_CREDENTIALS_URL=${{ vars.EODH__TMP_S3_CREDENTIALS_URL }}' >> envs.env
           echo 'EODH__STAC_API_ENDPOINT=${{ vars.EODH__STAC_API_ENDPOINT }}' >> envs.env
@@ -195,6 +198,7 @@ jobs:
           echo 'EODH__PASSWORD=${{ secrets.EODH__PASSWORD }}' >> envs.env
           echo 'EODH__REALM=${{ vars.EODH__REALM }}' >> envs.env
           echo 'EODH__USERNAME=${{ secrets.EODH__USERNAME }}' >> envs.env
+          echo 'EODH__WORKSPACE_SERVICES_ENDPOINT=${{ secrets.EODH__WORKSPACE_SERVICES_ENDPOINT }}' >> envs.env
           echo 'EODH__WORKSPACE_TOKENS_URL=${{ secrets.EODH__WORKSPACE_TOKENS_URL }}' >> envs.env
           echo 'EODH__TMP_S3_CREDENTIALS_URL=${{ vars.EODH__TMP_S3_CREDENTIALS_URL }}' >> envs.env
           echo 'EODH__STAC_API_ENDPOINT=${{ vars.EODH__STAC_API_ENDPOINT }}' >> envs.env
