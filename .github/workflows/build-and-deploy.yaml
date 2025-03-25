@@ -40,7 +40,6 @@ jobs:
       - name: Create file with environment variables
         run: |
           echo 'ENVIRONMENT=dev' >> envs.env
-          echo 'EODH__API_TOKEN=${{ secrets.EODH__API_TOKEN }}' >> envs.env
           echo 'EODH__BASE_URL=${{ vars.EODH__BASE_URL }}' >> envs.env
           echo 'EODH__CLIENT_ID=${{ secrets.EODH__CLIENT_ID }}' >> envs.env
           echo 'EODH__PASSWORD=${{ secrets.EODH__PASSWORD }}' >> envs.env
@@ -87,7 +86,6 @@ jobs:
       - name: Create file with environment variables
         run: |
           echo 'ENVIRONMENT=qa' >> envs.env
-          echo 'EODH__API_TOKEN=${{ secrets.EODH__API_TOKEN }}' >> envs.env
           echo 'EODH__BASE_URL=${{ vars.EODH__BASE_URL }}' >> envs.env
           echo 'EODH__CLIENT_ID=${{ secrets.EODH__CLIENT_ID }}' >> envs.env
           echo 'EODH__PASSWORD=${{ secrets.EODH__PASSWORD }}' >> envs.env
@@ -134,7 +132,6 @@ jobs:
       - name: Create file with environment variables
         run: |
           echo 'ENVIRONMENT=staging' >> envs.env
-          echo 'EODH__API_TOKEN=${{ secrets.EODH__API_TOKEN }}' >> envs.env
           echo 'EODH__BASE_URL=${{ vars.EODH__BASE_URL }}' >> envs.env
           echo 'EODH__CLIENT_ID=${{ secrets.EODH__CLIENT_ID }}' >> envs.env
           echo 'EODH__PASSWORD=${{ secrets.EODH__PASSWORD }}' >> envs.env
@@ -186,7 +183,6 @@ jobs:
       - name: Create file with environment variables
         run: |
           echo 'ENVIRONMENT=prod' >> envs.env
-          echo 'EODH__API_TOKEN=${{ secrets.EODH__API_TOKEN }}' >> envs.env
           echo 'EODH__BASE_URL=${{ vars.EODH__BASE_URL }}' >> envs.env
           echo 'EODH__CLIENT_ID=${{ secrets.EODH__CLIENT_ID }}' >> envs.env
           echo 'EODH__PASSWORD=${{ secrets.EODH__PASSWORD }}' >> envs.env
