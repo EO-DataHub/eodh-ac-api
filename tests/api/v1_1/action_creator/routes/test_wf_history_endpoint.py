@@ -14,8 +14,8 @@ from src.api.v1_1.action_creator.schemas import (
     OrderDirection,
     PaginationResults,
 )
-from src.services.ades.fake_client import GET_JOB_LIST_RESPONSE
 from src.services.ades.schemas import JobList, JobType, StatusCode
+from tests.fakes.ades import GET_JOB_LIST_RESPONSE
 
 if TYPE_CHECKING:
     from starlette.testclient import TestClient

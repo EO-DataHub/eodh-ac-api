@@ -29,6 +29,7 @@ _TEST_IDS = ["lulc", "ndvi-clip-reproject", "simple-ndvi"]
 def test_ws_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
     client: TestClient,
     mocked_ades_factory_ws: MagicMock,  # noqa: ARG001
+    mocked_token_client_factory: MagicMock,  # noqa: ARG001
     auth_token_module_scoped: str,
     preset_request_body: dict[str, Any],
 ) -> None:
@@ -60,6 +61,7 @@ def test_ws_job_submissions_endpoint_returns_valid_response_when_all_is_ok(
 def test_ws_job_submissions_endpoint_returns_422_when_invalid_stac_collection_was_provided(
     client: TestClient,
     mocked_ades_factory_ws: MagicMock,  # noqa: ARG001
+    mocked_token_client_factory: MagicMock,  # noqa: ARG001
     auth_token_module_scoped: str,
 ) -> None:
     # Arrange
@@ -90,6 +92,7 @@ def test_ws_job_submissions_endpoint_returns_422_when_invalid_stac_collection_wa
 def test_ws_job_submissions_endpoint_returns_422_when_missing_geometry(
     client: TestClient,
     mocked_ades_factory_ws: MagicMock,  # noqa: ARG001
+    mocked_token_client_factory: MagicMock,  # noqa: ARG001
     auth_token_module_scoped: str,
 ) -> None:
     # Arrange

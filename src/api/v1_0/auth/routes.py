@@ -75,6 +75,18 @@ def validate_token_from_websocket(token: str) -> tuple[str, dict[str, Any]]:
     return token, decode_token(token, ws=True)
 
 
+def try_get_workspace_from_token(introspected_token: dict[str, Any]) -> str:
+    parsed_token = IntrospectResponse(**introspected_token)
+    if parsed_token.workspaces:
+        # Take first workspace from the WS list
+        return parsed_token.workspaces[0]
+    if parsed_token.preferred_username is not None:
+        # As a fallback take preferred username if present
+        return parsed_token.preferred_username
+    # Raise exception otherwise
+    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect credentials")
+
+
 @auth_router_v1_0.post(
     "/token",
     response_model=TokenResponse,

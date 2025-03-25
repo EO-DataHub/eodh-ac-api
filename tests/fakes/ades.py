@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any
 
 from src.services.ades.base_client import ADESClientBase, ErrorResponse
 from src.services.ades.schemas import JobList, Process, ProcessList, ProcessSummary, StatusCode, StatusInfo
+from src.utils.logging import get_logger
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -1144,3 +1145,7 @@ class FakeADESClient(ADESClientBase):
         wf_id_override_lookup: dict[str, str],
     ) -> tuple[ErrorResponse | None, ProcessSummary | None]:
         return None, ProcessSummary(**REGISTER_PROCESS_RESPONSE)
+
+
+def fake_ades_client_factory(**kwargs: Any) -> FakeADESClient:  # noqa: ARG001
+    return FakeADESClient(url="https://fake.ades.com/api", logger=get_logger("fake_ades"))

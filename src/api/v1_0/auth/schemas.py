@@ -30,12 +30,13 @@ class RealmAccess(BaseModel):
     roles: list[str]
 
 
-class Account(BaseModel):
+class ResourceAccessRecord(BaseModel):
     roles: list[str]
 
 
 class ResourceAccess(BaseModel):
-    account: Account
+    account: ResourceAccessRecord
+    broker: ResourceAccessRecord | None = None
 
 
 class IntrospectResponse(BaseModel):
@@ -64,3 +65,5 @@ class IntrospectResponse(BaseModel):
     username: str | None = None
     token_type: str | None = None
     active: bool | None = None
+    member_groups: list[str] | None = None
+    workspaces: list[str] | None = None

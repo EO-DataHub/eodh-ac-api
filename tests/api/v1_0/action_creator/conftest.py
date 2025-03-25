@@ -5,8 +5,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.services.ades.factory import fake_ades_client_factory
-from src.services.ades.fake_client import FakeADESClient
+from tests.fakes.ades import FakeADESClient, fake_ades_client_factory
 
 
 @pytest.fixture

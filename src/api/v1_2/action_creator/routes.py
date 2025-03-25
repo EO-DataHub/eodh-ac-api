@@ -8,7 +8,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from fastapi.security import HTTPAuthorizationCredentials
 from starlette import status
 
-from src.api.v1_0.auth.routes import decode_token, validate_access_token
+from src.api.v1_0.auth.routes import decode_token, try_get_workspace_from_token, validate_access_token
 from src.api.v1_2.action_creator.functions import (
     FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING,
     FUNCTIONS,
@@ -37,6 +37,7 @@ from src.api.v1_2.action_creator.schemas import (
 from src.core.settings import current_settings
 from src.services.ades.factory import ades_client_factory
 from src.services.ades.schemas import StatusCode
+from src.services.ades.token_client import ws_token_session_auth_client_factory
 from src.services.stac.client import stac_client_factory
 from src.utils.logging import get_logger
 
@@ -156,8 +157,14 @@ async def submit_workflow(
         )
 
     introspected_token = decode_token(credential.credentials)
+    workspace = try_get_workspace_from_token(introspected_token)
 
-    ades = ades_client_factory(workspace=introspected_token["preferred_username"], token=credential.credentials)
+    ws_token_client = ws_token_session_auth_client_factory(token=credential.credentials, workspace=workspace)
+    err, token_response = await ws_token_client.get_token()
+    if err:
+        raise HTTPException(status_code=err.code, detail=err.detail)
+
+    ades = ades_client_factory(workspace=introspected_token["preferred_username"], token=token_response.access)
 
     workflow_step_spec = next(iter(workflow_spec.workflow.values()))
     ogc_inputs = workflow_step_spec.inputs.as_ogc_process_inputs()
@@ -179,21 +186,12 @@ async def submit_workflow(
     )
 
     if err is not None:
-        raise HTTPException(
-            status_code=err.code,
-            detail=err.detail,
-        )
+        raise HTTPException(status_code=err.code, detail=err.detail)
 
-    err, response = await ades.execute_process(
-        process_identifier=wf_identifier,
-        process_inputs=ogc_inputs,
-    )
+    err, response = await ades.execute_process(process_identifier=wf_identifier, process_inputs=ogc_inputs)
 
     if err is not None:  # Will happen if there are race conditions and the process was deleted or ADES is unresponsive
-        raise HTTPException(
-            status_code=err.code,
-            detail=err.detail,
-        )
+        raise HTTPException(status_code=err.code, detail=err.detail)
 
     if response is None:  # Impossible case
         raise HTTPException(
@@ -221,8 +219,14 @@ async def get_job_history(
     params: Annotated[ActionCreatorSubmissionsQueryParams, Query(...)],
 ) -> dict[str, Any]:
     introspected_token = decode_token(credential.credentials)
-    username = introspected_token["preferred_username"]
-    ades = ades_client_factory(workspace=username, token=credential.credentials)
+    workspace = try_get_workspace_from_token(introspected_token)
+
+    ws_token_client = ws_token_session_auth_client_factory(token=credential.credentials, workspace=workspace)
+    err, token_response = await ws_token_client.get_token()
+    if err:
+        raise HTTPException(status_code=err.code, detail=err.detail)
+
+    ades = ades_client_factory(workspace=introspected_token["preferred_username"], token=token_response.access)
 
     # Get the jobs
     ades_jobs: dict[str, Any]
@@ -288,8 +292,14 @@ async def get_job_status(
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
 ) -> ActionCreatorJobSummary:
     introspected_token = decode_token(credential.credentials)
-    username = introspected_token["preferred_username"]
-    ades = ades_client_factory(workspace=username, token=credential.credentials)
+    workspace = try_get_workspace_from_token(introspected_token)
+
+    ws_token_client = ws_token_session_auth_client_factory(token=credential.credentials, workspace=workspace)
+    err, token_response = await ws_token_client.get_token()
+    if err:
+        raise HTTPException(status_code=err.code, detail=err.detail)
+
+    ades = ades_client_factory(workspace=introspected_token["preferred_username"], token=token_response.access)
     err, job = await ades.get_job_details(job_id=submission_id)
 
     if err:
@@ -319,8 +329,14 @@ async def cancel_or_delete_job(
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
 ) -> None:
     introspected_token = decode_token(credential.credentials)
-    username = introspected_token["preferred_username"]
-    ades = ades_client_factory(workspace=username, token=credential.credentials)
+    workspace = try_get_workspace_from_token(introspected_token)
+
+    ws_token_client = ws_token_session_auth_client_factory(token=credential.credentials, workspace=workspace)
+    err, token_response = await ws_token_client.get_token()
+    if err:
+        raise HTTPException(status_code=err.code, detail=err.detail)
+
+    ades = ades_client_factory(workspace=introspected_token["preferred_username"], token=token_response.access)
     err, _ = await ades.cancel_or_delete_job(submission_id)
     if err:
         raise HTTPException(status_code=err.code, detail=err.detail)
@@ -337,8 +353,14 @@ async def batch_cancel_or_delete_jobs(
 ) -> BatchDeleteResponse:
     settings = current_settings()
     introspected_token = decode_token(credential.credentials)
-    username = introspected_token["preferred_username"]
-    ades = ades_client_factory(workspace=username, token=credential.credentials)
+    workspace = try_get_workspace_from_token(introspected_token)
+
+    ws_token_client = ws_token_session_auth_client_factory(token=credential.credentials, workspace=workspace)
+    err, token_response = await ws_token_client.get_token()
+    if err:
+        raise HTTPException(status_code=err.code, detail=err.detail)
+
+    ades = ades_client_factory(workspace=introspected_token["preferred_username"], token=token_response.access)
 
     err, removed_ids = await ades.batch_cancel_or_delete_jobs(
         remove_statuses=request.remove_statuses or [],  # type: ignore[arg-type]

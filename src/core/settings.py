@@ -57,6 +57,7 @@ class SentinelHubSettings(OAuthClientSettings):
 
 class EODHSettings(OAuth2Settings):
     stac_api_endpoint: str
+    workspace_services_endpoint: str
 
 
 class Settings(BaseSettings):
