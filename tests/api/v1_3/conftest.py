@@ -44,7 +44,7 @@ def mocked_token_client_factory() -> Generator[MagicMock, None]:
     with patch(  # type: ignore[assignment]
         "src.api.v1_3.action_creator.routes.ws_token_session_auth_client_factory",
     ) as token_client_factory_mock:
-        token_client_factory_mock.return_value = FakeTokenClient
+        token_client_factory_mock.return_value = FakeTokenClient()
         yield token_client_factory_mock
 
 
