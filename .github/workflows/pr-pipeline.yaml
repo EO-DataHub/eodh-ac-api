@@ -49,7 +49,7 @@ jobs:
           EODH__USERNAME: ${{ secrets.EODH__USERNAME }}
           EODH__PASSWORD: '${{ secrets.EODH__PASSWORD }}'
           EODH__CLIENT_ID: ${{ secrets.EODH__CLIENT_ID }}
-          EODH__WORKSPACE_SERVICES_ENDPOINT: ${{ secrets.EODH__WORKSPACE_SERVICES_ENDPOINT }}
+          EODH__WORKSPACE_SERVICES_ENDPOINT: ${{ vars.EODH__WORKSPACE_SERVICES_ENDPOINT }}
           EODH__STAC_API_ENDPOINT: ${{ vars.EODH__STAC_API_ENDPOINT }}
           ADES__URL: ${{ vars.ADES__URL }}
           ADES__OGC_PROCESSES_API_PATH: ${{ vars.ADES__OGC_PROCESSES_API_PATH }}

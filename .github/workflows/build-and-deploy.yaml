@@ -45,7 +45,7 @@ jobs:
           echo 'EODH__PASSWORD=${{ secrets.EODH__PASSWORD }}' >> envs.env
           echo 'EODH__REALM=${{ vars.EODH__REALM }}' >> envs.env
           echo 'EODH__USERNAME=${{ secrets.EODH__USERNAME }}' >> envs.env
-          echo 'EODH__WORKSPACE_SERVICES_ENDPOINT=${{ secrets.EODH__WORKSPACE_SERVICES_ENDPOINT }}' >> envs.env
+          echo 'EODH__WORKSPACE_SERVICES_ENDPOINT=${{ vars.EODH__WORKSPACE_SERVICES_ENDPOINT }}' >> envs.env
           echo 'EODH__STAC_API_ENDPOINT=${{ vars.EODH__STAC_API_ENDPOINT }}' >> envs.env
           echo 'ADES__URL=${{ vars.ADES__URL }}' >> envs.env
           echo 'ADES__OGC_PROCESSES_API_PATH=${{ vars.ADES__OGC_PROCESSES_API_PATH }}' >> envs.env
@@ -91,7 +91,7 @@ jobs:
           echo 'EODH__PASSWORD=${{ secrets.EODH__PASSWORD }}' >> envs.env
           echo 'EODH__REALM=${{ vars.EODH__REALM }}' >> envs.env
           echo 'EODH__USERNAME=${{ secrets.EODH__USERNAME }}' >> envs.env
-          echo 'EODH__WORKSPACE_SERVICES_ENDPOINT=${{ secrets.EODH__WORKSPACE_SERVICES_ENDPOINT }}' >> envs.env
+          echo 'EODH__WORKSPACE_SERVICES_ENDPOINT=${{ vars.EODH__WORKSPACE_SERVICES_ENDPOINT }}' >> envs.env
           echo 'EODH__STAC_API_ENDPOINT=${{ vars.EODH__STAC_API_ENDPOINT }}' >> envs.env
           echo 'ADES__URL=${{ vars.ADES__URL }}' >> envs.env
           echo 'ADES__OGC_PROCESSES_API_PATH=${{ vars.ADES__OGC_PROCESSES_API_PATH }}' >> envs.env
@@ -137,7 +137,7 @@ jobs:
           echo 'EODH__PASSWORD=${{ secrets.EODH__PASSWORD }}' >> envs.env
           echo 'EODH__REALM=${{ vars.EODH__REALM }}' >> envs.env
           echo 'EODH__USERNAME=${{ secrets.EODH__USERNAME }}' >> envs.env
-          echo 'EODH__WORKSPACE_SERVICES_ENDPOINT=${{ secrets.EODH__WORKSPACE_SERVICES_ENDPOINT }}' >> envs.env
+          echo 'EODH__WORKSPACE_SERVICES_ENDPOINT=${{ vars.EODH__WORKSPACE_SERVICES_ENDPOINT }}' >> envs.env
           echo 'EODH__STAC_API_ENDPOINT=${{ vars.EODH__STAC_API_ENDPOINT }}' >> envs.env
           echo 'ADES__URL=${{ vars.ADES__URL }}' >> envs.env
           echo 'ADES__OGC_PROCESSES_API_PATH=${{ vars.ADES__OGC_PROCESSES_API_PATH }}' >> envs.env
@@ -188,7 +188,7 @@ jobs:
           echo 'EODH__PASSWORD=${{ secrets.EODH__PASSWORD }}' >> envs.env
           echo 'EODH__REALM=${{ vars.EODH__REALM }}' >> envs.env
           echo 'EODH__USERNAME=${{ secrets.EODH__USERNAME }}' >> envs.env
-          echo 'EODH__WORKSPACE_SERVICES_ENDPOINT=${{ secrets.EODH__WORKSPACE_SERVICES_ENDPOINT }}' >> envs.env
+          echo 'EODH__WORKSPACE_SERVICES_ENDPOINT=${{ vars.EODH__WORKSPACE_SERVICES_ENDPOINT }}' >> envs.env
           echo 'EODH__STAC_API_ENDPOINT=${{ vars.EODH__STAC_API_ENDPOINT }}' >> envs.env
           echo 'ADES__URL=${{ vars.ADES__URL }}' >> envs.env
           echo 'ADES__OGC_PROCESSES_API_PATH=${{ vars.ADES__OGC_PROCESSES_API_PATH }}' >> envs.env
