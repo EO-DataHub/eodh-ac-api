@@ -3,7 +3,7 @@
 
 
 ### Search WF results
-POST {{eodh_stac_api_url}}/catalogs/user-datasets/{{workspace}}/processing-results/cat_{{job_id}}/search
+POST {{eodh_stac_api_url}}/catalogs/user/{{workspace}}/catalogs/processing-results/catalogs/cat_{{job_id}}/search
 Accept: application/json
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -28,35 +28,35 @@ Content-Type: application/json
 
 
 ### Get user catalogs
-GET {{eodh_stac_api_url}}/catalogs/user-datasets/{{workspace}}/processing-results
+GET {{eodh_stac_api_url}}/catalogs/user/catalogs/{{workspace}}/catalogs/processing-results/catalogs
 Accept: application/json
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 
 ### Get catalog details
-GET {{eodh_stac_api_url}}/catalogs/user-datasets/{{workspace}}/processing-results/cat_{{job_id}}
+GET {{eodh_stac_api_url}}/catalogs/user/catalogs/{{workspace}}/catalogs/processing-results/catalogs/cat_{{job_id}}
 Accept: application/json
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 
 ### Get collections under catalog
-GET {{eodh_stac_api_url}}/catalogs/user-datasets/{{workspace}}/processing-results/cat_{{job_id}}/collections
+GET {{eodh_stac_api_url}}/catalogs/user/catalogs/{{workspace}}/catalogs/processing-results/catalogs/cat_{{job_id}}/collections
 Accept: application/json
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 
 ### Get collection details
-GET {{eodh_stac_api_url}}/catalogs/user-datasets/{{workspace}}/processing-results/cat_{{job_id}}/collections/col_{{job_id}}
+GET {{eodh_stac_api_url}}/catalogs/user/catalogs/{{workspace}}/catalogs/processing-results/catalogs//cat_{{job_id}}/collections/col_{{job_id}}
 Accept: application/json
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 
 ### Get items for a collection
-GET {{eodh_stac_api_url}}/catalogs/user-datasets/{{workspace}}/processing-results/cat_{{job_id}}/collections/col_{{job_id}}/items
+GET {{eodh_stac_api_url}}/catalogs/user/catalogs/{{workspace}}/catalogs/processing-results/catalogs//cat_{{job_id}}/collections/col_{{job_id}}/items
 Accept: application/json
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -75,16 +75,8 @@ Authorization: Bearer {{token}}
 >> data_asset.tif
 
 
-### Get asset
-GET https://xultaeculcis.workspaces.test.eodhp.eco-ke-staging.com/files/workspaces-eodhp-test/processing-results/cat_5be877ee-b0a9-11ef-9f24-ee3aaed8a789/col_5be877ee-b0a9-11ef-9f24-ee3aaed8a789/e0518623-1c8f-46cf-b6b9-ae60a0966ef3.png
-Accept: */*
-Authorization: Bearer {{token}}
-
->> asset.png
-
-
 ### Search results catalog
-POST {{eodh_stac_api_url}}/catalogs/user-datasets/{{workspace}}/processing-results/cat_e454dbce-de4c-11ef-a182-12e2ea552ab2/search
+POST {{eodh_stac_api_url}}/catalogs/user/catalogs/{{workspace}}/catalogs/processing-results/catalogs/cat_e454dbce-de4c-11ef-a182-12e2ea552ab2/search
 Accept: application/json
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -108,13 +100,13 @@ Content-Type: application/json
 
 
 ### GET collection
-GET https://test.eodatahub.org.uk/api/catalogue/stac/catalogs/user-datasets/eopro-spyro-test/processing-results/cat_01e116ec-bdf2-11ef-a2af-8ef03814f15e/collections/collection
+GET https://test.eodatahub.org.uk/api/catalogue/stac/catalogs/user/catalogs/{{workspace}}/catalogs/processing-results/catalogs/cat_01e116ec-bdf2-11ef-a2af-8ef03814f15e/collections/collection
 Accept: application/json
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 ### Search S2 ARD TEST
-POST https://test.eodatahub.org.uk/api/catalogue/stac/catalogs/supported-datasets/ceda-stac-catalogue/search
+POST https://test.eodatahub.org.uk/api/catalogue/stac/catalogs/public/ceda-stac-catalogue/search
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -205,7 +197,7 @@ Authorization: Bearer {{token}}
 }
 
 ### Search S2 ARD STAGING
-POST https://staging.eodatahub.org.uk/api/catalogue/stac/catalogs/supported-datasets/catalogs/ceda-stac-catalogue/search
+POST https://staging.eodatahub.org.uk/api/catalogue/stac/catalogs/public/catalogs/ceda-stac-catalogue/search
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -296,29 +288,29 @@ Authorization: Bearer {{token}}
 }
 
 ### Planet collections
-GET https://staging.eodatahub.org.uk/api/catalogue/stac/catalogs/supported-datasets/catalogs/planet/collections
+GET https://staging.eodatahub.org.uk/api/catalogue/stac/catalogs/commercial/catalogs/planet/collections
 Accept: application/json
 Content-Type: application/json
 
 ### Planet Scope items
-GET https://staging.eodatahub.org.uk/api/catalogue/stac/catalogs/supported-datasets/catalogs/planet/collections/PSScene/items?limit=5
+GET https://staging.eodatahub.org.uk/api/catalogue/stac/catalogs/commercial/catalogs/planet/collections/PSScene/items?limit=5
 Accept: application/json
 Content-Type: application/json
 
 ### Planet search
-POST https://staging.eodatahub.org.uk/api/catalogue/stac/catalogs/supported-datasets/catalogs/planet/search
+POST https://test.eodatahub.org.uk/api/catalogue/stac/catalogs/commercial/catalogs/planet/search
 Accept: application/json
 Content-Type: application/json
 
 {
   "collections": ["PSScene"],
-  "limit": 5,
-  "sortby": [
-    {
-      "field": "properties.datetime",
-      "direction": "desc"
-    }
-  ],
+  "limit": 50,
+   "sortby":[
+      {
+         "field":"datetime",
+         "direction":"desc"
+      }
+   ],
   "filter-lang": "cql-json",
   "filter": {
     "op": "and",
@@ -327,7 +319,7 @@ Content-Type: application/json
         "op": "between",
         "args": [
           {
-            "property": "properties.datetime"
+            "property": "datetime"
           },
           "2023-01-12T00:00:00.000Z",
           "2023-02-12T23:59:59.999Z"
@@ -337,7 +329,7 @@ Content-Type: application/json
         "op": "<=",
         "args": [
           {
-            "property": "properties.cloud_percent"
+            "property": "cloud_percent"
           },
           18
         ]

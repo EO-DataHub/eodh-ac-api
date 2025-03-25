@@ -1,16 +1,16 @@
 @raster_calculator_cwl_href=https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/raster-calculate-app.cwl
 @lulc_change_cwl_href=https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/lulc-change-app.cwl
 @water_quality_cwl_href=https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/water-quality-app.cwl
-@ades_url=https://staging.eodatahub.org.uk/ades
+@ades_url=https://staging.eodatahub.org.uk/api/catalogue/stac/catalogs/user/catalogs
 
 
 ### List Processes
-GET {{ades_url}}/{{username}}/ogc-api/processes
+GET {{ades_url}}/{{username}}/processes
 Accept: application/json
 Authorization: Bearer {{token}}
 
 ### Register Process From URL
-POST {{ades_url}}/{{username}}/ogc-api/processes
+POST {{ades_url}}/{{username}}/processes
 Accept: application/json
 Authorization: Bearer {{token}}
 Content-Type: application/json

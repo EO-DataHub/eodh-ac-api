@@ -171,6 +171,8 @@ markers = [
 filterwarnings = [
     "ignore::UserWarning",
     "ignore::PendingDeprecationWarning",
+    "ignore::FutureWarning:",
+    "ignore::DeprecationWarning:",
 ]
 
 [tool.check-manifest]
