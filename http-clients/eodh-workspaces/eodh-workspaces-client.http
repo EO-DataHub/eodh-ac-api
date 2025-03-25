@@ -1,19 +1,21 @@
 ### Get S3 credentials
-GET https://test.eodatahub.org.uk/api/workspaces/s3/credentials
+POST https://{{env}}.eodatahub.org.uk/api/workspaces/{{username}}/me/s3-tokens
 Authorization: Bearer {{token}}
 Accept: application/json
 
 >> tmp_s3_credentials.json
 
 ### List Access Token
-GET https://test.eodatahub.org.uk/api/tokens
+GET https://{{env}}.eodatahub.org.uk/api/workspaces/{{username}}/me/tokens
 Authorization: Bearer {{token}}
 Accept: application/json
 
 ### Get Access Token
-POST https://test.eodatahub.org.uk/api/tokens
+POST https://{{env}}.eodatahub.org.uk/api/workspaces/{{username}}/me/tokens
 Authorization: Bearer {{token}}
 Accept: application/json
+
+{"name": "API Token", "scope": "offline_access", "expires": 30}
 
 > {%
 
@@ -22,6 +24,11 @@ Accept: application/json
 %}
 
 ### Invalidate Access Token
-DELETE https://test.eodatahub.org.uk/api/tokens/{{access_token_response.id}}
+DELETE https://{{env}}.eodatahub.org.uk/api/workspaces/{{username}}/me/tokens/{{access_token_response.id}}
 Authorization: Bearer {{token}}
 Accept: */*
+
+### Generate workspac scoped session token
+POST https://{{env}}.eodatahub.org.uk/api/workspaces/{{username}}/me/sessions
+Accept: application/json
+Authorization: Bearer {{$auth.token("auth-id")}}

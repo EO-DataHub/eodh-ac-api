@@ -80,7 +80,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     });
 %}
 
-### List Function Submissions No Params
+### Get Job History
 GET {{api_url}}/{{api_version}}/action-creator/submissions
 Accept: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
@@ -91,7 +91,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
     });
 %}
 
-### List Function Submissions Pagination
+### Get Job History Pagination
 GET {{api_url}}/{{api_version}}/action-creator/submissions?page=1&order_by=submitted_at&order_direction=desc&per_page=5&status=running
 Accept: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
