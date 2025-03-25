@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 def test_get_job_submissions_status_endpoint_returns_successful_response(
     client: TestClient,
     mocked_ades_factory: MagicMock,  # noqa: ARG001
+    mocked_token_client_factory: MagicMock,  # noqa: ARG001
     auth_token_module_scoped: str,
 ) -> None:
     # Arrange

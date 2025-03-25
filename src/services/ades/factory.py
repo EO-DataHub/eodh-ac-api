@@ -1,10 +1,7 @@
 from __future__ import annotations
 
-from typing import Any
-
 from src.core.settings import current_settings
 from src.services.ades.client import ADESClient
-from src.services.ades.fake_client import FakeADESClient
 from src.utils.logging import get_logger
 
 
@@ -19,7 +16,3 @@ def ades_client_factory(workspace: str, token: str) -> ADESClient:
         logger=get_logger("ades"),
         token=token,
     )
-
-
-def fake_ades_client_factory(**kwargs: Any) -> FakeADESClient:  # noqa: ARG001
-    return FakeADESClient()

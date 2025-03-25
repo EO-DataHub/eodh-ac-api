@@ -14,8 +14,8 @@ from src.api.v1_3.action_creator.schemas.history import (
     OrderDirection,
     PaginationResults,
 )
-from src.services.ades.fake_client import GET_JOB_LIST_RESPONSE
 from src.services.ades.schemas import JobList, JobType, StatusCode
+from tests.fakes.ades import GET_JOB_LIST_RESPONSE
 
 if TYPE_CHECKING:
     from starlette.testclient import TestClient
@@ -26,6 +26,7 @@ TOTAL_ITEMS = len(GET_JOB_LIST_RESPONSE["jobs"])  # type: ignore[arg-type]
 def test_get_job_submissions_endpoint_returns_valid_response_no_params(
     client: TestClient,
     mocked_ades_factory: MagicMock,  # noqa: ARG001
+    mocked_token_client_factory: MagicMock,  # noqa: ARG001
     auth_token_module_scoped: str,
 ) -> None:
     # Act
@@ -50,6 +51,7 @@ def test_get_job_submissions_endpoint_returns_valid_response_no_params(
 @patch("src.api.v1_3.action_creator.routes.ades_client_factory")
 def test_get_job_submissions_returns_empty_result_set_when_ades_job_history_is_empty(
     ades_factory_mock: MagicMock,
+    mocked_token_client_factory: MagicMock,  # noqa: ARG001
     client: TestClient,
     auth_token_module_scoped: str,
 ) -> None:
@@ -79,6 +81,7 @@ def test_get_job_submissions_returns_empty_result_set_when_ades_job_history_is_e
 @patch("src.api.v1_3.action_creator.routes.ades_client_factory")
 def test_get_job_submissions_returns_correct_pagination_with_fewer_jobs_than_per_page(
     ades_factory_mock: MagicMock,
+    mocked_token_client_factory: MagicMock,  # noqa: ARG001
     client: TestClient,
     auth_token_module_scoped: str,
 ) -> None:
@@ -132,6 +135,7 @@ def test_get_job_submissions_returns_correct_pagination_with_fewer_jobs_than_per
 )
 def test_get_job_submissions_sorts_results_by_order_by_and_direction(
     mocked_ades_factory: MagicMock,  # noqa: ARG001
+    mocked_token_client_factory: MagicMock,  # noqa: ARG001
     client: TestClient,
     auth_token_module_scoped: str,
     order_by: str,
@@ -176,6 +180,7 @@ def test_get_job_submissions_sorts_results_by_order_by_and_direction(
 @pytest.mark.parametrize("per_page", [1, 15, 30, 50, 80, 100], ids=lambda x: f"per_page={x}")
 def test_get_job_submissions_with_custom_per_page_item_count_and_page_idx(
     mocked_ades_factory: MagicMock,  # noqa: ARG001
+    mocked_token_client_factory: MagicMock,  # noqa: ARG001
     client: TestClient,
     auth_token_module_scoped: str,
     page: int,

@@ -5,8 +5,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.services.ades.factory import fake_ades_client_factory
-from src.services.ades.fake_client import FakeADESClient
+from tests.fakes.ades import FakeADESClient, fake_ades_client_factory
+from tests.fakes.ws_token_client import FakeTokenClient, fake_ws_token_session_auth_client_factory
 
 
 @pytest.fixture
@@ -29,3 +29,14 @@ def mocked_ades_factory_ws() -> Generator[MagicMock]:
     ) as ades_client_factory_mock:
         ades_client_factory_mock.return_value = FakeADESClient
         yield ades_client_factory_mock
+
+
+@pytest.fixture
+def mocked_token_client_factory() -> Generator[MagicMock, None]:
+    token_client_factory_mock: MagicMock
+    with patch(
+        "src.api.v1_2.action_creator.routes.ws_token_session_auth_client_factory",
+        fake_ws_token_session_auth_client_factory,
+    ) as token_client_factory_mock:
+        token_client_factory_mock.return_value = FakeTokenClient
+        yield token_client_factory_mock

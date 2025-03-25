@@ -10,8 +10,6 @@ from urllib.parse import urlparse
 
 import aiohttp
 import yaml
-from aiohttp import ClientSession
-from aiohttp_retry import ExponentialRetry, RetryClient
 from dotenv import load_dotenv
 from starlette import status
 
@@ -29,7 +27,6 @@ if TYPE_CHECKING:
     from logging import Logger
     from uuid import UUID
 
-    from aiohttp.client_exceptions import ClientResponse
 
 _logger = get_logger(__name__)
 
@@ -75,12 +72,11 @@ class ADESClient(ADESClientBase):
         token: str,
         logger: Logger,
     ) -> None:
+        super().__init__(url, logger)
         self.ogc_jobs_api_path = ogc_jobs_api_path
         self.ogc_processes_api_path = ogc_processes_api_path
-        self.logger = logger
         self.token = token
         self.workspace = workspace
-        self.url = url
         self.headers = {
             "Authorization": f"Bearer {self.token}",
             "Accept": "application/json",
@@ -93,30 +89,6 @@ class ADESClient(ADESClientBase):
     @property
     def jobs_endpoint_url(self) -> str:
         return f"{self.url.strip('/')}/{self.workspace}/{self.ogc_jobs_api_path}"
-
-    def _get_retry_client(
-        self,
-        attempts: int = 3,
-        max_timeout: float = 10,
-        start_timeout: float = 2,
-    ) -> tuple[ClientSession, RetryClient]:
-        client_session = ClientSession()
-        exp_retry = ExponentialRetry(
-            attempts=attempts,
-            max_timeout=max_timeout,
-            statuses={
-                status.HTTP_429_TOO_MANY_REQUESTS,
-                status.HTTP_502_BAD_GATEWAY,
-                status.HTTP_503_SERVICE_UNAVAILABLE,
-            },
-            start_timeout=start_timeout,
-        )
-        retry_client = RetryClient(
-            client_session=client_session,
-            retry_options=exp_retry,
-            logger=self.logger,
-        )
-        return client_session, retry_client
 
     async def _download_file(self, file_url: str, output_path: Path) -> tuple[ErrorResponse | None, Path | None]:
         client_session, retry_client = self._get_retry_client()
@@ -420,39 +392,6 @@ class ADESClient(ADESClientBase):
         cwl_href = wf_registry[process_identifier]["cwl_href"]
         id_override = wf_id_override_lookup.get(process_identifier)
         return await self.register_process_from_cwl_href_with_download(cwl_href, id_override=id_override)
-
-    @staticmethod
-    async def _handle_common_errors_if_necessary(response: ClientResponse) -> ErrorResponse | None:
-        if response.status >= status.HTTP_400_BAD_REQUEST:
-            _logger.warning(
-                "Response for %s %s, does not indicate success. Status code: %s",
-                response.method,
-                response.url,
-                response.status,
-            )
-
-        if response.status == status.HTTP_400_BAD_REQUEST:
-            return ErrorResponse(
-                code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid payload.",
-            )
-
-        if response.status == status.HTTP_401_UNAUTHORIZED:
-            return ErrorResponse(
-                code=status.HTTP_401_UNAUTHORIZED,
-                detail="You are not authorized to perform this action.",
-            )
-
-        if response.status == status.HTTP_429_TOO_MANY_REQUESTS:
-            return ErrorResponse(code=status.HTTP_429_TOO_MANY_REQUESTS, detail=(await response.json()).get("detail"))
-
-        if response.status == status.HTTP_500_INTERNAL_SERVER_ERROR:
-            return ErrorResponse(code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error.")
-
-        if response.status >= status.HTTP_400_BAD_REQUEST:
-            return ErrorResponse(code=response.status, detail=await response.text())
-
-        return None
 
     async def batch_cancel_or_delete_jobs(  # noqa: C901
         self,

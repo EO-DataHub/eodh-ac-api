@@ -1,9 +1,13 @@
 from __future__ import annotations
 
 import abc
+from logging import Logger
 from typing import TYPE_CHECKING, Any
 
+from aiohttp import ClientResponse, ClientSession
+from aiohttp_retry import ExponentialRetry, RetryClient
 from pydantic import BaseModel
+from starlette import status
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -17,7 +21,73 @@ class ErrorResponse(BaseModel):
     detail: str | dict[str, Any] | None = None
 
 
-class ADESClientBase(abc.ABC):
+class APIClient:
+    def __init__(
+        self,
+        url: str,
+        logger: Logger,
+    ) -> None:
+        self.url = url
+        self.logger = logger
+
+    def _get_retry_client(
+        self,
+        attempts: int = 3,
+        max_timeout: float = 10,
+        start_timeout: float = 2,
+    ) -> tuple[ClientSession, RetryClient]:
+        client_session = ClientSession()
+        exp_retry = ExponentialRetry(
+            attempts=attempts,
+            max_timeout=max_timeout,
+            statuses={
+                status.HTTP_429_TOO_MANY_REQUESTS,
+                status.HTTP_502_BAD_GATEWAY,
+                status.HTTP_503_SERVICE_UNAVAILABLE,
+            },
+            start_timeout=start_timeout,
+        )
+        retry_client = RetryClient(
+            client_session=client_session,
+            retry_options=exp_retry,
+            logger=self.logger,
+        )
+        return client_session, retry_client
+
+    async def _handle_common_errors_if_necessary(self, response: ClientResponse) -> ErrorResponse | None:
+        if response.status >= status.HTTP_400_BAD_REQUEST:
+            self.logger.warning(
+                "Response for %s %s, does not indicate success. Status code: %s",
+                response.method,
+                response.url,
+                response.status,
+            )
+
+        if response.status == status.HTTP_400_BAD_REQUEST:
+            return ErrorResponse(
+                code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid payload.",
+            )
+
+        if response.status == status.HTTP_401_UNAUTHORIZED:
+            return ErrorResponse(
+                code=status.HTTP_401_UNAUTHORIZED,
+                detail="You are not authorized to perform this action.",
+            )
+
+        if response.status == status.HTTP_429_TOO_MANY_REQUESTS:
+            return ErrorResponse(code=status.HTTP_429_TOO_MANY_REQUESTS, detail=(await response.json()).get("detail"))
+
+        if response.status == status.HTTP_500_INTERNAL_SERVER_ERROR:
+            return ErrorResponse(code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error.")
+
+        if response.status >= status.HTTP_400_BAD_REQUEST:
+            return ErrorResponse(code=response.status, detail=await response.text())
+
+        return None
+
+
+class ADESClientBase(APIClient, abc.ABC):
     @abc.abstractmethod
     async def get_job_details(self, job_id: str | UUID) -> tuple[ErrorResponse | None, StatusInfo | None]: ...
 

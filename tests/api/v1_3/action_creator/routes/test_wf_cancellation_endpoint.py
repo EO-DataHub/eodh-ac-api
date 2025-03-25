@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 def test_workflow_cancellation_endpoint_should_return_successful_response(
     client: TestClient,
     auth_token_module_scoped: str,
+    mocked_token_client_factory: MagicMock,  # noqa: ARG001
     mocked_ades_factory: MagicMock,  # noqa: ARG001
 ) -> None:
     # Arrange

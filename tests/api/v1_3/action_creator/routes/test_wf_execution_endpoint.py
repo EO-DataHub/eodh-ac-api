@@ -28,6 +28,7 @@ def test_workflow_execution_endpoint_should_return_expected_response(
     wf_spec: tuple[str, dict[str, Any]],
     client: TestClient,
     auth_token_module_scoped: str,
+    mocked_token_client_factory: MagicMock,  # noqa: ARG001
     mocked_ades_factory: MagicMock,  # noqa: ARG001
 ) -> None:
     # Arrange
@@ -61,6 +62,7 @@ def test_job_submission_endpoint_returns_400_when_no_items_to_process_for_given_
     wf_spec: tuple[str, dict[str, Any]],
     client: TestClient,
     auth_token_module_scoped: str,
+    mocked_token_client_factory: MagicMock,  # noqa: ARG001
     mocked_ades_factory: MagicMock,  # noqa: ARG001
 ) -> None:
     # Arrange
