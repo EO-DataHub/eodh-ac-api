@@ -23,6 +23,7 @@ def register_api_v1_0(app: FastAPI) -> FastAPI:
         version="1.0.0",
         description="API for Action Creator.",
         debug=settings.environment.lower() in {"local", "dev"},
+        openapi_url=None if settings.environment.lower() == "prod" else "/openapi.json",
     )
     sub_app.include_router(health_router_v1_0, deprecated=True)
     sub_app.include_router(auth_router_v1_0, deprecated=True)
@@ -37,6 +38,7 @@ def register_api_v1_1(app: FastAPI) -> FastAPI:
         version="1.1.0",
         description="API for Action Creator.",
         debug=settings.environment.lower() in {"local", "dev"},
+        openapi_url=None if settings.environment.lower() == "prod" else "/openapi.json",
     )
     sub_app.include_router(health_router_v1_0)
     sub_app.include_router(auth_router_v1_0)
@@ -52,6 +54,7 @@ def register_api_v1_2(app: FastAPI) -> FastAPI:
         version="1.2.0",
         description="API for Action Creator.",
         debug=settings.environment.lower() in {"local", "dev"},
+        openapi_url=None if settings.environment.lower() == "prod" else "/openapi.json",
     )
     sub_app.include_router(health_router_v1_0)
     sub_app.include_router(auth_router_v1_0)
@@ -68,6 +71,7 @@ def register_api_v1_3(app: FastAPI) -> FastAPI:
         version="1.3.0",
         description="API for Action Creator.",
         debug=settings.environment.lower() in {"local", "dev"},
+        openapi_url=None if settings.environment.lower() == "prod" else "/openapi.json",
     )
     sub_app.include_router(health_router_v1_0)
     sub_app.include_router(auth_router_v1_0)
