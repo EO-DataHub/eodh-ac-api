@@ -450,7 +450,7 @@ class ADESClient(ADESClientBase):
 
             if job["status"] == "successful" and remove_jobs_without_results:
                 async with aiohttp.ClientSession() as session, session.post(
-                    f"{stac_endpoint}/catalogs/user-datasets/catalogs/{self.workspace}/catalogs/processing-results/catalogs/{job['processID']}/catalogs/cat_{job['jobID']}/search",
+                    f"{stac_endpoint}/catalogs/user/catalogs/{self.workspace}/catalogs/processing-results/catalogs/{job['processID']}/catalogs/cat_{job['jobID']}/search",
                     headers={
                         "Authorization": f"Bearer {self.token}",
                         "Accept": "application/json",
