@@ -1,9 +1,9 @@
-@eodh_stac_api_url=https://staging.eodatahub.org.uk/api/catalogue/stac
-@job_id=56ecdb48-b88a-11ef-8fa3-6a040e2afd6f
+@eodh_stac_api_url=https://{{env}}.eodatahub.org.uk/api/catalogue/stac
+@job_id=21c5970a-0a17-11f0-b4a6-f25cddfce193
 
 
 ### Search WF results
-POST {{eodh_stac_api_url}}/catalogs/user/{{workspace}}/catalogs/processing-results/catalogs/cat_{{job_id}}/search
+POST {{eodh_stac_api_url}}/catalogs/user/catalogs/{{workspace}}/catalogs/processing-results/search
 Accept: application/json
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -28,7 +28,7 @@ Content-Type: application/json
 
 
 ### Get user catalogs
-GET {{eodh_stac_api_url}}/catalogs/user/catalogs/{{workspace}}/catalogs/processing-results/catalogs
+GET {{eodh_stac_api_url}}/catalogs/user/catalogs/{{workspace}}/catalogs/processing-results/catalogs?limit=150
 Accept: application/json
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -76,7 +76,7 @@ Authorization: Bearer {{token}}
 
 
 ### Search results catalog
-POST {{eodh_stac_api_url}}/catalogs/user/catalogs/{{workspace}}/catalogs/processing-results/catalogs/cat_e454dbce-de4c-11ef-a182-12e2ea552ab2/search
+POST {{eodh_stac_api_url}}/catalogs/user/catalogs/{{workspace}}/catalogs/processing-results/catalogs/cat_21c5970a-0a17-11f0-b4a6-f25cddfce193/search
 Accept: application/json
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -100,13 +100,13 @@ Content-Type: application/json
 
 
 ### GET collection
-GET https://test.eodatahub.org.uk/api/catalogue/stac/catalogs/user/catalogs/{{workspace}}/catalogs/processing-results/catalogs/cat_01e116ec-bdf2-11ef-a2af-8ef03814f15e/collections/collection
+GET {{eodh_stac_api_url}}/catalogs/user/catalogs/{{workspace}}/catalogs/processing-results/catalogs/cat_01e116ec-bdf2-11ef-a2af-8ef03814f15e/collections/collection
 Accept: application/json
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 ### Search S2 ARD TEST
-POST https://test.eodatahub.org.uk/api/catalogue/stac/catalogs/public/ceda-stac-catalogue/search
+POST {{eodh_stac_api_url}}/catalogs/public/ceda-stac-catalogue/search
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -197,7 +197,7 @@ Authorization: Bearer {{token}}
 }
 
 ### Search S2 ARD STAGING
-POST https://staging.eodatahub.org.uk/api/catalogue/stac/catalogs/public/catalogs/ceda-stac-catalogue/search
+POST {{eodh_stac_api_url}}/catalogs/public/catalogs/ceda-stac-catalogue/search
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -288,17 +288,17 @@ Authorization: Bearer {{token}}
 }
 
 ### Planet collections
-GET https://staging.eodatahub.org.uk/api/catalogue/stac/catalogs/commercial/catalogs/planet/collections
+GET {{eodh_stac_api_url}}/catalogs/commercial/catalogs/planet/collections
 Accept: application/json
 Content-Type: application/json
 
 ### Planet Scope items
-GET https://staging.eodatahub.org.uk/api/catalogue/stac/catalogs/commercial/catalogs/planet/collections/PSScene/items?limit=5
+GET {{eodh_stac_api_url}}/catalogs/commercial/catalogs/planet/collections/PSScene/items?limit=5
 Accept: application/json
 Content-Type: application/json
 
 ### Planet search
-POST https://test.eodatahub.org.uk/api/catalogue/stac/catalogs/commercial/catalogs/planet/search
+POST {{eodh_stac_api_url}}/catalogs/commercial/catalogs/planet/search
 Accept: application/json
 Content-Type: application/json
 
