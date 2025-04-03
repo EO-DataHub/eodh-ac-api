@@ -70,6 +70,7 @@ TStacQuery = Annotated[
 @catalogue_router_v1_3.post(
     "/stac/catalogs/user-datasets/{workspace}/processing-results/cat_{job_id}/charts",
     response_model=JobAssetsChartVisualizationResponse,
+    deprecated=True,
 )
 async def get_visualization_data_for_job_results(
     workspace: str,
@@ -107,6 +108,7 @@ async def get_visualization_data_for_job_results(
 @catalogue_router_v1_3.post(
     "/stac/catalogs/user-datasets/catalogs/{workspace}/catalogs/processing-results/catalogs/{workflow_identifier}/catalogs/cat_{job_id}/charts",
     response_model=JobAssetsChartVisualizationResponse,
+    deprecated=True,
 )
 async def get_visualization_data_for_job_results_v2(
     workspace: str,
@@ -143,7 +145,11 @@ async def get_visualization_data_for_job_results_v2(
     )
 
 
-@catalogue_router_v1_3.post("/stac/search", response_model=StacSearchResponse)
+@catalogue_router_v1_3.post(
+    "/stac/search",
+    response_model=StacSearchResponse,
+    deprecated=True,
+)
 async def stac_search(
     credential: Annotated[HTTPAuthorizationCredentials | None, Depends(validate_access_token_if_provided)],  # noqa: ARG001
     stac_search_query: TStacQuery,
