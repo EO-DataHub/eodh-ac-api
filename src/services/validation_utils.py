@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 
 EXPECTED_BBOX_ELEMENT_COUNT = 4
 MAX_AREA_SQ_KM = 10_000
+MAX_AREA_SQ_KM_OFFSET = 100
 CHIPPING_THRESHOLD_SQ_KM = 2500
 SQ_MILES_DIVISOR = 2.59
 
@@ -55,13 +56,15 @@ STAC_COLLECTION_DATE_RANGE_LOOKUP = {
 
 class AreaOfInterestTooBigError:
     @classmethod
-    def make(cls, aoi: Any, max_size: float) -> PydanticCustomError:
+    def make(cls, aoi: Any, max_size: float, actual_size: float) -> PydanticCustomError:
         max_size_imperial = max_size / SQ_MILES_DIVISOR
         return PydanticCustomError(
             "area_of_interest_too_big_error",
             f"Area exceeds {max_size_imperial:,.2f} {{units_imperial}}.",
             {
                 "aoi": aoi,
+                "aoi_size_metric": actual_size,
+                "aoi_size_imperial": actual_size / SQ_MILES_DIVISOR,
                 "max_size_metric": max_size,
                 "max_size_imperial": max_size / SQ_MILES_DIVISOR,
                 "units_metric": "square kilometers",
@@ -148,7 +151,11 @@ class NoItemsToProcessError:
         )
 
 
-def ensure_area_smaller_than(geom: dict[str, Any], area_size_limit: float = MAX_AREA_SQ_KM) -> None:
+def ensure_area_smaller_than(
+    geom: dict[str, Any],
+    area_size_limit: float = MAX_AREA_SQ_KM,
+    offset: float = MAX_AREA_SQ_KM_OFFSET,
+) -> None:
     # Parse the GeoJSON geometry (assume it's EPSG:4326)
     polygon: shapely.geometry.Polygon = shape(geom)
 
@@ -156,8 +163,8 @@ def ensure_area_smaller_than(geom: dict[str, Any], area_size_limit: float = MAX_
     area_sq_km = calculate_geodesic_area(polygon) / 1e6  # Convert from square meters to square kilometers
 
     # Raise an error if the area exceeds area_size_limit square kilometers
-    if area_sq_km > area_size_limit:
-        raise AreaOfInterestTooBigError.make(aoi=geom, max_size=area_size_limit)
+    if area_sq_km > (area_size_limit + offset):
+        raise AreaOfInterestTooBigError.make(aoi=geom, max_size=area_size_limit, actual_size=area_sq_km)
 
 
 def aoi_from_geojson_if_necessary(v: dict[str, Any]) -> dict[str, Any]:

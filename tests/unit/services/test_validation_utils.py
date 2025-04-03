@@ -7,6 +7,7 @@ import pytest
 from src.consts.geometries import HEATHROW_AOI, UK_AOI
 from src.services.validation_utils import (
     MAX_AREA_SQ_KM,
+    MAX_AREA_SQ_KM_OFFSET,
     SQ_MILES_DIVISOR,
     ensure_area_smaller_than,
 )
@@ -21,6 +22,38 @@ FEATURES = [
         "type": "Feature",
         "properties": {"id": "uk", "area": 698816.12},
         "geometry": UK_AOI,
+    },
+    {
+        "type": "Feature",
+        "properties": {"id": "esk_eden_delta_err", "area": 10035.96544626254},
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [-4.262596432942177, 54.31697631546501],
+                    [-2.812770287700935, 54.322295162807734],
+                    [-2.8127702877009346, 55.275306195348264],
+                    [-4.296653281021248, 55.275306195348264],
+                    [-4.262596432942177, 54.31697631546501],
+                ]
+            ],
+        },
+    },
+    {
+        "type": "Feature",
+        "properties": {"id": "esk_eden_delta_valid", "area": 9928.458894855943},
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+                [
+                    [-4.2961298207519665, 54.343357904147695],
+                    [-2.8007321509386056, 54.343357904147695],
+                    [-2.82617110270533, 55.2692921005673],
+                    [-4.3428609979336334, 55.25915080667062],
+                    [-4.2961298207519665, 54.343357904147695],
+                ]
+            ],
+        },
     },
     {
         "type": "Feature",
@@ -185,6 +218,23 @@ FEATURES = [
 def test_ensure_area_rises_error_if_necessary(feature: dict[str, Any]) -> None:
     if feature["properties"]["area"] > MAX_AREA_SQ_KM:
         with pytest.raises(ValueError, match=f"Area exceeds {MAX_AREA_SQ_KM / SQ_MILES_DIVISOR:,.2f} square miles."):
-            ensure_area_smaller_than(geom=feature["geometry"], area_size_limit=MAX_AREA_SQ_KM)
+            ensure_area_smaller_than(geom=feature["geometry"], area_size_limit=MAX_AREA_SQ_KM, offset=0)
     else:
-        ensure_area_smaller_than(geom=feature["geometry"], area_size_limit=MAX_AREA_SQ_KM)
+        ensure_area_smaller_than(geom=feature["geometry"], area_size_limit=MAX_AREA_SQ_KM, offset=0)
+
+
+@pytest.mark.parametrize(
+    "feature",
+    FEATURES,
+    ids=lambda feature: feature["properties"]["id"],
+)
+def test_ensure_area_rises_error_if_necessary_with_offset(feature: dict[str, Any]) -> None:
+    if feature["properties"]["area"] > (MAX_AREA_SQ_KM + MAX_AREA_SQ_KM_OFFSET):
+        with pytest.raises(ValueError, match=f"Area exceeds {MAX_AREA_SQ_KM / SQ_MILES_DIVISOR:,.2f} square miles."):
+            ensure_area_smaller_than(
+                geom=feature["geometry"],
+                area_size_limit=MAX_AREA_SQ_KM,
+                offset=MAX_AREA_SQ_KM_OFFSET,
+            )
+    else:
+        ensure_area_smaller_than(geom=feature["geometry"], area_size_limit=MAX_AREA_SQ_KM, offset=MAX_AREA_SQ_KM_OFFSET)
