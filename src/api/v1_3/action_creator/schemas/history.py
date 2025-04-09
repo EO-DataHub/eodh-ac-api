@@ -62,6 +62,7 @@ class OrderDirection(StrEnum):
 
 
 class ActionCreatorSubmissionsQueryParams(BaseModel):
+    workspace: Annotated[str | None, Field(None, description="Workspace to query")]
     order_by: Annotated[
         Literal["job_id", "status", "workflow_identifier", "submitted_at", "finished_at", "successful"],
         Field("submitted_at", description="Field to use for ordering - `submitted_at` by default"),

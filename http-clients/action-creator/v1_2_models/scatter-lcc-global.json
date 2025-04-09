@@ -1,4 +1,5 @@
 {
+  "workspace": "eopro-spyro-test",
   "workflow": {
     "land-cover-change-detection": {
       "inputs": {

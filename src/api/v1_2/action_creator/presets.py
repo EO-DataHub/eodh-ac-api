@@ -103,6 +103,7 @@ WATER_QUALITY_PRESET_SPEC_ARD = {
 }
 
 NDVI_PRESET = {
+    "workspace": "my-workspace",
     "workflow": {
         "ndvi": {
             "identifier": "ndvi",
@@ -114,10 +115,11 @@ NDVI_PRESET = {
                 "aoi": HEATHROW_AOI,
             },
         }
-    }
+    },
 }
 
 NDVI_CLIP_PRESET = {
+    "workspace": "my-workspace",
     "workflow": {
         "ndvi": {
             "identifier": "ndvi",
@@ -136,10 +138,11 @@ NDVI_CLIP_PRESET = {
                 "aoi": HEATHROW_AOI,
             },
         },
-    }
+    },
 }
 
 WATER_QUALITY_PRESET = {
+    "workspace": "my-workspace",
     "workflow": WATER_QUALITY_PRESET_SPEC_ARD["workflow"],
 }
 

@@ -330,6 +330,7 @@ class ActionCreatorJobStatusRequest(BaseModel):
 
 
 class ActionCreatorSubmissionRequest(BaseModel):
+    workspace: str | None = None
     workflow: dict[str, TWorkflowStep]
 
 
@@ -372,6 +373,7 @@ class OrderDirection(StrEnum):
 
 
 class ActionCreatorSubmissionsQueryParams(BaseModel):
+    workspace: Annotated[str | None, Field(None, description="Workspace to query")]
     order_by: Annotated[
         Literal["submission_id", "status", "function_identifier", "submitted_at", "finished_at", "successful"],
         Field("submitted_at", description="Field to use for ordering - `submitted_at` by default"),
@@ -437,6 +439,7 @@ class BatchDeleteResponse(BaseModel):
 
 
 class BatchDeleteRequest(BaseModel):
+    workspace: str | None = None
     remove_statuses: list[ActionCreatorJobStatus] | None = None
     remove_all_before: datetime | None = None
     remove_all_after: datetime | None = None

@@ -13,7 +13,7 @@ from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import ValidationError
 from starlette import status
 
-from src.api.v1_0.auth.routes import decode_token, try_get_workspace_from_token, validate_access_token
+from src.api.v1_0.auth.routes import decode_token, try_get_workspace_from_token_or_request_body, validate_access_token
 from src.api.v1_3.action_creator.schemas.errors import ErrorResponse
 from src.api.v1_3.action_creator.schemas.functions import FunctionsResponse
 from src.api.v1_3.action_creator.schemas.history import (
@@ -197,7 +197,9 @@ async def submit_workflow(
         )
 
     introspected_token = decode_token(credential.credentials)
-    workspace = try_get_workspace_from_token(introspected_token)
+    workspace = try_get_workspace_from_token_or_request_body(
+        introspected_token, workspace_from_request_body=wf_model.workspace
+    )
 
     ws_token_client = ws_token_session_auth_client_factory(token=credential.credentials, workspace=workspace)
     err, token_response = await ws_token_client.get_token()
@@ -205,7 +207,7 @@ async def submit_workflow(
         raise HTTPException(status_code=err.code, detail=err.detail)
 
     ades = ades_client_factory(
-        workspace=introspected_token["preferred_username"],
+        workspace=workspace,
         token=token_response.access,  # type: ignore[union-attr]
     )
 
@@ -264,7 +266,10 @@ async def get_job_history(
     params: Annotated[ActionCreatorSubmissionsQueryParams, Query(...)],
 ) -> dict[str, Any]:
     introspected_token = decode_token(credential.credentials)
-    workspace = try_get_workspace_from_token(introspected_token)
+    workspace = try_get_workspace_from_token_or_request_body(
+        introspected_token,
+        workspace_from_request_body=params.workspace,
+    )
 
     ws_token_client = ws_token_session_auth_client_factory(token=credential.credentials, workspace=workspace)
     err, token_response = await ws_token_client.get_token()
@@ -272,7 +277,7 @@ async def get_job_history(
         raise HTTPException(status_code=err.code, detail=err.detail)
 
     ades = ades_client_factory(
-        workspace=introspected_token["preferred_username"],
+        workspace=workspace,
         token=token_response.access,  # type: ignore[union-attr]
     )
 
@@ -338,9 +343,10 @@ async def get_job_history(
 async def get_job_status(
     submission_id: uuid.UUID,
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
+    workspace: str | None = None,
 ) -> ActionCreatorJobSummary:
     introspected_token = decode_token(credential.credentials)
-    workspace = try_get_workspace_from_token(introspected_token)
+    workspace = try_get_workspace_from_token_or_request_body(introspected_token, workspace_from_request_body=workspace)
 
     ws_token_client = ws_token_session_auth_client_factory(token=credential.credentials, workspace=workspace)
     err, token_response = await ws_token_client.get_token()
@@ -348,7 +354,7 @@ async def get_job_status(
         raise HTTPException(status_code=err.code, detail=err.detail)
 
     ades = ades_client_factory(
-        workspace=introspected_token["preferred_username"],
+        workspace=workspace,
         token=token_response.access,  # type: ignore[union-attr]
     )
     err, job = await ades.get_job_details(job_id=submission_id)
@@ -378,9 +384,10 @@ async def get_job_status(
 async def cancel_or_delete_job(
     job_id: uuid.UUID,
     credential: Annotated[HTTPAuthorizationCredentials, Depends(validate_access_token)],
+    workspace: str | None = None,
 ) -> None:
     introspected_token = decode_token(credential.credentials)
-    workspace = try_get_workspace_from_token(introspected_token)
+    workspace = try_get_workspace_from_token_or_request_body(introspected_token, workspace_from_request_body=workspace)
 
     ws_token_client = ws_token_session_auth_client_factory(token=credential.credentials, workspace=workspace)
     err, token_response = await ws_token_client.get_token()
@@ -388,7 +395,7 @@ async def cancel_or_delete_job(
         raise HTTPException(status_code=err.code, detail=err.detail)
 
     ades = ades_client_factory(
-        workspace=introspected_token["preferred_username"],
+        workspace=workspace,
         token=token_response.access,  # type: ignore[union-attr]
     )
     err, _ = await ades.cancel_or_delete_job(job_id)
@@ -407,7 +414,10 @@ async def batch_cancel_or_delete_jobs(
 ) -> BatchDeleteResponse:
     settings = current_settings()
     introspected_token = decode_token(credential.credentials)
-    workspace = try_get_workspace_from_token(introspected_token)
+    workspace = try_get_workspace_from_token_or_request_body(
+        introspected_token,
+        workspace_from_request_body=request.workspace,
+    )
 
     ws_token_client = ws_token_session_auth_client_factory(token=credential.credentials, workspace=workspace)
     err, token_response = await ws_token_client.get_token()
@@ -415,7 +425,7 @@ async def batch_cancel_or_delete_jobs(
         raise HTTPException(status_code=err.code, detail=err.detail)
 
     ades = ades_client_factory(
-        workspace=introspected_token["preferred_username"],
+        workspace=workspace,
         token=token_response.access,  # type: ignore[union-attr]
     )
 

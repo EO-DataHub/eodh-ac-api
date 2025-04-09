@@ -81,7 +81,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 %}
 
 ### Get Job History
-GET {{api_url}}/{{api_version}}/action-creator/submissions
+GET {{api_url}}/{{api_version}}/action-creator/submissions?workspace={{workspace}}
 Accept: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 
@@ -92,7 +92,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 %}
 
 ### Get Job History Pagination
-GET {{api_url}}/{{api_version}}/action-creator/submissions?page=1&order_by=submitted_at&order_direction=desc&per_page=5&status=running
+GET {{api_url}}/{{api_version}}/action-creator/submissions?workspace={{workspace}}&page=1&order_by=submitted_at&order_direction=desc&per_page=5&status=running
 Accept: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 
@@ -217,7 +217,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 < v1_2_models/scatter-lcc-global.json
 
 ### Get Job Status
-GET {{api_url}}/{{api_version}}/action-creator/submissions/a78b7580-d8b7-11ef-ac87-7acca6d0ccd7
+GET {{api_url}}/{{api_version}}/action-creator/submissions/a78b7580-d8b7-11ef-ac87-7acca6d0ccd7?workspace={{workspace}}
 Accept: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 
@@ -228,7 +228,7 @@ Authorization: Bearer {{$auth.token("auth-id")}}
 %}
 
 ### Cancel Job
-DELETE {{api_url}}/{{api_version}}/action-creator/submissions/bafd6490-d8b0-11ef-92bb-7acca6d0ccd7
+DELETE {{api_url}}/{{api_version}}/action-creator/submissions/bafd6490-d8b0-11ef-92bb-7acca6d0ccd7?workspace={{workspace}}
 Accept: application/json
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
@@ -443,10 +443,11 @@ Content-Type: application/json
 Authorization: Bearer {{$auth.token("auth-id")}}
 
 {
+  "workspace": {{workspace}},
   "remove_statuses": [
-    "failed"
+    "running"
   ],
-  "remove_all_before": "2025-02-15T13:18:40.108Z",
+  "remove_all_before": null,
   "remove_all_after": null,
   "remove_jobs_without_results": false,
   "max_jobs_to_process": 1000

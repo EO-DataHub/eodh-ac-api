@@ -1,4 +1,5 @@
 {
+  "workspace": "eopro-spyro-test",
   "workflow": {
     "water-quality": {
       "identifier": "water-quality",

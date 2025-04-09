@@ -1,10 +1,11 @@
 {
+  "workspace": "eopro-spyro-test",
   "workflow": {
     "land-cover-change-detection": {
       "identifier": "land-cover-change-detection",
       "order": 0,
       "inputs": {
-        "stac_collection": "clms-corinelc",
+        "stac_collection": "esacci-globallc",
         "date_start": "1992-01-01T00:00:00Z",
         "date_end": "2015-12-31T23:59:59Z",
         "aoi": {
