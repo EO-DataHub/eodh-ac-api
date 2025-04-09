@@ -75,7 +75,13 @@ def validate_token_from_websocket(token: str) -> tuple[str, dict[str, Any]]:
     return token, decode_token(token, ws=True)
 
 
-def try_get_workspace_from_token(introspected_token: dict[str, Any]) -> str:
+def try_get_workspace_from_token_or_request_body(
+    introspected_token: dict[str, Any],
+    workspace_from_request_body: str | None = None,
+) -> str:
+    if workspace_from_request_body is not None:
+        return workspace_from_request_body
+
     parsed_token = IntrospectResponse(**introspected_token)
     if parsed_token.workspaces:
         # Take first workspace from the WS list

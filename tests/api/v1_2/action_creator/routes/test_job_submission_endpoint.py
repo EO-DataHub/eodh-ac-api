@@ -94,7 +94,7 @@ def test_job_submissions_endpoint_returns_422_when_missing_geometry(
 ) -> None:
     # Arrange
     preset_request_body = deepcopy(NDVI_CLIP_PRESET)
-    preset_request_body["workflow"]["ndvi"]["inputs"].pop("aoi")  # type: ignore[attr-defined]
+    preset_request_body["workflow"]["ndvi"]["inputs"].pop("aoi")  # type: ignore[attr-defined,index]
 
     # Act
     response = client.post(

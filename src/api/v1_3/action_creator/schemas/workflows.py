@@ -221,6 +221,7 @@ def check_task_collection_support(data: dict[str, Any]) -> None:
 
 
 class WorkflowSpec(BaseModel):
+    workspace: str | None = None
     identifier: Annotated[str | None, Field(None, min_length=3, max_length=19)]
     description: Annotated[str | None, Field(None, min_length=1, max_length=256)]
     inputs: MainWorkflowInputs
@@ -252,15 +253,12 @@ class WorkflowSpec(BaseModel):
         return resolved
 
 
-class WorkflowSubmissionRequest(BaseModel):
-    workflow: WorkflowSpec
-
-
 class BatchDeleteResponse(BaseModel):
     removed_jobs: list[str]
 
 
 class BatchDeleteRequest(BaseModel):
+    workspace: str | None = None
     remove_statuses: list[ActionCreatorJobStatus] | None = None
     remove_all_before: datetime | None = None
     remove_all_after: datetime | None = None
