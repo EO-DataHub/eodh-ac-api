@@ -33,17 +33,17 @@ settings = current_settings()
 
 DATASET_LOOKUP: dict[str, DatasetLookupRecord] = {
     "sentinel-2-l2a-ard": DatasetLookupRecord(
-        catalog_url=f"{settings.eodh.stac_api_endpoint}/catalogs/supported-datasets/catalogs/ceda-stac-catalogue",
+        catalog_url=f"{settings.eodh.stac_api_endpoint}/catalogs/{settings.eodh.ceda_stac_catalog_path}",
         collection_name="sentinel2_ard",
         processor="CEDA",
     ),
     "esa-lccci-glcm": DatasetLookupRecord(
-        catalog_url=f"{settings.eodh.stac_api_endpoint}/catalogs/supported-datasets/catalogs/ceda-stac-catalogue",
+        catalog_url=f"{settings.eodh.stac_api_endpoint}/catalogs/{settings.eodh.ceda_stac_catalog_path}",
         collection_name="land_cover",
         processor="CEDA",
     ),
     "esacci-globallc": DatasetLookupRecord(
-        catalog_url=f"{settings.eodh.stac_api_endpoint}/catalogs/supported-datasets/catalogs/ceda-stac-catalogue",
+        catalog_url=f"{settings.eodh.stac_api_endpoint}/catalogs/{settings.eodh.ceda_stac_catalog_path}",
         collection_name="land_cover",
         processor="CEDA",
     ),
