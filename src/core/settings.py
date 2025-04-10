@@ -54,6 +54,7 @@ class SentinelHubSettings(OAuthClientSettings):
 
 class EODHSettings(OAuth2Settings):
     stac_api_endpoint: str
+    ceda_stac_catalog_path: str
     workspace_services_endpoint: str
 
     @property
