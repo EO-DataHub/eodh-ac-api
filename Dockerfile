@@ -1,13 +1,13 @@
 FROM python:3.11-slim-bullseye
 
-ENV CONDA_ENV=notebook \
-    # Tell apt-get to not block installs by asking for interactive human input
-    DEBIAN_FRONTEND=noninteractive \
+ENV DEBIAN_FRONTEND=noninteractive \
     # Use /bin/bash as shell, not the default /bin/sh (arrow keys, etc don't work then)
     SHELL=/bin/bash \
     # Setup locale to be UTF-8, avoiding gnarly hard to debug encoding errors
     LANG=C.UTF-8  \
     LC_ALL=C.UTF-8
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 # Install basic apt packages
 RUN echo "Installing apt-get packages..." \
@@ -18,12 +18,13 @@ RUN echo "Installing apt-get packages..." \
 
 WORKDIR /code
 
-COPY ./requirements.txt /code/requirements.txt
+COPY ./uv.lock /code
+COPY ./pyproject.toml /code
 
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+RUN uv sync --frozen --no-cache
 
 COPY . /code
 
 EXPOSE 8000
 
-CMD ["fastapi", "run", "app.py", "--port", "8000"]
+CMD [".venv/bin/python3", "-m", "fastapi", "run", "app.py", "--port", "8000"]
