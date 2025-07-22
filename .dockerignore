@@ -1,0 +1,12 @@
+.github
+.venv
+/data
+/docs
+/http-clients
+/notebooks
+/tests
+/README.md
+mkdocs.yml
+LICENSE
+.pre-commit-config.yaml
+.env-sample

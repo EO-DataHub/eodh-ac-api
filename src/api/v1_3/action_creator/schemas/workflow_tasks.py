@@ -99,7 +99,7 @@ class QueryTaskInputsBase(BaseModel):
 
 class Sentinel1QueryTaskInputs(QueryTaskInputsBase):
     stac_collection: Literal["sentinel-1-grd"] = "sentinel-1-grd"
-    date_start: Annotated[datetime | None, Field(None, ge="2014-10-10")]
+    date_start: Annotated[datetime | None, Field(None, ge="2014-10-10T00:00:00")]
     orbit_direction: list[OrbitDirection] = Field(default_factory=list)
     polarization: list[Polarization] = Field(default_factory=list)
 
@@ -187,7 +187,7 @@ class Sentinel1DatasetQueryTask(WorkflowTask):
 
 class Sentinel2QueryTaskInputs(QueryTaskInputsBase):
     stac_collection: Literal["sentinel-2-l2a-ard", "sentinel-2-l2a"] = "sentinel-2-l2a-ard"
-    date_start: Annotated[datetime | None, Field(None, ge="2015-06-27")]
+    date_start: Annotated[datetime | None, Field(None, ge="2015-06-27T00:00:00")]
     cloud_cover_min: Annotated[int, Field(default=0, ge=0, le=100)]
     cloud_cover_max: Annotated[int, Field(default=100, ge=0, le=100)]
 
