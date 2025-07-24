@@ -17,12 +17,12 @@ class ActionCreatorRepository(AbstractActionCreatorRepository):
     ) -> tuple[bool, list[dict[str, Any]]]:
         if collection is None:
             return True, self._functions
-        _funcs = defaultdict(list)
+        functions = defaultdict(list)
         for f in self._functions:
             if "stac_collection" in f["inputs"]:
                 for c in f["inputs"]["stac_collection"]["options"]:
-                    _funcs[c].append(f)
-        return collection in _funcs, _funcs[collection]
+                    functions[c].append(f)
+        return collection in functions, functions[collection]
 
 
 def get_function_repo() -> ActionCreatorRepository:

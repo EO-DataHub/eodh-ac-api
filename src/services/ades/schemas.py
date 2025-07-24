@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import Annotated, Any, Dict, List, Optional, Union
+from typing import Annotated, Any, Optional, Union
 
 from pydantic import (
     AnyUrl,
@@ -168,11 +168,11 @@ class DescriptionType(BaseModel):
     additional_parameters: AdditionalParameters | None = Field(None, alias="additionalParameters")
 
 
-class InputValueNoObject(RootModel[Union[str, float, int, bool, List[str], BinaryInputValue, Bbox]]):
+class InputValueNoObject(RootModel[Union[str, float, int, bool, list[str], BinaryInputValue, Bbox]]):  # noqa: UP007
     root: str | float | int | bool | list[str] | BinaryInputValue | Bbox
 
 
-class InputValue(RootModel[Union[InputValueNoObject, Dict[str, Any]]]):
+class InputValue(RootModel[Union[InputValueNoObject, dict[str, Any]]]):  # noqa: UP007
     root: InputValueNoObject | dict[str, Any]
 
 
@@ -208,7 +208,7 @@ class RegisterProcessRequest(BaseModel):
     execution_unit: ExecutionUnit = Field(..., alias="executionUnit")
 
 
-class InlineOrRefData(RootModel[Union[InputValueNoObject, QualifiedInputValue, Link]]):
+class InlineOrRefData(RootModel[Union[InputValueNoObject, QualifiedInputValue, Link]]):  # noqa: UP007
     root: InputValueNoObject | QualifiedInputValue | Link
 
 
@@ -219,11 +219,11 @@ class Execute(BaseModel):
     subscriber: Subscriber | None = None
 
 
-class Results(RootModel[Optional[Dict[str, InlineOrRefData]]]):
+class Results(RootModel[Optional[dict[str, InlineOrRefData]]]):  # noqa: UP045
     root: dict[str, InlineOrRefData] | None = None
 
 
-class InlineResponse200(RootModel[Union[str, float, int, Dict[str, Any], List[Dict[str, Any]], bool, bytes, Results]]):
+class InlineResponse200(RootModel[Union[str, float, int, dict[str, Any], list[dict[str, Any]], bool, bytes, Results]]):  # noqa: UP007
     root: str | float | int | dict[str, Any] | list[dict[str, Any]] | bool | bytes | Results
 
 
@@ -283,7 +283,7 @@ class SchemaModel(BaseModel):
     content_schema: str | None = Field(None, alias="contentSchema")
 
 
-class Schema(RootModel[Union[Reference, SchemaModel]]):
+class Schema(RootModel[Union[Reference, SchemaModel]]):  # noqa: UP007
     root: Reference | SchemaModel
 
 

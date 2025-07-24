@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -92,8 +92,8 @@ def test_get_job_submissions_returns_correct_pagination_with_fewer_jobs_than_per
             "jobID": f"job-{i}",
             "processID": f"process-{i}",
             "status": StatusCode.successful,
-            "created": datetime.now(tz=timezone.utc),
-            "finished": datetime.now(tz=timezone.utc),
+            "created": datetime.now(tz=UTC),
+            "finished": datetime.now(tz=UTC),
             "type": JobType.process,
             "links": [],
         }

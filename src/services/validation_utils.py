@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
 from geojson_pydantic.geometries import Polygon, parse_geometry_obj
@@ -216,15 +216,9 @@ def validate_stac_date_range(
 ) -> None:
     valid_date_min, valid_date_max = STAC_COLLECTION_DATE_RANGE_LOOKUP[stac_collection]
     if date_start is not None:
-        date_start = (
-            date_start.replace(tzinfo=timezone.utc)
-            if date_start.tzinfo is None
-            else date_start.astimezone(tz=timezone.utc)
-        )
+        date_start = date_start.replace(tzinfo=UTC) if date_start.tzinfo is None else date_start.astimezone(tz=UTC)
     if date_end is not None:
-        date_end = (
-            date_end.replace(tzinfo=timezone.utc) if date_end.tzinfo is None else date_end.astimezone(tz=timezone.utc)
-        )
+        date_end = date_end.replace(tzinfo=UTC) if date_end.tzinfo is None else date_end.astimezone(tz=UTC)
 
     if date_start is not None and (
         (valid_date_min is not None and date_start < valid_date_min)

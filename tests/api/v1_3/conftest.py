@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Generator
+from typing import TYPE_CHECKING
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -25,6 +25,9 @@ from src.api.v1_3.action_creator.schemas.presets import (
 )
 from tests.fakes.ades import FakeADESClient, fake_ades_client_factory
 from tests.fakes.ws_token_client import FakeTokenClient
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 
 @pytest.fixture

@@ -112,18 +112,21 @@ async def authenticate(
     token_request: TokenRequest,
     settings: Annotated[Settings, Depends(current_settings)],
 ) -> TokenResponse:
-    async with aiohttp.ClientSession() as session, session.post(
-        url=settings.eodh.token_url,
-        headers=_HEADERS,
-        data={
-            "client_id": settings.eodh.client_id,
-            "username": token_request.username,
-            "password": token_request.password,
-            "grant_type": "password",
-            "scope": "openid",
-        },
-        timeout=TIMEOUT,
-    ) as response:
+    async with (
+        aiohttp.ClientSession() as session,
+        session.post(
+            url=settings.eodh.token_url,
+            headers=_HEADERS,
+            data={
+                "client_id": settings.eodh.client_id,
+                "username": token_request.username,
+                "password": token_request.password,
+                "grant_type": "password",
+                "scope": "openid",
+            },
+            timeout=TIMEOUT,
+        ) as response,
+    ):
         if response.status != status.HTTP_200_OK:
             raise HTTPException(status_code=response.status, detail=await response.json())
         return TokenResponse(**await response.json())

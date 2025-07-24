@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src import consts
-from src.utils.logging import get_logger, timed
+from src.utils.logging import get_logger, timing_context
 
 _NAME_TO_LEVEL = {
     "CRITICAL": logging.CRITICAL,
@@ -59,22 +59,24 @@ def test_formatter_configuration() -> None:
 
 
 def test_timed_decorator_functionality() -> None:
-    @timed
     def test_func(x: int, y: int) -> int:
         return x + y * y
 
+    with timing_context("test_func"):
+        result = test_func(1, 2)
+
     # Test that the function still works as expected
-    assert test_func(1, 2) == 5  # noqa: PLR2004
+    assert result == 5  # noqa: PLR2004
 
 
 @patch("src.utils.logging.time.time", MagicMock(side_effect=[100.0, 101.0]))
 @patch("logging.Logger.info")
 def test_timed_decorator_logging(mock_info: MagicMock) -> None:
-    @timed
     def test_func(x: int, y: int) -> int:
         return x + y * y
 
-    test_func(1, 2)
+    with timing_context("test_func"):
+        test_func(1, 2)
 
     assert mock_info.call_count == 2  # noqa: PLR2004
     start_call, end_call = mock_info.call_args_list

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import abc
+import dataclasses
 from typing import TYPE_CHECKING, Any
 
 from aiohttp import ClientResponse, ClientSession
@@ -21,14 +22,10 @@ class ErrorResponse(BaseModel):
     detail: str | dict[str, Any] | None = None
 
 
+@dataclasses.dataclass
 class APIClient:
-    def __init__(
-        self,
-        url: str,
-        logger: Logger,
-    ) -> None:
-        self.url = url
-        self.logger = logger
+    url: str
+    logger: Logger
 
     def _get_retry_client(
         self,

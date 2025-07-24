@@ -1,19 +1,19 @@
 from __future__ import annotations
 
 import dataclasses
-from datetime import datetime as dt
-from typing import TYPE_CHECKING, Annotated, Any, List, Literal, Optional, Union, cast
+from typing import TYPE_CHECKING, Annotated, Any, Literal, Union, cast
 
 from geojson_pydantic import GeometryCollection, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon
 from pydantic import AfterValidator, BaseModel, Field, PositiveInt, TypeAdapter, field_validator, model_validator
-from stac_pydantic.api.extensions.query import Operator  # noqa: TCH002
-from stac_pydantic.api.extensions.sort import SortExtension  # noqa: TCH002
 from stac_pydantic.shared import UtcDatetime
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
+    from datetime import datetime as dt
 
     from pystac import Item
+    from stac_pydantic.api.extensions.query import Operator
+    from stac_pydantic.api.extensions.sort import SortExtension
 
 EXAMPLE_SEARCH_MODEL = {
     "sentinel-1-grd": {
@@ -420,7 +420,7 @@ def crop(v: PositiveInt) -> PositiveInt:
 
 
 Limit = Annotated[PositiveInt, AfterValidator(crop)]
-Intersection = Union[
+Intersection = Union[  # noqa: UP007
     Point,
     MultiPoint,
     LineString,
@@ -429,7 +429,7 @@ Intersection = Union[
     MultiPolygon,
     GeometryCollection,
 ]
-SearchDatetime = TypeAdapter(Optional[UtcDatetime])
+SearchDatetime = TypeAdapter(UtcDatetime | None)
 
 
 class FieldsExtension(BaseModel):
@@ -497,7 +497,7 @@ class StacSearch(BaseModel):
 
         # Cast because pylance gets confused by the type adapter and annotated type
         dates = cast(
-            List[Optional[dt]],
+            "list[dt | None]",
             [
                 # Use the type adapter to validate the datetime strings, strict is necessary
                 # due to pydantic issues #8736 and #8762
@@ -508,7 +508,7 @@ class StacSearch(BaseModel):
 
         # If there is a start and end date, check that the start date is before the end date
         if dates[0] and dates[1] and dates[0] > dates[1]:
-            msg = "Invalid datetime range. Begin date after end date. " "Must match format: {begin_date}/{end_date}"
+            msg = "Invalid datetime range. Begin date after end date. Must match format: {begin_date}/{end_date}"
             raise ValueError(msg)
 
         # Store the parsed dates

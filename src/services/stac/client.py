@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 import asyncio
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from itertools import starmap
 from typing import TYPE_CHECKING, Any, ClassVar, TypedDict
 
@@ -167,18 +167,19 @@ class StacSearchClient:
 
             # Filter on datetime in filter field is not supported, and we can't just extract it from the filter
             # field easily. If not set as datetime filter - get all data until now
-            search_model["datetime"] = (
-                search_model.pop("datetime", None) or f"/{datetime.now(timezone.utc).isoformat()}"
-            )
+            search_model["datetime"] = search_model.pop("datetime", None) or f"/{datetime.now(UTC).isoformat()}"
 
-        async with aiohttp.ClientSession() as session, session.post(
-            search_url,
-            headers={"Authorization": f"Bearer {self._sentinel_hub_auth_token()}", "Accept": "application/geo+json"}
-            if lookup["processor"] == "Synergise"
-            else None,
-            json=search_model,
-            timeout=aiohttp.ClientTimeout(total=30),
-        ) as response:
+        async with (
+            aiohttp.ClientSession() as session,
+            session.post(
+                search_url,
+                headers={"Authorization": f"Bearer {self._sentinel_hub_auth_token()}", "Accept": "application/geo+json"}
+                if lookup["processor"] == "Synergise"
+                else None,
+                json=search_model,
+                timeout=aiohttp.ClientTimeout(total=30),
+            ) as response,
+        ):
             if response.status != status.HTTP_200_OK:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -227,12 +228,15 @@ class StacSearchClient:
         if search_params.sortby is None:
             search_params.sortby = [SortExtension(field="properties.datetime", direction=SortDirections.asc)]
 
-        async with aiohttp.ClientSession() as session, session.post(
-            url,
-            headers={"Authorization": f"Bearer {token}"},
-            json=search_params.model_dump(mode="json"),
-            timeout=aiohttp.ClientTimeout(total=30),
-        ) as response:
+        async with (
+            aiohttp.ClientSession() as session,
+            session.post(
+                url,
+                headers={"Authorization": f"Bearer {token}"},
+                json=search_params.model_dump(mode="json"),
+                timeout=aiohttp.ClientTimeout(total=30),
+            ) as response,
+        ):
             if response.status != status.HTTP_200_OK:
                 raise HTTPException(
                     status_code=response.status,

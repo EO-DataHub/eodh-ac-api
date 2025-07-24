@@ -53,10 +53,13 @@ def test_ws_job_submissions_endpoint_returns_422_when_invalid_stac_collection_wa
     # Arrange
     raster_calculator_request_body["preset_function"]["inputs"]["stac_collection"] = "dummy-collection"
 
-    with pytest.raises(RuntimeError), client.websocket_connect(  # noqa: PT012
-        url="/api/v1.0/action-creator/ws/submissions",
-        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
-    ) as websocket:
+    with (  # noqa: PT012
+        pytest.raises(RuntimeError),
+        client.websocket_connect(
+            url="/api/v1.0/action-creator/ws/submissions",
+            headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
+        ) as websocket,
+    ):
         # Send the request body (job submission)
         websocket.send_json(raster_calculator_request_body)
 
@@ -84,10 +87,13 @@ def test_ws_job_submissions_endpoint_returns_422_when_missing_geometry(
     raster_calculator_request_body["preset_function"]["inputs"].pop("aoi")
 
     # Act
-    with pytest.raises(RuntimeError), client.websocket_connect(  # noqa: PT012
-        url="/api/v1.0/action-creator/ws/submissions",
-        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
-    ) as websocket:
+    with (  # noqa: PT012
+        pytest.raises(RuntimeError),
+        client.websocket_connect(
+            url="/api/v1.0/action-creator/ws/submissions",
+            headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
+        ) as websocket,
+    ):
         # Send the request body (job submission)
         websocket.send_json(raster_calculator_request_body)
 
@@ -111,10 +117,13 @@ def test_ws_job_submissions_endpoint_returns_422_when_invalid_date_range_was_pro
     raster_calculator_request_body["preset_function"]["inputs"]["date_end"] = "2024-01-01T00:00:00"
 
     # Act
-    with pytest.raises(RuntimeError), client.websocket_connect(  # noqa: PT012
-        url="/api/v1.0/action-creator/ws/submissions",
-        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
-    ) as websocket:
+    with (  # noqa: PT012
+        pytest.raises(RuntimeError),
+        client.websocket_connect(
+            url="/api/v1.0/action-creator/ws/submissions",
+            headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
+        ) as websocket,
+    ):
         # Send the request body (job submission)
         websocket.send_json(raster_calculator_request_body)
 

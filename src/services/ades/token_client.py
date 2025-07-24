@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import datetime as dt  # noqa: TCH003
 from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
@@ -10,6 +9,7 @@ from src.services.ades.base_client import APIClient, ErrorResponse
 from src.utils.logging import get_logger
 
 if TYPE_CHECKING:
+    import datetime as dt
     from logging import Logger
 
 

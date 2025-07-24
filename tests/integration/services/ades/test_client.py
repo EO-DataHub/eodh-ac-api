@@ -153,8 +153,7 @@ async def test_ades_reregistering_process_with_unknown_function_returns_404_not_
     assert err.code == status.HTTP_404_NOT_FOUND
     assert result is None
     assert err.detail == (
-        f"Process '{NON_EXISTENT_PROCESS_ID}' does not exist in Action Creator Function Registry. "
-        f"Have you made a typo?"
+        f"Process '{NON_EXISTENT_PROCESS_ID}' does not exist in Action Creator Function Registry. Have you made a typo?"
     )
 
 
