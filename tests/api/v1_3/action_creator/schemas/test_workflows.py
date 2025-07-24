@@ -43,13 +43,13 @@ def test_should_raise_ex_if_task_does_not_support_collection() -> None:
 
 def test_should_raise_ex_if_invalid_date_range() -> None:
     # Act & Assert
-    with pytest.raises(ValidationError, match="End date cannot be before start date"):
+    with pytest.raises(ValidationError, match=r"End date cannot be before start date"):
         WorkflowSpec(**INVALID_DATE_RANGE_PRESET)
 
 
 def test_should_raise_ex_if_too_many_tasks() -> None:
     # Act & Assert
-    with pytest.raises(ValidationError, match="Maximum number of tasks exceeded"):
+    with pytest.raises(ValidationError, match=r"Maximum number of tasks exceeded"):
         WorkflowSpec(**TOO_MANY_TASKS_PRESET)
 
 
@@ -57,7 +57,7 @@ def test_should_raise_ex_if_last_tasks_have_no_outputs_mapping() -> None:
     # Act & Assert
     with pytest.raises(
         ValidationError,
-        match="Those functions are wasted computations. Please ensure that their outputs map to workflow outputs.",
+        match=r"Those functions are wasted computations. Please ensure that their outputs map to workflow outputs.",
     ):
         WorkflowSpec(**TASKS_HAVE_NO_OUTPUTS_MAPPING_PRESET)
 
@@ -66,7 +66,7 @@ def test_should_raise_ex_if_invalid_task_order() -> None:
     # Act & Assert
     with pytest.raises(
         ValidationError,
-        match="Task 'savi' with identifier 'functions.savi' cannot be used with",
+        match=r"Task 'savi' with identifier 'functions.savi' cannot be used with",
     ):
         WorkflowSpec(**INVALID_TASK_ORDER_PRESET)
 
@@ -75,7 +75,7 @@ def test_should_raise_ex_if_wf_output_not_mapped_to_task_result() -> None:
     # Act & Assert
     with pytest.raises(
         ValidationError,
-        match="Please map which function outputs should be used for those workflow outputs.",
+        match=r"Please map which function outputs should be used for those workflow outputs.",
     ):
         WorkflowSpec(**WF_OUTPUT_NOT_MAPPED_TO_TASK_RESULT_PRESET)
 
@@ -108,7 +108,7 @@ def test_should_raise_ex_if_disjoined_subgraph_exist() -> None:
     # Act & Assert
     with pytest.raises(
         ValidationError,
-        match="The workflow specification must be a single, fully connected directed acyclic graph. "
+        match=r"The workflow specification must be a single, fully connected directed acyclic graph. "
         "Subgraphs found: 2.",
     ):
         WorkflowSpec(**DISJOINED_SUBGRAPH_EXIST_PRESET)
@@ -118,7 +118,7 @@ def test_should_raise_ex_if_wf_id_collides_with_func_id() -> None:
     # Act & Assert
     with pytest.raises(
         ValidationError,
-        match="The workflow identifier 'ndvi' collides with a function with the same identifier.",
+        match=r"The workflow identifier 'ndvi' collides with a function with the same identifier.",
     ):
         WorkflowSpec(**WF_ID_COLLISION_PRESET)
 

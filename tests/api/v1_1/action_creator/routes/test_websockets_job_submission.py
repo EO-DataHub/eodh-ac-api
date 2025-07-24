@@ -66,10 +66,13 @@ def test_ws_job_submissions_endpoint_returns_422_when_invalid_stac_collection_wa
     preset_request_body = deepcopy(NDVI_CLIP_PRESET)
     preset_request_body["workflow"]["ndvi"]["inputs"]["stac_collection"] = "dummy-collection"  # type: ignore[index]
 
-    with pytest.raises(RuntimeError), client.websocket_connect(  # noqa: PT012
-        url="/api/v1.1/action-creator/ws/submissions",
-        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
-    ) as websocket:
+    with (  # noqa: PT012
+        pytest.raises(RuntimeError),
+        client.websocket_connect(
+            url="/api/v1.1/action-creator/ws/submissions",
+            headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
+        ) as websocket,
+    ):
         # Send the request body (job submission)
         websocket.send_json(preset_request_body)
 
@@ -97,10 +100,13 @@ def test_ws_job_submissions_endpoint_returns_422_when_missing_geometry(
     preset_request_body["workflow"]["ndvi"]["inputs"].pop("aoi")  # type: ignore[attr-defined]
 
     # Act
-    with pytest.raises(RuntimeError), client.websocket_connect(  # noqa: PT012
-        url="/api/v1.1/action-creator/ws/submissions",
-        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
-    ) as websocket:
+    with (  # noqa: PT012
+        pytest.raises(RuntimeError),
+        client.websocket_connect(
+            url="/api/v1.1/action-creator/ws/submissions",
+            headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
+        ) as websocket,
+    ):
         # Send the request body (job submission)
         websocket.send_json(preset_request_body)
 
@@ -125,10 +131,13 @@ def test_ws_job_submissions_endpoint_returns_422_when_invalid_date_range_was_pro
     preset_request_body["workflow"]["ndvi"]["inputs"]["date_end"] = "2023-01-01T00:00:00"  # type: ignore[index]
 
     # Act
-    with pytest.raises(RuntimeError), client.websocket_connect(  # noqa: PT012
-        url="/api/v1.1/action-creator/ws/submissions",
-        headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
-    ) as websocket:
+    with (  # noqa: PT012
+        pytest.raises(RuntimeError),
+        client.websocket_connect(
+            url="/api/v1.1/action-creator/ws/submissions",
+            headers={"Authorization": f"Bearer {auth_token_module_scoped}"},
+        ) as websocket,
+    ):
         # Send the request body (job submission)
         websocket.send_json(preset_request_body)
 

@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING
 
 from pystac import Catalog, Item
 
 from src.services.stac.client import FakeStacClient
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
     from unittest.mock import MagicMock
 
 DATA_DIR = Path(__file__).parent / "routes" / "data"

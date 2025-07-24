@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import abc
-from datetime import datetime  # noqa: TCH003
 from enum import StrEnum, auto
-from typing import TYPE_CHECKING, Annotated, Any, Generic, Literal, Sequence, TypeVar, Union
+from typing import TYPE_CHECKING, Annotated, Any, Literal, TypeVar
 
 from geojson_pydantic.geometries import Polygon
 from pydantic import BaseModel, Field, field_validator, model_validator
@@ -17,6 +16,9 @@ from src.services.validation_utils import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+    from datetime import datetime
+
     from pydantic_core.core_schema import ValidationInfo
 
 T = TypeVar("T", bound=BaseModel)
@@ -256,15 +258,13 @@ class LandCoverChangeDetectionWorkflowStep(WorkflowStepBase):
 
 
 TWorkflowStep = Annotated[
-    Union[
-        NDVIWorkflowStep,
-        NDWIWorkflowStep,
-        SAVIWorkflowStep,
-        EVIWorkflowStep,
-        ClipWorkflowStep,
-        LandCoverChangeDetectionWorkflowStep,
-        WaterQualityWorkflowStep,
-    ],
+    NDVIWorkflowStep
+    | NDWIWorkflowStep
+    | SAVIWorkflowStep
+    | EVIWorkflowStep
+    | ClipWorkflowStep
+    | LandCoverChangeDetectionWorkflowStep
+    | WaterQualityWorkflowStep,
     Field(discriminator="identifier"),
 ]
 
@@ -365,7 +365,7 @@ class ActionCreatorSubmissionsQueryParams(BaseModel):
         return DEFAULT_RESULTS_PER_PAGE if v is None else v
 
 
-class PaginationResults(BaseModel, Generic[T]):
+class PaginationResults[T: BaseModel](BaseModel):
     results: Sequence[T]
     total_items: int
     current_page: int

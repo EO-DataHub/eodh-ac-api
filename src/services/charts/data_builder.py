@@ -108,7 +108,7 @@ class ChartDataBuilder(ChartDataBuilderBase):
 
         for cls in asset_data["data"].values():
             chart_data[cls["name"]] = {}
-            for datetime, area in zip(x_labels, cls["area"]):
+            for datetime, area in zip(x_labels, cls["area"], strict=False):
                 records.append({
                     "name": cls["name"],
                     "area": area,

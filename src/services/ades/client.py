@@ -44,10 +44,10 @@ def replace_placeholders_in_text(content: str) -> str:
 
 
 def replace_placeholders_in_cwl_file(file_path: Path) -> None:
-    content = file_path.read_text()
+    content = file_path.read_text(encoding="utf-8")
     content = replace_placeholders_in_text(content)
 
-    file_path.write_text(content)
+    file_path.write_text(content, encoding="utf-8")
 
 
 def override_id_in_cwl_if_necessary(file_path: Path, id_override: str | None) -> bytes:
@@ -449,21 +449,24 @@ class ADESClient(ADESClientBase):
                 continue
 
             if job["status"] == "successful" and remove_jobs_without_results:
-                async with aiohttp.ClientSession() as session, session.post(
-                    f"{stac_endpoint}/catalogs/user/catalogs/{self.workspace}/catalogs/processing-results/catalogs/{job['processID']}/catalogs/cat_{job['jobID']}/search",
-                    headers={
-                        "Authorization": f"Bearer {self.token}",
-                        "Accept": "application/json",
-                        "Content-Type": "application/json",
-                    },
-                    json={
-                        "limit": 1,
-                        "sortby": [{"field": "properties.datetime", "direction": "desc"}],
-                        "filter-lang": "cql-json",
-                        "fields": {},
-                    },
-                    timeout=aiohttp.ClientTimeout(total=30),
-                ) as response:
+                async with (
+                    aiohttp.ClientSession() as session,
+                    session.post(
+                        f"{stac_endpoint}/catalogs/user/catalogs/{self.workspace}/catalogs/processing-results/catalogs/{job['processID']}/catalogs/cat_{job['jobID']}/search",
+                        headers={
+                            "Authorization": f"Bearer {self.token}",
+                            "Accept": "application/json",
+                            "Content-Type": "application/json",
+                        },
+                        json={
+                            "limit": 1,
+                            "sortby": [{"field": "properties.datetime", "direction": "desc"}],
+                            "filter-lang": "cql-json",
+                            "fields": {},
+                        },
+                        timeout=aiohttp.ClientTimeout(total=30),
+                    ) as response,
+                ):
                     if response.status == status.HTTP_200_OK:
                         continue
                     _logger.info(

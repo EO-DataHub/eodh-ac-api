@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from geojson_pydantic import Polygon
@@ -20,7 +20,7 @@ def test_raster_calculate_preset_validation_no_aoi_provided() -> None:
     }
 
     # Act & Assert
-    with pytest.raises(ValueError, match="Area of Interest is missing."):
+    with pytest.raises(ValueError, match=r"Area of Interest is missing."):
         RasterCalculatorFunctionInputs(**data)
 
 
@@ -63,7 +63,7 @@ def test_raster_calculate_preset_validation_raises_for_invalid_date_range() -> N
     }
 
     # Act & Assert
-    with pytest.raises(ValueError, match="End date cannot be before start date."):
+    with pytest.raises(ValueError, match=r"End date cannot be before start date."):
         RasterCalculatorFunctionInputs(**data)
 
 
@@ -96,8 +96,8 @@ def test_raster_calculate_preset_validation_happy_path() -> None:
 
     # Assert
     assert result.aoi == Polygon(**HEATHROW_AOI)
-    assert result.date_start == datetime(2024, 1, 1, tzinfo=timezone.utc)
-    assert result.date_end == datetime(2024, 1, 1, tzinfo=timezone.utc)
+    assert result.date_start == datetime(2024, 1, 1, tzinfo=UTC)
+    assert result.date_end == datetime(2024, 1, 1, tzinfo=UTC)
     assert result.stac_collection == "sentinel-2-l2a"
     assert result.index == "EVI"
 

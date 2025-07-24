@@ -63,7 +63,7 @@ class MainWorkflowInputs(BaseModel):
         return date_end
 
 
-class ExtendedDict(dict[Hashable, Any]):
+class ExtendedDict(dict[Hashable, Any]):  # noqa: FURB189, RUF100
     """Extended dictionary that supports nested key lookup using list of keys.
 
     Changes a normal dict into one where you can hand a list
@@ -104,7 +104,7 @@ def resolve_references_and_atom_values(data: dict[str, Any]) -> dict[str, Any]:
     for f_id, f_spec in data["functions"].items():
         resolved_inputs: dict[str, Any] = {}
         resolved_outputs: dict[str, Any] = {}
-        for kind, collection in zip(["inputs", "outputs"], [resolved_inputs, resolved_outputs]):
+        for kind, collection in zip(["inputs", "outputs"], [resolved_inputs, resolved_outputs], strict=False):
             for id_, val in f_spec[kind].items():
                 if isinstance(val, dict) and val.get("$type") == "ref":
                     collection[id_] = extended_dict.multi_level_get(val["value"])

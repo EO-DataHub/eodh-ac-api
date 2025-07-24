@@ -4,7 +4,7 @@ import os
 import re
 import shutil
 import uuid
-from typing import TYPE_CHECKING, Generator
+from typing import TYPE_CHECKING
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -15,6 +15,7 @@ from src.services.ades.client import override_id_in_cwl_if_necessary, replace_pl
 from src.services.ades.factory import ades_client_factory
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
     from pathlib import Path
 
     from _pytest.monkeypatch import MonkeyPatch
@@ -93,7 +94,7 @@ def test_placeholder_replacement(tmp_cwl_file: Path, monkeypatch: MonkeyPatch) -
 
     # Assert
     # Assert all placeholders have been replaced
-    content = tmp_cwl_file.read_text()
+    content = tmp_cwl_file.read_text(encoding="utf-8")
     pattern = re.compile(r"<<([A-Za-z\-_ ]+)>>")
     placeholders = re.findall(pattern=pattern, string=content)
     assert not placeholders
@@ -102,6 +103,7 @@ def test_placeholder_replacement(tmp_cwl_file: Path, monkeypatch: MonkeyPatch) -
     data = yaml.safe_load(
         tmp_cwl_file.open(
             mode="r",
+            encoding="utf-8",
         )
     )
     for node in data["$graph"]:

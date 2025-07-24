@@ -13,7 +13,7 @@ _logger = get_logger(__name__)
 T = TypeVar("T", bound=ConfigBase)
 
 
-def parse_args(parser: argparse.ArgumentParser, cfg_cls: type[T]) -> T:
+def parse_args[T: ConfigBase](parser: argparse.ArgumentParser, cfg_cls: type[T]) -> T:
     """Parses Command Line arguments and returns the script config model.
 
     Args:

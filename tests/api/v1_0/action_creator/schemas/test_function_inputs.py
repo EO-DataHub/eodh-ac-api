@@ -71,7 +71,7 @@ def test_raises_when_aoi_is_missing(
     inputs.pop("aoi")
 
     # Act & Assert
-    with pytest.raises(ValidationError, match="Area of Interest is missing."):
+    with pytest.raises(ValidationError, match=r"Area of Interest is missing."):
         model_cls(**inputs)
 
 
@@ -115,7 +115,7 @@ def test_raises_when_invalid_date_range(
     inputs["date_end"] = "2023-01-01"
 
     # Act & Assert
-    with pytest.raises(ValidationError, match="End date cannot be before start date."):
+    with pytest.raises(ValidationError, match=r"End date cannot be before start date."):
         model_cls(**inputs)
 
 

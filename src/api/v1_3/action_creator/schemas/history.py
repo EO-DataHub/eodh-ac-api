@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from datetime import datetime
 from enum import StrEnum, auto
-from typing import Annotated, Any, Generic, Literal, Sequence, TypeVar
+from typing import Annotated, Any, Literal, TypeVar
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
@@ -112,7 +113,7 @@ class ActionCreatorSubmissionsQueryParams(BaseModel):
         return DEFAULT_RESULTS_PER_PAGE if v is None else v
 
 
-class PaginationResults(BaseModel, Generic[T]):
+class PaginationResults[T: BaseModel](BaseModel):
     results: Sequence[T]
     total_items: int
     current_page: int

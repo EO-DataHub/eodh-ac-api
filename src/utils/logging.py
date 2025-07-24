@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+import contextlib
 import logging
 import time
-from functools import wraps
-from typing import Callable, TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 from typing_extensions import ParamSpec
 
 from src import consts
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 T = TypeVar("T")
 P = ParamSpec("P")
@@ -43,30 +46,30 @@ def get_logger(name: str, log_level: int | str = logging.INFO) -> logging.Logger
 _timed_logger = get_logger("timed", log_level=logging.INFO)
 
 
-def timed(func: Callable[P, T]) -> Callable[P, T]:
-    """This decorator prints the execution time for the decorated function.
+@contextlib.contextmanager
+def timing_context(name: str) -> Generator[None]:
+    """Prints the execution time for the decorated function.
+
+    Notes:
+        Can also act as a context manager.
 
     Args:
-        func: The function to wrap.
+        name: The name of the wrapped execution block.
 
     Returns:
-        Wrapper around the function.
+        A context manager that prints the execution time.
 
     """
-
-    @wraps(func)
-    def wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
-        _timed_logger.info("%(func_name)s is running...", {"func_name": func.__qualname__})
-        start = time.time()
-        result = func(*args, **kwargs)
-        end = time.time()
+    _timed_logger.info("%(func_name)s is running...", {"func_name": name})
+    t0 = time.monotonic()
+    try:
+        yield
+    finally:
+        t1 = time.monotonic()
         _timed_logger.info(
             "%(func_name)s ran in %(execution_time)s",
             {
-                "func_name": func.__qualname__,
-                "execution_time": f"{(end - start):.4f}",
+                "func_name": name,
+                "execution_time": f"{(t1 - t0):.4f}",
             },
         )
-        return result
-
-    return wrapper

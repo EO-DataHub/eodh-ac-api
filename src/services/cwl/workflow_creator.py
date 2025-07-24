@@ -162,8 +162,8 @@ class WorkflowCreator:
                     "class": "Workflow",
                     "id": wf_name,
                     "label": f"AC Workflow {wf_name}",
-                    "doc": f'AC Workflow that uses {user_inputs["dataset"]} STAC collection '
-                    f'to execute following tasks: {list(wf_spec["functions"])}',
+                    "doc": f"AC Workflow that uses {user_inputs['dataset']} STAC collection "
+                    f"to execute following tasks: {list(wf_spec['functions'])}",
                     "requirements": wf_requirements,
                     "inputs": wf_inputs,
                     "outputs": wf_outputs,
