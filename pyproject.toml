@@ -123,7 +123,7 @@ select = [
     "YTT", # see: https://pypi.org/project/flake8-2020
     "ANN", # see: https://pypi.org/project/flake8-annotations
     "ASYNC", # see: https://pypi.org/project/flake8-async
-    "TRIO", # see: https://pypi.org/project/flake8-trio
+    "ASYNC1", # see: https://pypi.org/project/flake8-trio
     "S", # see: https://pypi.org/project/flake8-bandit
     "BLE", # see: https://pypi.org/project/flake8-blind-except
     "FBT", # see: https://pypi.org/project/flake8-boolean-trap
@@ -168,8 +168,6 @@ select = [
 ]
 ignore = [
     "A005", # see: https://pypi.org/project/flake8-builtins - A005 Module `XXX` is shadowing a Python builtin module
-    "ANN101", # see: https://pypi.org/project/flake8-annotations - Missing type annotation for self in method
-    "ANN102", # see: https://pypi.org/project/flake8-annotations - Missing type annotation for cls in method
     "ANN401", # see: https://pypi.org/project/flake8-annotations - Dynamically typed expressions (typing.Any) are disallowed
     "D1", # see: https://pypi.org/project/pydocstyle - D1 - undocumented public member - too restrictive
     "COM", # see: https://pypi.org/project/flake8-commas - conflicts with formatter
