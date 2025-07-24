@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import abc
+from collections.abc import Sequence  # noqa: TC003
+from datetime import datetime  # noqa: TC003
 from enum import StrEnum, auto
 from typing import TYPE_CHECKING, Annotated, Any, Literal, TypeVar
 
@@ -16,9 +18,6 @@ from src.services.validation_utils import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
-    from datetime import datetime
-
     from pydantic_core.core_schema import ValidationInfo
 
 T = TypeVar("T", bound=BaseModel)
