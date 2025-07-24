@@ -1,19 +1,19 @@
 from __future__ import annotations
 
 import dataclasses
+import datetime as dt  # noqa: TC003
 from typing import TYPE_CHECKING, Annotated, Any, Literal, Union, cast
 
 from geojson_pydantic import GeometryCollection, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon
 from pydantic import AfterValidator, BaseModel, Field, PositiveInt, TypeAdapter, field_validator, model_validator
+from stac_pydantic.api.extensions.query import Operator  # noqa: TC002
+from stac_pydantic.api.extensions.sort import SortExtension  # noqa: TC002
 from stac_pydantic.shared import UtcDatetime
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
-    from datetime import datetime as dt
 
     from pystac import Item
-    from stac_pydantic.api.extensions.query import Operator
-    from stac_pydantic.api.extensions.sort import SortExtension
 
 EXAMPLE_SEARCH_MODEL = {
     "sentinel-1-grd": {
@@ -460,16 +460,16 @@ class StacSearch(BaseModel):
     datetime: str | None = None
 
     # Private properties to store the parsed datetime values. Not part of the model schema.
-    _start_date: dt | None = None
-    _end_date: dt | None = None
+    _start_date: dt.datetime | None = None
+    _end_date: dt.datetime | None = None
 
     # Properties to return the private values
     @property
-    def start_date(self) -> dt | None:
+    def start_date(self) -> dt.datetime | None:
         return self._start_date
 
     @property
-    def end_date(self) -> dt | None:
+    def end_date(self) -> dt.datetime | None:
         return self._end_date
 
     @model_validator(mode="before")
@@ -497,7 +497,7 @@ class StacSearch(BaseModel):
 
         # Cast because pylance gets confused by the type adapter and annotated type
         dates = cast(
-            "list[dt | None]",
+            "list[dt.datetime | None]",
             [
                 # Use the type adapter to validate the datetime strings, strict is necessary
                 # due to pydantic issues #8736 and #8762
