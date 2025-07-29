@@ -364,3 +364,204 @@ Content-Type: application/json
      ]
   }
 }
+
+### Query S1
+POST {{eodh_stac_api_url}}/catalogs/{{ceda_stac_catalogue_path}}/search
+
+{
+    "limit": 50,
+    "sortby": [
+        {
+            "field": "properties.datetime",
+            "direction": "desc"
+        }
+    ],
+    "filter-lang": "cql-json",
+    "filter": {
+        "op": "and",
+        "args": [
+            {
+                "op": "between",
+                "args": [
+                    {
+                        "property": "properties.datetime"
+                    },
+                    "2000-03-11T00:00:00.000Z",
+                    "2025-04-11T23:59:59.999Z"
+                ]
+            },
+            {
+                "op": "and",
+                "args": [
+                    {
+                        "op": "=",
+                        "args": [
+                            {
+                                "property": "collection"
+                            },
+                            "sentinel1"
+                        ]
+                    },
+                    {
+                        "op": "or",
+                        "args": [
+                            {
+                                "op": "=",
+                                "args": [
+                                    {
+                                        "property": "properties.Orbit Direction"
+                                    },
+                                    "ASCENDING"
+                                ]
+                            },
+                            {
+                                "op": "=",
+                                "args": [
+                                    {
+                                        "property": "properties.Orbit Direction"
+                                    },
+                                    "DESCENDING"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "op": "or",
+                        "args": [
+                            {
+                                "op": "and",
+                                "args": [
+                                    {
+                                        "op": "=",
+                                        "args": [
+                                            {
+                                                "property": "properties.sar:instrument_mode"
+                                            },
+                                            "EW"
+                                        ]
+                                    },
+                                    {
+                                        "op": "and",
+                                        "args": [
+                                            {
+                                                "op": "in",
+                                                "args": [
+                                                    {
+                                                        "property": "properties.sar:polarizations"
+                                                    },
+                                                    [
+                                                        "HH"
+                                                    ]
+                                                ]
+                                            },
+                                            {
+                                                "op": "in",
+                                                "args": [
+                                                    {
+                                                        "property": "properties.sar:polarizations"
+                                                    },
+                                                    [
+                                                        "HV"
+                                                    ]
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                "op": "and",
+                                "args": [
+                                    {
+                                        "op": "=",
+                                        "args": [
+                                            {
+                                                "property": "properties.sar:instrument_mode"
+                                            },
+                                            "IW"
+                                        ]
+                                    },
+                                    {
+                                        "op": "and",
+                                        "args": [
+                                            {
+                                                "op": "in",
+                                                "args": [
+                                                    {
+                                                        "property": "properties.sar:polarizations"
+                                                    },
+                                                    [
+                                                        "VV"
+                                                    ]
+                                                ]
+                                            },
+                                            {
+                                                "op": "in",
+                                                "args": [
+                                                    {
+                                                        "property": "properties.sar:polarizations"
+                                                    },
+                                                    [
+                                                        "VH"
+                                                    ]
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    },
+    "fields": {
+        "include": [
+            "properties.sar:instrument_mode",
+            "properties.sar:polarizations",
+            "properties.sat:orbit_state",
+            "properties.instrument_mode",
+            "properties.Polarisation",
+            "properties.Orbit Direction",
+            "type",
+            "geometry",
+            "properties.datetime",
+            "id",
+            "bbox",
+            "stac_version",
+            "stac_extensions",
+            "assets",
+            "links",
+            "collection"
+        ],
+        "exclude": []
+    },
+    "intersects": {
+        "type": "Polygon",
+        "coordinates": [
+            [
+                [
+                    -0.7168468828124998,
+                    50.81228118154442
+                ],
+                [
+                    0.8816638593749999,
+                    50.81228118154442
+                ],
+                [
+                    0.8816638593749999,
+                    51.95045545180386
+                ],
+                [
+                    -0.7168468828124998,
+                    51.95045545180386
+                ],
+                [
+                    -0.7168468828124998,
+                    50.81228118154442
+                ]
+            ]
+        ]
+    }
+}
