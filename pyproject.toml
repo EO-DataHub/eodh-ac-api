@@ -54,6 +54,7 @@ dependencies = [
 dev = [
     "coverage>=7.8.0",
     "flaky>=3.8.1",
+    "gha-update>=0.2.0",
     "interrogate>=1.7.0",
     "jupyter>=1.1.1",
     "jupyterlab>=4.4.1",
