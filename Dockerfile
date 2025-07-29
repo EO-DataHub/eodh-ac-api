@@ -1,4 +1,4 @@
-FROM python:3.11-slim-bullseye
+FROM python:3.13-slim-bullseye
 
 ENV DEBIAN_FRONTEND=noninteractive \
     # Use /bin/bash as shell, not the default /bin/sh (arrow keys, etc don't work then)
