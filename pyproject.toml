@@ -2,7 +2,7 @@
 name = 'eodh-ac-api'
 description = 'API for interacting with Action Creator component and scheduling spatial computation in EO Data Hub.'
 version = '0.0.1'
-requires-python = '>=3.12.0'
+requires-python = '>=3.13.0'
 authors = [
     { name = 'xultaeculcis' }
 ]
@@ -24,50 +24,50 @@ license = "BSD-3-Clause"
 license-files = ["LICENSE"]
 
 dependencies = [
-    "aiodns>=3.2.0",
-    "aiohttp-retry>=2.8.3",
-    "aiohttp[speedups]>=3.11.14",
-    "cryptography>=44.0.2",
-    "cwltool>=3.1.20250110105449",
-    "fastapi[standard]>=0.115.12",
-    "geojson-pydantic>=1.2.0",
-    "geopandas>=1.0.1",
-    "matplotlib>=3.10.1",
-    "networkx>=3.4.2",
-    "oauthlib>=3.2.2",
-    "pydantic>=2.10.6",
-    "pydantic-settings>=2.8.1",
+    "aiodns>=3.5.0",
+    "aiohttp-retry>=2.9.1",
+    "aiohttp[speedups]>=3.12.15",
+    "cryptography>=45.0.5",
+    "cwltool>=3.1.20250715140722",
+    "fastapi[standard]>=0.116.1",
+    "geojson-pydantic>=2.0.0",
+    "geopandas>=1.1.1",
+    "matplotlib>=3.10.3",
+    "networkx>=3.5",
+    "oauthlib>=3.3.1",
+    "pydantic>=2.11.7",
+    "pydantic-settings>=2.10.1",
     "pygraphviz>=1.14",
     "pyjwt>=2.10.1",
     "pyproj>=3.7.1",
-    "pystac>=1.12.1",
-    "pystac-client>=0.8.6",
+    "pystac>=1.13.0",
+    "pystac-client>=0.9.0",
     "python-dotenv>=1.1.0",
     "requests-oauthlib>=2.0.0",
     "retry>=0.9.2",
-    "shapely>=2.0.7",
-    "stac-pydantic>=3.2.0",
-    "uvicorn>=0.34.0",
+    "shapely>=2.1.1",
+    "stac-pydantic>=3.4.0",
+    "uvicorn>=0.35.0",
     "websockets>=15.0.1",
 ]
 [dependency-groups]
 dev = [
-    "coverage>=7.8.0",
+    "coverage>=7.10.1",
     "flaky>=3.8.1",
     "gha-update>=0.2.0",
     "interrogate>=1.7.0",
     "jupyter>=1.1.1",
     "jupyterlab>=4.4.1",
     "mock>=5.2.0",
-    "mypy>=1.15.0",
+    "mypy>=1.17.0",
     "notebook>=7.4.1",
     "pre-commit>=4.2.0",
     "pretty>=0.1",
-    "pytest>=8.3.5",
-    "pytest-asyncio>=0.26.0",
-    "pytest-cov>=6.1.1",
-    "pytest-mock>=3.14.0",
-    "ruff>=0.11.7",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.1.0",
+    "pytest-cov>=6.2.1",
+    "pytest-mock>=3.14.1",
+    "ruff>=0.12.7",
     "types-click-spinner>=0.1.13.20240311",
     "types-dataclasses>=0.6.6",
     "types-dateparser>=1.2.0.20250408",
@@ -102,7 +102,7 @@ readme = { file = ["README.md"] }
 
 [tool.ruff]
 show-fixes = true
-target-version = "py312"
+target-version = "py313"
 line-length = 120
 extend-exclude = [
     "docs/*",
