@@ -27,7 +27,7 @@ jobs:
 
       - name: Log in to Amazon ECR
         run: |
-          aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
@@ -35,17 +35,17 @@ jobs:
       - name: Build Docker image
         run: |
           # Build the Docker image
-          docker build -t ${ECR_REPOSITORY}:latest .
+          docker build -t $ECR_REPOSITORY:latest .
         env:
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
 
       - name: Tag and push Docker image to Amazon ECR
         run: |
           # Get the ECR URI
-          ECR_URI=$(aws ecr describe-repositories --repository-names ${ECR_REPOSITORY} --region ${AWS_REGION} --query "repositories[0].repositoryUri" --output text)
+          ECR_URI=$(aws ecr describe-repositories --repository-names $ECR_REPOSITORY --region $AWS_REGION --query "repositories[0].repositoryUri" --output text)
           # Loop through the tags and push each one
-          for TAG in ${TAGS} ${GITHUB_SHA}; do
-            docker tag ${ECR_REPOSITORY}:latest $ECR_URI:$TAG
+          for TAG in $TAGS ${GITHUB_SHA}; do
+            docker tag $ECR_REPOSITORY:latest $ECR_URI:$TAG
             docker push $ECR_URI:$TAG
           done
         env:
@@ -56,21 +56,21 @@ jobs:
       - name: Create file with environment variables
         run: |
           echo 'ENVIRONMENT=dev' >> envs.env
-          echo 'EODH__BASE_URL=${EODH__BASE_URL}' >> envs.env
-          echo 'EODH__CLIENT_ID=${EODH__CLIENT_ID}' >> envs.env
-          echo 'EODH__PASSWORD=${EODH__PASSWORD}' >> envs.env
-          echo 'EODH__REALM=${EODH__REALM}' >> envs.env
-          echo 'EODH__USERNAME=${EODH__USERNAME}' >> envs.env
-          echo 'EODH__WORKSPACE_SERVICES_ENDPOINT=${EODH__WORKSPACE_SERVICES_ENDPOINT}' >> envs.env
-          echo 'EODH__STAC_API_ENDPOINT=${EODH__STAC_API_ENDPOINT}' >> envs.env
-          echo 'EODH__CEDA_STAC_CATALOG_PATH=${EODH__CEDA_STAC_CATALOG_PATH}' >> envs.env
+          echo 'EODH__BASE_URL=$EODH__BASE_URL' >> envs.env
+          echo 'EODH__CLIENT_ID=$EODH__CLIENT_ID' >> envs.env
+          echo 'EODH__PASSWORD=$EODH__PASSWORD' >> envs.env
+          echo 'EODH__REALM=$EODH__REALM' >> envs.env
+          echo 'EODH__USERNAME=$EODH__USERNAME' >> envs.env
+          echo 'EODH__WORKSPACE_SERVICES_ENDPOINT=$EODH__WORKSPACE_SERVICES_ENDPOINT' >> envs.env
+          echo 'EODH__STAC_API_ENDPOINT=$EODH__STAC_API_ENDPOINT' >> envs.env
+          echo 'EODH__CEDA_STAC_CATALOG_PATH=$EODH__CEDA_STAC_CATALOG_PATH' >> envs.env
           echo 'ADES__URL=${ADES__URL}' >> envs.env
-          echo 'ADES__OGC_PROCESSES_API_PATH=${ADES__OGC_PROCESSES_API_PATH}' >> envs.env
-          echo 'ADES__OGC_JOBS_API_PATH=${ADES__OGC_JOBS_API_PATH}' >> envs.env
-          echo 'SENTINEL_HUB__CLIENT_ID=${SENTINEL_HUB__CLIENT_ID}' >> envs.env
-          echo 'SENTINEL_HUB__CLIENT_SECRET=${SENTINEL_HUB__CLIENT_SECRET}' >> envs.env
-          echo 'SENTINEL_HUB__TOKEN_URL=${SENTINEL_HUB__TOKEN_URL}' >> envs.env
-          echo 'SENTINEL_HUB__STAC_API_ENDPOINT=${SENTINEL_HUB__STAC_API_ENDPOINT}' >> envs.env
+          echo 'ADES__OGC_PROCESSES_API_PATH=$ADES__OGC_PROCESSES_API_PATH' >> envs.env
+          echo 'ADES__OGC_JOBS_API_PATH=$ADES__OGC_JOBS_API_PATH' >> envs.env
+          echo 'SENTINEL_HUB__CLIENT_ID=$SENTINEL_HUB__CLIENT_ID' >> envs.env
+          echo 'SENTINEL_HUB__CLIENT_SECRET=$SENTINEL_HUB__CLIENT_SECRET' >> envs.env
+          echo 'SENTINEL_HUB__TOKEN_URL=$SENTINEL_HUB__TOKEN_URL' >> envs.env
+          echo 'SENTINEL_HUB__STAC_API_ENDPOINT=$SENTINEL_HUB__STAC_API_ENDPOINT' >> envs.env
         env:
           EODH__BASE_URL: ${{ vars.EODH__BASE_URL }}
           EODH__CLIENT_ID: ${{ secrets.EODH__CLIENT_ID }}
@@ -90,13 +90,13 @@ jobs:
 
       - name: Upload file as artifact
         run: |
-          aws s3 cp envs.env s3://ukri-task-definition-variables/${TAGS}/
+          aws s3 cp envs.env s3://ukri-task-definition-variables/$TAGS/
         env:
           TAGS: ${{ vars.TAGS }}
 
       - name: Update ECS service
         run: |
-          aws --region ${AWS_REGION} ecs update-service --cluster ${TAGS} --service ${ECR_REPOSITORY} --force-new-deployment
+          aws --region $AWS_REGION ecs update-service --cluster $TAGS --service $ECR_REPOSITORY --force-new-deployment
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
@@ -123,7 +123,7 @@ jobs:
 
       - name: Log in to Amazon ECR
         run: |
-          aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
@@ -131,8 +131,8 @@ jobs:
       - name: Tag and push Docker image to Amazon ECR
         run: |
           # Get the ECR URI
-          MANIFEST=$(aws ecr batch-get-image --repository-name ${ECR_REPOSITORY} --region ${AWS_REGION} --image-ids imageTag=${GITHUB_SHA} --query 'images[].imageManifest' --output text)
-          aws ecr put-image --repository-name ${ECR_REPOSITORY} --image-tag ${TAGS} --image-manifest "$MANIFEST" --region ${AWS_REGION}
+          MANIFEST=$(aws ecr batch-get-image --repository-name $ECR_REPOSITORY --region $AWS_REGION --image-ids imageTag=${GITHUB_SHA} --query 'images[].imageManifest' --output text)
+          aws ecr put-image --repository-name $ECR_REPOSITORY --image-tag $TAGS --image-manifest "$MANIFEST" --region $AWS_REGION
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
@@ -142,21 +142,21 @@ jobs:
       - name: Create file with environment variables
         run: |
           echo 'ENVIRONMENT=qa' >> envs.env
-          echo 'EODH__BASE_URL=${EODH__BASE_URL}' >> envs.env
-          echo 'EODH__CLIENT_ID=${EODH__CLIENT_ID}' >> envs.env
-          echo 'EODH__PASSWORD=${EODH__PASSWORD}' >> envs.env
-          echo 'EODH__REALM=${EODH__REALM}' >> envs.env
-          echo 'EODH__USERNAME=${EODH__USERNAME}' >> envs.env
-          echo 'EODH__WORKSPACE_SERVICES_ENDPOINT=${EODH__WORKSPACE_SERVICES_ENDPOINT}' >> envs.env
-          echo 'EODH__STAC_API_ENDPOINT=${EODH__STAC_API_ENDPOINT}' >> envs.env
-          echo 'EODH__CEDA_STAC_CATALOG_PATH=${EODH__CEDA_STAC_CATALOG_PATH}' >> envs.env
-          echo 'ADES__URL=${ADES__URL}' >> envs.env
-          echo 'ADES__OGC_PROCESSES_API_PATH=${ADES__OGC_PROCESSES_API_PATH}' >> envs.env
-          echo 'ADES__OGC_JOBS_API_PATH=${ADES__OGC_JOBS_API_PATH}' >> envs.env
-          echo 'SENTINEL_HUB__CLIENT_ID=${SENTINEL_HUB__CLIENT_ID}' >> envs.env
-          echo 'SENTINEL_HUB__CLIENT_SECRET=${SENTINEL_HUB__CLIENT_SECRET}' >> envs.env
-          echo 'SENTINEL_HUB__TOKEN_URL=${SENTINEL_HUB__TOKEN_URL}' >> envs.env
-          echo 'SENTINEL_HUB__STAC_API_ENDPOINT=${SENTINEL_HUB__STAC_API_ENDPOINT}' >> envs.env
+          echo 'EODH__BASE_URL=$EODH__BASE_URL' >> envs.env
+          echo 'EODH__CLIENT_ID=$EODH__CLIENT_ID' >> envs.env
+          echo 'EODH__PASSWORD=$EODH__PASSWORD' >> envs.env
+          echo 'EODH__REALM=$EODH__REALM' >> envs.env
+          echo 'EODH__USERNAME=$EODH__USERNAME' >> envs.env
+          echo 'EODH__WORKSPACE_SERVICES_ENDPOINT=$EODH__WORKSPACE_SERVICES_ENDPOINT' >> envs.env
+          echo 'EODH__STAC_API_ENDPOINT=$EODH__STAC_API_ENDPOINT' >> envs.env
+          echo 'EODH__CEDA_STAC_CATALOG_PATH=$EODH__CEDA_STAC_CATALOG_PATH' >> envs.env
+          echo 'ADES__URL=$ADES__URL' >> envs.env
+          echo 'ADES__OGC_PROCESSES_API_PATH=$ADES__OGC_PROCESSES_API_PATH' >> envs.env
+          echo 'ADES__OGC_JOBS_API_PATH=$ADES__OGC_JOBS_API_PATH' >> envs.env
+          echo 'SENTINEL_HUB__CLIENT_ID=$SENTINEL_HUB__CLIENT_ID' >> envs.env
+          echo 'SENTINEL_HUB__CLIENT_SECRET=$SENTINEL_HUB__CLIENT_SECRET' >> envs.env
+          echo 'SENTINEL_HUB__TOKEN_URL=$SENTINEL_HUB__TOKEN_URL' >> envs.env
+          echo 'SENTINEL_HUB__STAC_API_ENDPOINT=$SENTINEL_HUB__STAC_API_ENDPOINT' >> envs.env
         env:
           EODH__BASE_URL: ${{ vars.EODH__BASE_URL }}
           EODH__CLIENT_ID: ${{ secrets.EODH__CLIENT_ID }}
@@ -176,13 +176,13 @@ jobs:
 
       - name: Upload file as artifact
         run: |
-          aws s3 cp envs.env s3://ukri-task-definition-variables/${TAGS}/
+          aws s3 cp envs.env s3://ukri-task-definition-variables/$TAGS/
         env:
           TAGS: ${{ vars.TAGS }}
 
       - name: Update ECS service
         run: |
-          aws --region ${AWS_REGION} ecs update-service --cluster ${TAGS} --service ${ECR_REPOSITORY} --force-new-deployment
+          aws --region $AWS_REGION ecs update-service --cluster $TAGS --service $ECR_REPOSITORY --force-new-deployment
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
@@ -209,7 +209,7 @@ jobs:
 
       - name: Log in to Amazon ECR
         run: |
-          aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
@@ -217,8 +217,8 @@ jobs:
       - name: Tag and push Docker image to Amazon ECR
         run: |
           # Get the ECR URI
-          MANIFEST=$(aws ecr batch-get-image --repository-name ${ECR_REPOSITORY} --region ${AWS_REGION} --image-ids imageTag=${GITHUB_SHA} --query 'images[].imageManifest' --output text)
-          aws ecr put-image --repository-name ${ECR_REPOSITORY} --image-tag ${TAGS} --image-manifest "$MANIFEST" --region ${AWS_REGION}
+          MANIFEST=$(aws ecr batch-get-image --repository-name $ECR_REPOSITORY --region $AWS_REGION --image-ids imageTag=${GITHUB_SHA} --query 'images[].imageManifest' --output text)
+          aws ecr put-image --repository-name $ECR_REPOSITORY --image-tag $TAGS --image-manifest "$MANIFEST" --region $AWS_REGION
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
@@ -228,21 +228,21 @@ jobs:
       - name: Create file with environment variables
         run: |
           echo 'ENVIRONMENT=staging' >> envs.env
-          echo 'EODH__BASE_URL=${EODH__BASE_URL}' >> envs.env
-          echo 'EODH__CLIENT_ID=${EODH__CLIENT_ID}' >> envs.env
-          echo 'EODH__PASSWORD=${EODH__PASSWORD}' >> envs.env
-          echo 'EODH__REALM=${EODH__REALM}' >> envs.env
-          echo 'EODH__USERNAME=${EODH__USERNAME}' >> envs.env
-          echo 'EODH__WORKSPACE_SERVICES_ENDPOINT=${EODH__WORKSPACE_SERVICES_ENDPOINT}' >> envs.env
-          echo 'EODH__STAC_API_ENDPOINT=${EODH__STAC_API_ENDPOINT}' >> envs.env
-          echo 'EODH__CEDA_STAC_CATALOG_PATH=${EODH__CEDA_STAC_CATALOG_PATH}' >> envs.env
-          echo 'ADES__URL=${ADES__URL}' >> envs.env
-          echo 'ADES__OGC_PROCESSES_API_PATH=${ADES__OGC_PROCESSES_API_PATH}' >> envs.env
-          echo 'ADES__OGC_JOBS_API_PATH=${ADES__OGC_JOBS_API_PATH}' >> envs.env
-          echo 'SENTINEL_HUB__CLIENT_ID=${SENTINEL_HUB__CLIENT_ID}' >> envs.env
-          echo 'SENTINEL_HUB__CLIENT_SECRET=${SENTINEL_HUB__CLIENT_SECRET}' >> envs.env
-          echo 'SENTINEL_HUB__TOKEN_URL=${SENTINEL_HUB__TOKEN_URL}' >> envs.env
-          echo 'SENTINEL_HUB__STAC_API_ENDPOINT=${SENTINEL_HUB__STAC_API_ENDPOINT}' >> envs.env
+          echo 'EODH__BASE_URL=$EODH__BASE_URL' >> envs.env
+          echo 'EODH__CLIENT_ID=$EODH__CLIENT_ID' >> envs.env
+          echo 'EODH__PASSWORD=$EODH__PASSWORD' >> envs.env
+          echo 'EODH__REALM=$EODH__REALM' >> envs.env
+          echo 'EODH__USERNAME=$EODH__USERNAME' >> envs.env
+          echo 'EODH__WORKSPACE_SERVICES_ENDPOINT=$EODH__WORKSPACE_SERVICES_ENDPOINT' >> envs.env
+          echo 'EODH__STAC_API_ENDPOINT=$EODH__STAC_API_ENDPOINT' >> envs.env
+          echo 'EODH__CEDA_STAC_CATALOG_PATH=$EODH__CEDA_STAC_CATALOG_PATH' >> envs.env
+          echo 'ADES__URL=$ADES__URL' >> envs.env
+          echo 'ADES__OGC_PROCESSES_API_PATH=$ADES__OGC_PROCESSES_API_PATH' >> envs.env
+          echo 'ADES__OGC_JOBS_API_PATH=$ADES__OGC_JOBS_API_PATH' >> envs.env
+          echo 'SENTINEL_HUB__CLIENT_ID=$SENTINEL_HUB__CLIENT_ID' >> envs.env
+          echo 'SENTINEL_HUB__CLIENT_SECRET=$SENTINEL_HUB__CLIENT_SECRET' >> envs.env
+          echo 'SENTINEL_HUB__TOKEN_URL=$SENTINEL_HUB__TOKEN_URL' >> envs.env
+          echo 'SENTINEL_HUB__STAC_API_ENDPOINT=$SENTINEL_HUB__STAC_API_ENDPOINT' >> envs.env
         env:
           EODH__BASE_URL: ${{ vars.EODH__BASE_URL }}
           EODH__CLIENT_ID: ${{ secrets.EODH__CLIENT_ID }}
@@ -262,13 +262,13 @@ jobs:
 
       - name: Upload file as artifact
         run: |
-          aws s3 cp envs.env s3://ukri-task-definition-variables/${TAGS}/
+          aws s3 cp envs.env s3://ukri-task-definition-variables/$TAGS/
         env:
           TAGS: ${{ vars.TAGS }}
 
       - name: Update ECS service
         run: |
-          aws --region ${AWS_REGION} ecs update-service --cluster ${TAGS} --service ${ECR_REPOSITORY} --force-new-deployment
+          aws --region $AWS_REGION ecs update-service --cluster $TAGS --service $ECR_REPOSITORY --force-new-deployment
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
@@ -295,7 +295,7 @@ jobs:
 
       - name: Log in to Amazon ECR
         run: |
-          aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
@@ -303,8 +303,8 @@ jobs:
       - name: Tag and push Docker image to Amazon ECR
         run: |
           # Get the ECR URI
-          MANIFEST=$(aws ecr batch-get-image --repository-name ${ECR_REPOSITORY} --region ${AWS_REGION} --image-ids imageTag=${GITHUB_SHA} --query 'images[].imageManifest' --output text)
-          aws ecr put-image --repository-name ${ECR_REPOSITORY} --image-tag ${TAGS} --image-manifest "$MANIFEST" --region ${AWS_REGION}
+          MANIFEST=$(aws ecr batch-get-image --repository-name $ECR_REPOSITORY --region $AWS_REGION --image-ids imageTag=${GITHUB_SHA} --query 'images[].imageManifest' --output text)
+          aws ecr put-image --repository-name $ECR_REPOSITORY --image-tag $TAGS --image-manifest "$MANIFEST" --region $AWS_REGION
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
           ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
@@ -320,21 +320,21 @@ jobs:
       - name: Create file with environment variables
         run: |
           echo 'ENVIRONMENT=prod' >> envs.env
-          echo 'EODH__BASE_URL=${EODH__BASE_URL}' >> envs.env
-          echo 'EODH__CLIENT_ID=${EODH__CLIENT_ID}' >> envs.env
-          echo 'EODH__PASSWORD=${EODH__PASSWORD}' >> envs.env
-          echo 'EODH__REALM=${EODH__REALM}' >> envs.env
-          echo 'EODH__USERNAME=${EODH__USERNAME}' >> envs.env
-          echo 'EODH__WORKSPACE_SERVICES_ENDPOINT=${EODH__WORKSPACE_SERVICES_ENDPOINT}' >> envs.env
-          echo 'EODH__STAC_API_ENDPOINT=${EODH__STAC_API_ENDPOINT}' >> envs.env
-          echo 'EODH__CEDA_STAC_CATALOG_PATH=${EODH__CEDA_STAC_CATALOG_PATH}' >> envs.env
-          echo 'ADES__URL=${ADES__URL}' >> envs.env
-          echo 'ADES__OGC_PROCESSES_API_PATH=${ADES__OGC_PROCESSES_API_PATH}' >> envs.env
-          echo 'ADES__OGC_JOBS_API_PATH=${ADES__OGC_JOBS_API_PATH}' >> envs.env
-          echo 'SENTINEL_HUB__CLIENT_ID=${SENTINEL_HUB__CLIENT_ID}' >> envs.env
-          echo 'SENTINEL_HUB__CLIENT_SECRET=${SENTINEL_HUB__CLIENT_SECRET}' >> envs.env
-          echo 'SENTINEL_HUB__TOKEN_URL=${SENTINEL_HUB__TOKEN_URL}' >> envs.env
-          echo 'SENTINEL_HUB__STAC_API_ENDPOINT=${SENTINEL_HUB__STAC_API_ENDPOINT}' >> envs.env
+          echo 'EODH__BASE_URL=$EODH__BASE_URL' >> envs.env
+          echo 'EODH__CLIENT_ID=$EODH__CLIENT_ID' >> envs.env
+          echo 'EODH__PASSWORD=$EODH__PASSWORD' >> envs.env
+          echo 'EODH__REALM=$EODH__REALM' >> envs.env
+          echo 'EODH__USERNAME=$EODH__USERNAME' >> envs.env
+          echo 'EODH__WORKSPACE_SERVICES_ENDPOINT=$EODH__WORKSPACE_SERVICES_ENDPOINT' >> envs.env
+          echo 'EODH__STAC_API_ENDPOINT=$EODH__STAC_API_ENDPOINT' >> envs.env
+          echo 'EODH__CEDA_STAC_CATALOG_PATH=$EODH__CEDA_STAC_CATALOG_PATH' >> envs.env
+          echo 'ADES__URL=$ADES__URL' >> envs.env
+          echo 'ADES__OGC_PROCESSES_API_PATH=$ADES__OGC_PROCESSES_API_PATH' >> envs.env
+          echo 'ADES__OGC_JOBS_API_PATH=$ADES__OGC_JOBS_API_PATH' >> envs.env
+          echo 'SENTINEL_HUB__CLIENT_ID=$SENTINEL_HUB__CLIENT_ID' >> envs.env
+          echo 'SENTINEL_HUB__CLIENT_SECRET=$SENTINEL_HUB__CLIENT_SECRET' >> envs.env
+          echo 'SENTINEL_HUB__TOKEN_URL=$SENTINEL_HUB__TOKEN_URL' >> envs.env
+          echo 'SENTINEL_HUB__STAC_API_ENDPOINT=$SENTINEL_HUB__STAC_API_ENDPOINT' >> envs.env
         env:
           EODH__BASE_URL: ${{ vars.EODH__BASE_URL }}
           EODH__CLIENT_ID: ${{ secrets.EODH__CLIENT_ID }}
@@ -354,13 +354,13 @@ jobs:
 
       - name: Upload file as artifact
         run: |
-          aws s3 cp envs.env s3://prod-ukri-task-definition-variables/${TAGS}/
+          aws s3 cp envs.env s3://prod-ukri-task-definition-variables/$TAGS/
         env:
           TAGS: ${{ vars.TAGS }}
 
       - name: Update ECS service
         run: |
-          aws --region ${AWS_REGION} ecs update-service --cluster ${TAGS} --service ${ECR_REPOSITORY} --force-new-deployment
+          aws --region $AWS_REGION ecs update-service --cluster $TAGS --service $ECR_REPOSITORY --force-new-deployment
         env:
           AWS_REGION: ${{ vars.AWS_REGION }}
           ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
