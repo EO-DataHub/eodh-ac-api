@@ -3,9 +3,7 @@ from __future__ import annotations
 import contextlib
 import logging
 import time
-from typing import TYPE_CHECKING, TypeVar
-
-from typing_extensions import ParamSpec
+from typing import TYPE_CHECKING, ParamSpec, TypeVar
 
 from src import consts
 
