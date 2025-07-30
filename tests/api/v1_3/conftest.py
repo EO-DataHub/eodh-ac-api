@@ -42,7 +42,7 @@ def mocked_ades_factory() -> Generator[MagicMock]:
 
 
 @pytest.fixture
-def mocked_token_client_factory() -> Generator[MagicMock, None]:
+def mocked_token_client_factory() -> Generator[MagicMock]:
     token_client_factory_mock: MagicMock
     with patch(  # type: ignore[assignment]
         "src.api.v1_3.action_creator.routes.ws_token_session_auth_client_factory",
