@@ -40,7 +40,7 @@ jobs:
       - name: Tag and push Docker image to Amazon ECR
         run: |
           # Get the ECR URI
-          ECR_URI=$(aws ecr describe-repositories --repository-names ${ECR_REPOSITORY} --region $} --query "repositories[0].repositoryUri" --output text)
+          ECR_URI=$(aws ecr describe-repositories --repository-names ${ECR_REPOSITORY} --region ${AWS_REGION} --query "repositories[0].repositoryUri" --output text)
           # Loop through the tags and push each one
           for TAG in ${TAGS} ${GITHUB_SHA}; do
             docker tag ${ECR_REPOSITORY}:latest $ECR_URI:$TAG
