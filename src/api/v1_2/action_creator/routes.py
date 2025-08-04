@@ -184,7 +184,7 @@ async def submit_workflow(
         wf_identifier = f"scatter-{wf_identifier}"
         ogc_inputs["areas"] = ogc_inputs.pop("aoi")
 
-    err, _ = await ades.reregister_process_v2(
+    err, _ = await ades.reregister_process(
         wf_identifier,
         wf_registry=WORKFLOW_REGISTRY,
         wf_id_override_lookup=WORKFLOW_ID_OVERRIDE_LOOKUP,

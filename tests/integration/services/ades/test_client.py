@@ -10,6 +10,7 @@ from aiohttp import ClientSession
 from flaky import flaky
 from starlette import status
 
+from src.api.v1_2.action_creator.functions import WORKFLOW_ID_OVERRIDE_LOOKUP, WORKFLOW_REGISTRY
 from src.core.settings import current_settings
 from src.services.ades.factory import ades_client_factory
 from src.services.ades.schemas import JobList, StatusCode
@@ -79,7 +80,7 @@ async def test_ades_ensure_process_exists(ades: ADESClient) -> None:
     assert err is None or err.code == status.HTTP_404_NOT_FOUND
 
     # Act
-    err = await ades.ensure_process_exists(RASTER_CALCULATOR_PROCESS_IDENTIFIER)
+    err = await ades.ensure_process_exists(RASTER_CALCULATOR_PROCESS_IDENTIFIER, wf_registry=WORKFLOW_REGISTRY)
 
     # Assert
     assert err is None
@@ -133,7 +134,11 @@ async def test_ades_reregistering_process(ades: ADESClient) -> None:
     assert err is None or err.code == status.HTTP_404_NOT_FOUND
 
     # Act
-    err, result = await ades.reregister_process(RASTER_CALCULATOR_PROCESS_IDENTIFIER)
+    err, result = await ades.reregister_process(
+        RASTER_CALCULATOR_PROCESS_IDENTIFIER,
+        wf_registry=WORKFLOW_REGISTRY,
+        wf_id_override_lookup=WORKFLOW_ID_OVERRIDE_LOOKUP,
+    )
 
     # Assert
     assert err is None
@@ -146,7 +151,11 @@ async def test_ades_reregistering_process(ades: ADESClient) -> None:
 @pytest.mark.asyncio(scope="function")
 async def test_ades_reregistering_process_with_unknown_function_returns_404_not_found(ades: ADESClient) -> None:
     # Act
-    err, result = await ades.reregister_process(NON_EXISTENT_PROCESS_ID)
+    err, result = await ades.reregister_process(
+        NON_EXISTENT_PROCESS_ID,
+        wf_registry=WORKFLOW_REGISTRY,
+        wf_id_override_lookup=WORKFLOW_ID_OVERRIDE_LOOKUP,
+    )
 
     # Assert
     assert err is not None

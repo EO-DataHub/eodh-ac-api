@@ -1,15 +1,11 @@
 .DEFAULT_GOAL := help
-ruff-lint = ruff check --fix --preview .
-ruff-format = ruff format --preview .
-mypy = mypy .
-pre-commit = pre-commit run --all-files
+ruff-lint = uv run ruff check --fix --preview .
+ruff-format = uv run ruff format --preview .
+mypy = uv run mypy .
+pre-commit = uv run pre-commit run --all-files
 
 DATA_DIR=data
 SHELL=/bin/bash
-CONDA_ENV_NAME=eodh-ac-api
-# Note that the extra activate is needed to ensure that the activate floats env to the front of PATH
-CONDA_ACTIVATE_BASE=source $$(conda info --base)/etc/profile.d/conda.sh ; conda activate ; conda activate base
-CONDA_ACTIVATE=source $$(conda info --base)/etc/profile.d/conda.sh ; conda activate ; conda activate $(CONDA_ENV_NAME)
 
 IMAGE_NAME=eodh-ac-api
 CONTAINER_NAME=eodh-ac-api
@@ -29,56 +25,6 @@ export PRINT_HELP_PYSCRIPT
 .PHONY: help  ## Prints help message
 help:
 	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
-
-# Git repo initialization
-
-.PHONY: git-init  ## Initializes Git repository
-git-init:
-	git init -b main
-	git add .
-
-# Freezing dependedncies
-
-.PHONY: lock-file  ## Creates conda-lock file
-lock-file:
-	rm -rf conda-lock-dev.yml
-	$(CONDA_ACTIVATE_BASE) ; conda-lock --mamba -f env.yaml -f env-dev.yaml --lockfile conda-lock-dev.yml
-	git add conda-lock-dev.yml
-
-.PHONY: release-lock-file  ## Creates conda-lock file without dev dependencies - to be used for deployment
-release-lock-file:
-	rm -rf conda-lock.yml
-	$(CONDA_ACTIVATE_BASE) ; conda-lock --mamba -f env.yaml --lockfile conda-lock.yml
-	git add conda-lock.yml
-
-# Environment creation
-
-.PHONY: conda-lock-install  ## Creates env from conda-lock file
-conda-lock-install:
-	$(CONDA_ACTIVATE_BASE) ; conda-lock install --mamba -n $(CONDA_ENV_NAME) conda-lock-dev.yml
-
-.PHONY: setup-pre-commit  ## Installs pre-commit hooks
-setup-pre-commit:
-	$(CONDA_ACTIVATE) ; pre-commit install
-
-.PHONY: setup-editable  ## Installs the project in an editable mode
-setup-editable:
-	$(CONDA_ACTIVATE) ; pip install -e .
-
-.PHONY: env  ## Creates local environment and installs pre-commit hooks
-env: conda-lock-install setup-pre-commit setup-editable
-
-.PHONY: remove-env  ## Removes current conda environment
-remove-env:
-	$(CONDA_ACTIVATE_BASE) ; conda env remove -n $(CONDA_ENV_NAME) -y
-
-.PHONY: recreate-env  ## Recreates conda environment by making new one from fresh lockfile
-recreate-env: remove-env lock-file env
-
-# Project initialization
-
-.PHONY: init-project  ## Runs Git init, lock-file creation and env setup - to be used after cookiecutter initialization
-init-project: git-init lock-file env
 
 # Helpers
 
