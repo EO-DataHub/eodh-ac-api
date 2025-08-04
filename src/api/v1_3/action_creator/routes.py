@@ -13,7 +13,7 @@ from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import ValidationError
 from starlette import status
 
-from src.api.v1_0.auth.routes import decode_token, try_get_workspace_from_token_or_request_body, validate_access_token
+from src.api.auth.routes import decode_token, try_get_workspace_from_token_or_request_body, validate_access_token
 from src.api.v1_3.action_creator.schemas.errors import ErrorResponse
 from src.api.v1_3.action_creator.schemas.functions import FunctionsResponse
 from src.api.v1_3.action_creator.schemas.history import (

@@ -13,10 +13,10 @@ if TYPE_CHECKING:
     ("method", "endpoint"),
     [
         ("get", "action-creator/functions"),
-        ("get", "action-creator/submissions"),
-        ("get", "action-creator/submissions/dummy-id"),
-        ("post", "action-creator/submissions"),
-        ("delete", "action-creator/submissions/dummy-id"),
+        ("get", "action-creator/workflow-submissions"),
+        ("get", "action-creator/workflow-submissions/dummy-id"),
+        ("post", "action-creator/workflow-submissions"),
+        ("delete", "action-creator/workflow-submissions/dummy-id"),
     ],
     ids=[
         "GET-functions",
@@ -26,8 +26,8 @@ if TYPE_CHECKING:
         "DELETE-job",
     ],
 )
-@pytest.mark.parametrize("api_version", ["/api/v1.0", "/api/v1.1"], ids=["v1.0", "v1.1"])
-def test_functions_endpoint_returns_forbidden_error_when_no_token_specified(
+@pytest.mark.parametrize("api_version", ["/api/v1.3"], ids=["v1.3"])
+def test_functions_endpoint_returns_forbidden_error_when_no_token_specified_v1_3(
     api_version: str,
     method: str,
     endpoint: str,
@@ -41,10 +41,10 @@ def test_functions_endpoint_returns_forbidden_error_when_no_token_specified(
     ("method", "endpoint"),
     [
         ("get", "action-creator/functions"),
-        ("get", "action-creator/submissions"),
-        ("get", "action-creator/submissions/dummy-id"),
-        ("post", "action-creator/submissions"),
-        ("delete", "action-creator/submissions/dummy-id"),
+        ("get", "action-creator/workflow-submissions"),
+        ("get", "action-creator/workflow-submissions/dummy-id"),
+        ("post", "action-creator/workflow-submissions"),
+        ("delete", "action-creator/workflow-submissions/dummy-id"),
     ],
     ids=[
         "GET-functions",
@@ -54,8 +54,8 @@ def test_functions_endpoint_returns_forbidden_error_when_no_token_specified(
         "DELETE-job",
     ],
 )
-@pytest.mark.parametrize("api_version", ["/api/v1.0", "/api/v1.1"], ids=["v1.0", "v1.1"])
-def test_functions_endpoint_returns_unauthorized_error_when_bad_token(
+@pytest.mark.parametrize("api_version", ["/api/v1.3"], ids=["v1.3"])
+def test_functions_endpoint_returns_unauthorized_error_when_bad_token_v1_3(
     api_version: str,
     method: str,
     endpoint: str,

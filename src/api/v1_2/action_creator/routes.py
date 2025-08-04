@@ -8,7 +8,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from fastapi.security import HTTPAuthorizationCredentials
 from starlette import status
 
-from src.api.v1_0.auth.routes import decode_token, try_get_workspace_from_token_or_request_body, validate_access_token
+from src.api.auth.routes import decode_token, try_get_workspace_from_token_or_request_body, validate_access_token
 from src.api.v1_2.action_creator.functions import (
     FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING,
     FUNCTIONS,

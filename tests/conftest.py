@@ -42,7 +42,7 @@ def auth_token_module_scoped() -> str:
     settings = current_settings()
     client = TestClient(fast_api_app)
     response = client.post(
-        "/api/v1.0/auth/token",
+        "/api/v1.2/auth/token",
         json={"username": settings.eodh.username, "password": settings.eodh.password},
     )
     return response.json()["access_token"]  # type: ignore[no-any-return]
@@ -53,7 +53,7 @@ def auth_token_func_scoped() -> str:
     settings = current_settings()
     client = TestClient(fast_api_app)
     response = client.post(
-        "/api/v1.0/auth/token",
+        "/api/v1.2/auth/token",
         json={"username": settings.eodh.username, "password": settings.eodh.password},
     )
     return response.json()["access_token"]  # type: ignore[no-any-return]
@@ -64,7 +64,7 @@ def auth_token_session_scoped() -> str:
     settings = current_settings()
     client = TestClient(fast_api_app)
     response = client.post(
-        "/api/v1.0/auth/token",
+        "/api/v1.2/auth/token",
         json={"username": settings.eodh.username, "password": settings.eodh.password},
     )
     return response.json()["access_token"]  # type: ignore[no-any-return]
