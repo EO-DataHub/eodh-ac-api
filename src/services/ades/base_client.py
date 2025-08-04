@@ -121,7 +121,11 @@ class ADESClientBase(APIClient, abc.ABC):
     async def process_exists(self, process_identifier: str) -> tuple[ErrorResponse | None, bool | None]: ...
 
     @abc.abstractmethod
-    async def ensure_process_exists(self, process_identifier: str) -> ErrorResponse | None: ...
+    async def ensure_process_exists(
+        self,
+        process_identifier: str,
+        wf_registry: dict[str, dict[str, str]],
+    ) -> ErrorResponse | None: ...
 
     @abc.abstractmethod
     async def list_processes(self) -> tuple[ErrorResponse | None, ProcessList | None]: ...
@@ -141,5 +145,8 @@ class ADESClientBase(APIClient, abc.ABC):
 
     @abc.abstractmethod
     async def reregister_process(
-        self, process_identifier: str
+        self,
+        process_identifier: str,
+        wf_registry: dict[str, dict[str, str]],
+        wf_id_override_lookup: dict[str, str],
     ) -> tuple[ErrorResponse | None, ProcessSummary | None]: ...
