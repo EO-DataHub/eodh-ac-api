@@ -9,12 +9,12 @@ from fastapi import APIRouter, Depends, HTTPException, WebSocketException, statu
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import PyJWKClient  # type: ignore[attr-defined]
 
-from src.api.v1_0.auth.schemas import IntrospectResponse, TokenRequest, TokenResponse
+from src.api.auth.schemas import IntrospectResponse, TokenRequest, TokenResponse
 from src.core.settings import Settings, current_settings
 
 _HEADERS = {"Content-Type": "application/x-www-form-urlencoded"}
 
-auth_router_v1_0 = APIRouter(
+auth_router = APIRouter(
     prefix="/auth",
     tags=["Authentication"],
 )
@@ -93,7 +93,7 @@ def try_get_workspace_from_token_or_request_body(
     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect credentials")
 
 
-@auth_router_v1_0.post(
+@auth_router.post(
     "/token",
     response_model=TokenResponse,
     responses={
@@ -132,7 +132,7 @@ async def authenticate(
         return TokenResponse(**await response.json())
 
 
-@auth_router_v1_0.post(
+@auth_router.post(
     "/token/introspection",
     response_model=IntrospectResponse,
     responses={
