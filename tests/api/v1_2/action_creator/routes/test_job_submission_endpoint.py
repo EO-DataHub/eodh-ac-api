@@ -161,7 +161,7 @@ def test_job_submissions_endpoint_returns_422_when_stac_date_range_is_invalid_nd
     assert response_body["detail"][0]["type"] == "stac_date_range_error"
     assert (
         response_body["detail"][0]["msg"] == "Invalid date range for selected STAC collection: sentinel-2-l2a-ard. "
-        "Valid range is between 2015-06-27T10:25:31+00:00 and None."
+        "Valid range is between 2022-01-02T11:35:01+00:00 and None."
     )
 
 
