@@ -35,7 +35,7 @@ STAC_COLLECTION_DATE_RANGE_LOOKUP = {
         None,
     ),
     "sentinel-2-l2a-ard": (
-        datetime.fromisoformat("2015-06-27T10:25:31+00:00"),
+        datetime.fromisoformat("2022-01-02T11:35:01+00:00"),
         None,
     ),
     "esacci-globallc": (
