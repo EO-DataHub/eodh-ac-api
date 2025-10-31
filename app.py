@@ -53,6 +53,7 @@ app = FastAPI(
 app_v1_2 = register_api_v1_2(app)
 app_v1_3 = register_api_v1_3(app)
 app.mount("/api/latest", app_v1_3)
+app.mount("/api/v1.1", app_v1_3)
 
 app.add_middleware(
     CORSMiddleware,
