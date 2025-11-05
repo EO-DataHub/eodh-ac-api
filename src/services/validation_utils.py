@@ -23,19 +23,19 @@ SQ_MILES_DIVISOR = 2.59
 
 STAC_COLLECTION_DATE_RANGE_LOOKUP = {
     "sentinel-1-grd": (
-        datetime.fromisoformat("2014-10-10T10:28:21+00:00"),
+        datetime.fromisoformat("2014-10-10T00:00:00+00:00"),
         None,
     ),
     "sentinel-2-l1c": (
-        datetime.fromisoformat("2015-06-27T10:25:31+00:00"),
+        datetime.fromisoformat("2015-06-27T00:00:00+00:00"),
         None,
     ),
     "sentinel-2-l2a": (
-        datetime.fromisoformat("2015-06-27T10:25:31+00:00"),
+        datetime.fromisoformat("2015-06-27T00:00:00+00:00"),
         None,
     ),
     "sentinel-2-l2a-ard": (
-        datetime.fromisoformat("2022-01-02T11:35:01+00:00"),
+        datetime.fromisoformat("2022-01-02T00:00:00+00:00"),
         None,
     ),
     "esacci-globallc": (
