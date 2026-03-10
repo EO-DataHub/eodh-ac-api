@@ -355,7 +355,7 @@ class ADESClient(ADESClientBase):
         if await self.process_exists(process_identifier):
             _ = await self.unregister_process(process_identifier)
         cwl_href = wf_registry[process_identifier]["cwl_href"]
-        id_override = wf_id_override_lookup.get(process_identifier)
+        id_override = wf_id_override_lookup.get(process_identifier, process_identifier)
         return await self.register_process_from_cwl_href_with_download(cwl_href, id_override=id_override)
 
     async def batch_cancel_or_delete_jobs(  # noqa: C901

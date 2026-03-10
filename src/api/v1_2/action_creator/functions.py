@@ -520,17 +520,23 @@ FUNCTIONS = [
 ]
 FUNCTIONS_REGISTRY: dict[str, dict[str, Any]] = {f["identifier"]: f for f in FUNCTIONS}  # type: ignore[misc]
 FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING = {
-    "evi": "raster-calculate",
-    "ndvi": "raster-calculate",
-    "ndwi": "raster-calculate",
-    "savi": "raster-calculate",
-    "cdom": "raster-calculate",
-    "doc": "raster-calculate",
-    "turb": "raster-calculate",
-    "cya_cells": "raster-calculate",
+    "evi": "raster-calculate-evi",
+    "ndvi": "raster-calculate-ndvi",
+    "ndwi": "raster-calculate-ndwi",
+    "savi": "raster-calculate-savi",
+    "cdom": "raster-calculate-cdom",
+    "doc": "raster-calculate-doc",
+    "turb": "raster-calculate-turb",
+    "cya_cells": "raster-calculate-cya_cells",
     "land-cover-change-detection": "land-cover-change",
     "water-quality": "water-quality",
 }
+_RASTER_CALCULATE_CWL = (
+    "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/raster-calculate-app.cwl"
+)
+_SCATTER_RASTER_CALCULATE_CWL = (
+    "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/scatter-raster-calculate-app.cwl"
+)
 WORKFLOW_REGISTRY = {
     "lulc-change": {
         "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/lulc-change-app.cwl",
@@ -538,9 +544,15 @@ WORKFLOW_REGISTRY = {
     "land-cover-change": {
         "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/lulc-change-app.cwl",
     },
-    "raster-calculate": {
-        "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/raster-calculate-app.cwl",
-    },
+    "raster-calculate": {"cwl_href": _RASTER_CALCULATE_CWL},
+    "raster-calculate-evi": {"cwl_href": _RASTER_CALCULATE_CWL},
+    "raster-calculate-ndvi": {"cwl_href": _RASTER_CALCULATE_CWL},
+    "raster-calculate-ndwi": {"cwl_href": _RASTER_CALCULATE_CWL},
+    "raster-calculate-savi": {"cwl_href": _RASTER_CALCULATE_CWL},
+    "raster-calculate-cdom": {"cwl_href": _RASTER_CALCULATE_CWL},
+    "raster-calculate-doc": {"cwl_href": _RASTER_CALCULATE_CWL},
+    "raster-calculate-turb": {"cwl_href": _RASTER_CALCULATE_CWL},
+    "raster-calculate-cya_cells": {"cwl_href": _RASTER_CALCULATE_CWL},
     "water-quality": {
         "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/water-quality-app.cwl",
     },
@@ -550,9 +562,15 @@ WORKFLOW_REGISTRY = {
     "scatter-land-cover-change": {
         "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/scatter-lulc-change-app.cwl",
     },
-    "scatter-raster-calculate": {
-        "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/scatter-raster-calculate-app.cwl",
-    },
+    "scatter-raster-calculate": {"cwl_href": _SCATTER_RASTER_CALCULATE_CWL},
+    "scatter-raster-calculate-evi": {"cwl_href": _SCATTER_RASTER_CALCULATE_CWL},
+    "scatter-raster-calculate-ndvi": {"cwl_href": _SCATTER_RASTER_CALCULATE_CWL},
+    "scatter-raster-calculate-ndwi": {"cwl_href": _SCATTER_RASTER_CALCULATE_CWL},
+    "scatter-raster-calculate-savi": {"cwl_href": _SCATTER_RASTER_CALCULATE_CWL},
+    "scatter-raster-calculate-cdom": {"cwl_href": _SCATTER_RASTER_CALCULATE_CWL},
+    "scatter-raster-calculate-doc": {"cwl_href": _SCATTER_RASTER_CALCULATE_CWL},
+    "scatter-raster-calculate-turb": {"cwl_href": _SCATTER_RASTER_CALCULATE_CWL},
+    "scatter-raster-calculate-cya_cells": {"cwl_href": _SCATTER_RASTER_CALCULATE_CWL},
     "scatter-water-quality": {
         "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/scatter-water-quality-app.cwl",
     },
