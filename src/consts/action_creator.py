@@ -55,6 +55,7 @@ RASTER_CALCULATOR_FUNCTION_SPEC = {
                 "NDWI",
                 "EVI",
                 "SAVI",
+                "NBR",
             ],
         },
         "limit": {

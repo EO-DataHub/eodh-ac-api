@@ -262,6 +262,15 @@ class NDWIWorkflowStep(WorkflowStepBase):
     inputs: NDWIFunctionInputs
 
 
+class NBRFunctionInputs(RasterCalculatorFunctionInputs):
+    identifier: Literal["nbr"] = "nbr"
+
+
+class NBRWorkflowStep(WorkflowStepBase):
+    identifier: Literal["nbr"] = "nbr"
+    inputs: NBRFunctionInputs
+
+
 class CYAFunctionInputs(RasterCalculatorFunctionInputs):
     identifier: Literal["cya_cells"] = "cya_cells"
 
@@ -311,6 +320,7 @@ class LandCoverChangeDetectionWorkflowStep(WorkflowStepBase):
 TWorkflowStep = Annotated[
     NDVIWorkflowStep
     | NDWIWorkflowStep
+    | NBRWorkflowStep
     | SAVIWorkflowStep
     | EVIWorkflowStep
     | CYAWorkflowStep
