@@ -26,6 +26,7 @@ COLOR_WHEEL = {
     "chl_a_low": "#f97306",
     "chl_a_high": "#daa520",
     "ndwi": "#9a0eea",
+    "nbr": "#ff6347",
     "turb": "#6e750e",
     "unknown": "#000000",
 }

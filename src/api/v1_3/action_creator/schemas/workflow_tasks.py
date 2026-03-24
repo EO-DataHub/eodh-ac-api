@@ -676,6 +676,39 @@ class NDWITask(WorkflowTask):
         }
 
 
+class NBRTask(WorkflowTask):
+    identifier: Literal["nbr"] = "nbr"
+    inputs: DirectoryInputs
+    outputs: DirectoryOutputs
+
+    @classmethod
+    def as_function_spec(cls) -> dict[str, Any]:
+        return {
+            "name": "NBR",
+            "identifier": "nbr",
+            "category": FunctionCategory.spectral_indices,
+            "tags": ["NBR", "Burn Index", "Spectral indices"],
+            "description": "Normalized Burn Ratio (NBR).",
+            "visible": True,
+            "compatible_input_datasets": ["sentinel-2-l2a-ard", "sentinel-2-l2a"],
+            "inputs": {
+                "data_dir": {
+                    "name": "data_dir",
+                    "description": "Directory containing the input data",
+                    "type": FuncInputOutputType.directory,
+                    "required": True,
+                }
+            },
+            "outputs": {
+                "results": {
+                    "name": "results",
+                    "type": FuncInputOutputType.directory,
+                    "description": "Directory to store index calculation results",
+                }
+            },
+        }
+
+
 class CYATask(WorkflowTask):
     identifier: Literal["cya_cells"] = "cya_cells"
     inputs: DirectoryInputs
@@ -1154,6 +1187,7 @@ SPECTRAL_INDEX_TASKS = [
     EVITask,
     NDWITask,
     SAVITask,
+    NBRTask,
     CYATask,
     CDOMTask,
     DOCTask,

@@ -47,6 +47,7 @@ class WorkflowCreator:
         "savi": "spectral-index.yaml",
         "evi": "spectral-index.yaml",
         "ndwi": "spectral-index.yaml",
+        "nbr": "spectral-index.yaml",
         "cya_cells": "spectral-index.yaml",
         "cdom": "spectral-index.yaml",
         "turb": "spectral-index.yaml",

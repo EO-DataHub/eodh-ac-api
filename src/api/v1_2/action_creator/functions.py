@@ -190,6 +190,53 @@ NDWI_FUNCTION_SPEC = {
         },
     },
 }
+NBR_FUNCTION_SPEC = {
+    "identifier": "nbr",
+    "name": "Normalized Burn Ratio (NBR)",
+    "description": "Computes NBR spectral index.",
+    "visible": True,
+    "standalone": True,
+    "compatible_input_datasets": ["sentinel-2-l2a", "sentinel-2-l2a-ard"],
+    "inputs": {
+        "stac_collection": {
+            "type": "string",
+            "required": False,
+            "default": "sentinel-2-l2a",
+            "description": "The STAC collection to use.",
+            "options": [
+                {
+                    "label": "Sentinel 2 L2A",
+                    "value": "sentinel-2-l2a",
+                },
+                {
+                    "label": "Sentinel 2 ARD",
+                    "value": "sentinel-2-l2a-ard",
+                },
+            ],
+        },
+        "date_start": {
+            "type": "datetime",
+            "required": False,
+            "description": "The start date and time to use for item filtering. Must be RFC3339 compliant.",
+        },
+        "date_end": {
+            "type": "datetime",
+            "required": False,
+            "description": "The end date and time to use for item filtering. Must be RFC3339 compliant.",
+        },
+        "aoi": {
+            "type": "polygon",
+            "required": True,
+            "description": "The Area of Interest as GeoJSON (polygon).",
+        },
+    },
+    "outputs": {
+        "collection": {
+            "type": "stac_collection",
+            "description": "STAC collection with results.",
+        },
+    },
+}
 DOC_FUNCTION_SPEC = {
     "identifier": "doc",
     "name": "Dissolved Organic Compounds Index (DOC)",
@@ -510,6 +557,7 @@ FUNCTIONS = [
     EVI_FUNCTION_SPEC,
     SAVI_FUNCTION_SPEC,
     NDWI_FUNCTION_SPEC,
+    NBR_FUNCTION_SPEC,
     DOC_FUNCTION_SPEC,
     CDOM_FUNCTION_SPEC,
     CYA_FUNCTION_SPEC,
@@ -523,6 +571,7 @@ FUNCTION_IDENTIFIER_TO_WORKFLOW_MAPPING = {
     "evi": "raster-calculate-evi",
     "ndvi": "raster-calculate-ndvi",
     "ndwi": "raster-calculate-ndwi",
+    "nbr": "raster-calculate-nbr",
     "savi": "raster-calculate-savi",
     "cdom": "raster-calculate-cdom",
     "doc": "raster-calculate-doc",
@@ -548,6 +597,7 @@ WORKFLOW_REGISTRY = {
     "raster-calculate-evi": {"cwl_href": _RASTER_CALCULATE_CWL},
     "raster-calculate-ndvi": {"cwl_href": _RASTER_CALCULATE_CWL},
     "raster-calculate-ndwi": {"cwl_href": _RASTER_CALCULATE_CWL},
+    "raster-calculate-nbr": {"cwl_href": _RASTER_CALCULATE_CWL},
     "raster-calculate-savi": {"cwl_href": _RASTER_CALCULATE_CWL},
     "raster-calculate-cdom": {"cwl_href": _RASTER_CALCULATE_CWL},
     "raster-calculate-doc": {"cwl_href": _RASTER_CALCULATE_CWL},
@@ -566,6 +616,7 @@ WORKFLOW_REGISTRY = {
     "scatter-raster-calculate-evi": {"cwl_href": _SCATTER_RASTER_CALCULATE_CWL},
     "scatter-raster-calculate-ndvi": {"cwl_href": _SCATTER_RASTER_CALCULATE_CWL},
     "scatter-raster-calculate-ndwi": {"cwl_href": _SCATTER_RASTER_CALCULATE_CWL},
+    "scatter-raster-calculate-nbr": {"cwl_href": _SCATTER_RASTER_CALCULATE_CWL},
     "scatter-raster-calculate-savi": {"cwl_href": _SCATTER_RASTER_CALCULATE_CWL},
     "scatter-raster-calculate-cdom": {"cwl_href": _SCATTER_RASTER_CALCULATE_CWL},
     "scatter-raster-calculate-doc": {"cwl_href": _SCATTER_RASTER_CALCULATE_CWL},
