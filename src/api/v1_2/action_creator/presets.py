@@ -155,7 +155,7 @@ NBR_PRESET_SPEC = {
             "identifier": "nbr",
             "order": 0,
             "inputs": {
-                "stac_collection": "sentinel-2-l2a",
+                "stac_collection": "sentinel-2-l2a-ard",
                 "date_start": "2023-01-01T00:00:00Z",
                 "date_end": "2024-12-31T23:59:59Z",
                 "aoi": KIELDER_WATER_AOI,
