@@ -333,7 +333,76 @@ WATER_QUALITY_PRESET: dict[str, Any] = {
     "workflow": WATER_QUALITY_WORKFLOW_SPEC,
 }
 
-PRESETS = [LULC_CHANGE_PRESET, WATER_QUALITY_PRESET]
+NBR_WORKFLOW_SPEC: dict[str, Any] = {
+    "identifier": "nbr-wf",
+    "inputs": {
+        "area": KIELDER_WATER_AOI,
+        "dataset": "sentinel-2-l2a",
+        "date_start": "2024-03-01",
+        "date_end": "2024-10-10",
+    },
+    "outputs": {"results": {"name": "results", "type": "directory"}},
+    "functions": {
+        "query": {
+            "identifier": "s2-ds-query",
+            "inputs": {
+                "area": {"$type": "ref", "value": ["inputs", "area"]},
+                "stac_collection": {"$type": "ref", "value": ["inputs", "dataset"]},
+                "date_start": {"$type": "ref", "value": ["inputs", "date_start"]},
+                "date_end": {"$type": "ref", "value": ["inputs", "date_end"]},
+                "clip": {"$type": "atom", "value": True},
+                "limit": {"$type": "atom", "value": 10},
+                "cloud_cover_min": {"$type": "atom", "value": 0},
+                "cloud_cover_max": {"$type": "atom", "value": 100},
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "nbr": {
+            "identifier": "nbr",
+            "inputs": {
+                "data_dir": {
+                    "$type": "ref",
+                    "value": ["functions", "query", "outputs", "results"],
+                },
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "reproject": {
+            "identifier": "reproject",
+            "inputs": {
+                "data_dir": {
+                    "$type": "ref",
+                    "value": ["functions", "nbr", "outputs", "results"],
+                },
+                "epsg": {"$type": "atom", "value": "EPSG:3857"},
+            },
+            "outputs": {"results": {"name": "results", "type": "directory"}},
+        },
+        "thumbnail": {
+            "identifier": "thumbnail",
+            "inputs": {
+                "data_dir": {
+                    "$type": "ref",
+                    "value": ["functions", "reproject", "outputs", "results"],
+                },
+            },
+            "outputs": {
+                "results": {"$type": "ref", "value": ["outputs", "results"]},
+            },
+        },
+    },
+}
+NBR_PRESET: dict[str, Any] = {
+    "identifier": "nbr",
+    "name": "Normalized Burn Ratio (NBR)",
+    "description": "Calculates the Normalized Burn Ratio (NBR) to identify burned areas and assess burn severity "
+    "using near-infrared and shortwave-infrared satellite imagery.",
+    "thumbnail_b64": _load_base_64_thumbnail("raster-calculate"),
+    "disabled": False,
+    "workflow": NBR_WORKFLOW_SPEC,
+}
+
+PRESETS = [LULC_CHANGE_PRESET, WATER_QUALITY_PRESET, NBR_PRESET]
 PRESET_LOOKUP = {p["identifier"]: p for p in PRESETS}
 
 SIMPLEST_NDVI_WORKFLOW_SPEC: dict[str, Any] = {

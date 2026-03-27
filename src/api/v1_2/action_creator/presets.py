@@ -141,9 +141,39 @@ NDVI_CLIP_PRESET = {
     },
 }
 
+NBR_PRESET_SPEC = {
+    "identifier": "nbr",
+    "name": "Normalized Burn Ratio (NBR)",
+    "description": "Calculates the Normalized Burn Ratio (NBR) to identify burned areas and assess burn severity "
+    "using near-infrared and shortwave-infrared satellite imagery.",
+    "thumbnail_b64": _load_base_64_thumbnail("raster-calculate"),
+    "cwl_href": "https://raw.githubusercontent.com/EO-DataHub/eodh-workflows/main/cwl_files/raster-calculate-app.cwl",
+    "visible": True,
+    "disabled": False,
+    "workflow": {
+        "nbr": {
+            "identifier": "nbr",
+            "order": 0,
+            "inputs": {
+                "stac_collection": "sentinel-2-l2a",
+                "date_start": "2023-01-01T00:00:00Z",
+                "date_end": "2024-12-31T23:59:59Z",
+                "aoi": KIELDER_WATER_AOI,
+            },
+        },
+        "clip": {
+            "identifier": "clip",
+            "order": 1,
+            "inputs": {
+                "aoi": KIELDER_WATER_AOI,
+            },
+        },
+    },
+}
+
 WATER_QUALITY_PRESET = {
     "workspace": "my-workspace",
     "workflow": WATER_QUALITY_PRESET_SPEC_ARD["workflow"],
 }
 
-PRESETS = [LAND_COVER_CHANGE_DETECTION_PRESET_SPEC, WATER_QUALITY_PRESET_SPEC_ARD]
+PRESETS = [LAND_COVER_CHANGE_DETECTION_PRESET_SPEC, WATER_QUALITY_PRESET_SPEC_ARD, NBR_PRESET_SPEC]
