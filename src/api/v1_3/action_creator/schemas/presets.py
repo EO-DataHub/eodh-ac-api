@@ -337,7 +337,7 @@ NBR_WORKFLOW_SPEC: dict[str, Any] = {
     "identifier": "nbr-wf",
     "inputs": {
         "area": KIELDER_WATER_AOI,
-        "dataset": "sentinel-2-l2a",
+        "dataset": "sentinel-2-l2a-ard",
         "date_start": "2024-03-01",
         "date_end": "2024-10-10",
     },
